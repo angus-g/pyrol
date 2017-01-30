@@ -9,13 +9,20 @@ using namespace ROL;
 %template(StdVectorDouble) ROL::StdVector<double>;
 %include "ROLVector.h"
 
-// A typemap for ROL::Vector input
-%typemap(in) ROL::Vector<double> const&
-{
-  std::cout << "Hello\n";
-  auto ptr = $input;
-  //   $1 = dynamic_cast<ROL::Vector<double>>($input);
-}
+// // A typemap for ROL::Vector input
+// %typemap(in) ROL::Vector<double> const&
+// {
+//   std::cout << "Hello\n";
+
+//  //  $input = $1;
+
+
+//   //  std::cout << "$input = " << $input << "\n";
+//   //  $1 = reinterpret_cast< ROL::MyVector * >($input);
+//   //  std::cout << "$input = " << $1 << "\n";
+//   auto ptr = std::make_shared<ROL::MyVector>(200);
+//   $1 = ptr.get();
+// }
 
 // Apply 'double& tol'
 %apply double& INPUT { double& tol };

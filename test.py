@@ -6,6 +6,7 @@ v = ROL.MyVector(20)
 
 obj = ROL.MyObjective()
 print v
-print obj.value(v, 0.1555)
+
+print obj.valuezz(v, 0.1555)
 
 print v.dimension()
