@@ -14,6 +14,7 @@ namespace ROL
 
   double value(const ROL::Vector<double>& x, double& tol)
   {
+    std::cout << "tol = " << tol << "\n";
     return 0.23254;
   }
 
