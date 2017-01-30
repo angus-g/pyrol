@@ -12,16 +12,14 @@ namespace ROL
     {
     }
 
-  /// Implementation of pure virtual from c++
+  /// Implementation of pure virtual from c++ (ignore in SWIG)
   double value(const ROL::Vector<double>& x, double& tol)
   {
-    // FIXME: call to valuezz instead
-    //    return valuezz(xxx, tol);
-    return 0;
+    return value(dynamic_cast<const ROL::MyVector&>(x), tol);
   }
 
   /// Python/SWIG implementation
-  double valuezz(const ROL::MyVector& x, double& tol)
+  double value(const ROL::MyVector& x, double& tol)
   {
     std::cout << "tol = " << tol << "\n";
     std::cout << "size(x) = " << x.dimension() << "\n";

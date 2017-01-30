@@ -5,24 +5,13 @@
 using namespace ROL;
 %}
 
+// -- ROL::Vector<double> --
+
 %include <ROL_StdVector.hpp>
 %template(StdVectorDouble) ROL::StdVector<double>;
 %include "ROLVector.h"
 
-// // A typemap for ROL::Vector input
-// %typemap(in) ROL::Vector<double> const&
-// {
-//   std::cout << "Hello\n";
-
-//  //  $input = $1;
-
-
-//   //  std::cout << "$input = " << $input << "\n";
-//   //  $1 = reinterpret_cast< ROL::MyVector * >($input);
-//   //  std::cout << "$input = " << $1 << "\n";
-//   auto ptr = std::make_shared<ROL::MyVector>(200);
-//   $1 = ptr.get();
-// }
+// -- ROL::Objective<double> --
 
 // Apply 'double& tol'
 %apply double& INPUT { double& tol };
@@ -30,4 +19,10 @@ using namespace ROL;
 %feature("notabstract") MyObjective;
 %include <ROL_Objective.hpp>
 %template(ObjectiveDouble) ROL::Objective<double>;
+%ignore ObjectiveDouble::value(const ROL::Vector<double>& x, double& tol);
+
 %include "ROLObjective.h"
+
+// -- ROL::Algorithm<double> --
+ //
+ // TODO
