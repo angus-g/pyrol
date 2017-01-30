@@ -9,8 +9,8 @@ namespace ROL
   public:
 
   MyObjective()
-    {
-    }
+  {
+  }
 
   /// Implementation of pure virtual from c++ (ignore in SWIG)
   double value(const ROL::Vector<double>& x, double& tol)

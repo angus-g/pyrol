@@ -7,7 +7,9 @@ using namespace ROL;
 
 // -- ROL::Vector<double> --
 
+%include <ROL_Vector.hpp>
 %include <ROL_StdVector.hpp>
+%template(VectorDouble) ROL::Vector<double>;
 %template(StdVectorDouble) ROL::StdVector<double>;
 %include "ROLVector.h"
 
