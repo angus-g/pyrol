@@ -11,6 +11,8 @@ PYBIND11_PLUGIN(ROL)
 {
   py::module m("ROL", "pybind11 ROL plugin");
 
+  py::class_<ROL::Vector<double>>(m, "Vector");
+
   // ROL::StdVector<double>
   //
   py::class_<ROL::StdVector<double>>(m, "StdVector")
@@ -35,10 +37,11 @@ PYBIND11_PLUGIN(ROL)
          [](ROL::Algorithm<double> &instance, const std::string& str, const std::map<std::string, std::string>& params)
          {
            Teuchos::ParameterList parlist;
-    parlist.sublist("Step").sublist("Line Search").sublist("Descent Method").set("Type", "Newton-Krylov");
-    parlist.sublist("Status Test").set("Gradient Tolerance",1.e-12);
-    parlist.sublist("Status Test").set("Step Tolerance",1.e-14);
-    parlist.sublist("Status Test").set("Iteration Limit",100);
+           parlist.sublist("Step").sublist("Line Search")
+             .sublist("Descent Method").set("Type", "Newton-Krylov");
+           parlist.sublist("Status Test").set("Gradient Tolerance",1.e-12);
+           parlist.sublist("Status Test").set("Step Tolerance",1.e-14);
+           parlist.sublist("Status Test").set("Iteration Limit",100);
 
            new (&instance) ROL::Algorithm<double>(str, parlist);
          })
