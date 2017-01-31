@@ -1,5 +1,6 @@
 
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 namespace py = pybind11;
 
 #include <ROL_StdVector.hpp>
@@ -30,7 +31,12 @@ PYBIND11_PLUGIN(ROL)
   // ROL::Algorithm<double>
   //
   py::class_<ROL::Algorithm<double>>(m, "Algorithm")
-    .def(py::init<const std::string&, Teuchos::ParameterList&>());
+    .def("__init__",
+         [](ROL::Algorithm<double> &instance, const std::string& str, const std::map<std::string, std::string>& params)
+         {
+           Teuchos::ParameterList param_list;
+           new (&instance) ROL::Algorithm<double>(str, param_list);
+         });
 
   return m.ptr();
 }

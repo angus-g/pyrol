@@ -10,7 +10,10 @@ class GreatObjective(ROL.Objective):
         pass
     def value(self, x, tol):
         print x, tol
-        print x.norm()
+        return x.norm()
 
 w = GreatObjective()
 print w.value(v, 0.1)
+
+algo = ROL.Algorithm("work", {'example':'param'})
+print algo
