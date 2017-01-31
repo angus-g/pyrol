@@ -16,7 +16,7 @@ PYBIND11_PLUGIN(ROL)
   py::class_<ROL::StdVector<double>>(m, "StdVector")
     .def("__init__",
          [](ROL::StdVector<double> &instance, int n) {
-           Teuchos::RCP<std::vector<double>> tp = Teuchos::rcp<std::vector<double>>(new std::vector<double>(n));
+           Teuchos::RCP<std::vector<double>> tp = Teuchos::rcp<std::vector<double>>(new std::vector<double>(n, 1.0));
            new (&instance) ROL::StdVector<double>(tp);
          })
     .def("norm", &ROL::StdVector<double>::norm)
@@ -34,9 +34,15 @@ PYBIND11_PLUGIN(ROL)
     .def("__init__",
          [](ROL::Algorithm<double> &instance, const std::string& str, const std::map<std::string, std::string>& params)
          {
-           Teuchos::ParameterList param_list;
-           new (&instance) ROL::Algorithm<double>(str, param_list);
-         });
+           Teuchos::ParameterList parlist;
+    parlist.sublist("Step").sublist("Line Search").sublist("Descent Method").set("Type", "Newton-Krylov");
+    parlist.sublist("Status Test").set("Gradient Tolerance",1.e-12);
+    parlist.sublist("Status Test").set("Step Tolerance",1.e-14);
+    parlist.sublist("Status Test").set("Iteration Limit",100);
+
+           new (&instance) ROL::Algorithm<double>(str, parlist);
+         })
+    .def("run", (std::vector<std::string> (ROL::Algorithm<double>::*)(ROL::Vector<double>&, ROL::Objective<double>&, bool, std::ostream&)) &ROL::Algorithm<double>::run);
 
   return m.ptr();
 }

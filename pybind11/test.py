@@ -15,5 +15,7 @@ class GreatObjective(ROL.Objective):
 w = GreatObjective()
 print w.value(v, 0.1)
 
-algo = ROL.Algorithm("work", {'example':'param'})
+algo = ROL.Algorithm("Line Search", {'example':'param'})
 print algo
+
+algo.run(v, w)
