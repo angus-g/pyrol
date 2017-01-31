@@ -1,14 +1,15 @@
 %module ROL
 %{
 #include "ROLVector.h"
-#include "ROLObjective.h"
+#include <ROL_Objective.hpp>
 #include <ROL_Algorithm.hpp>
 using namespace ROL;
 %}
 
 %include "exception.i"
+%include "std_string.i"
 
-// Typemap to convert a sequence to a Teuchos pointer to std::vector double
+// Typemap to convert a sequence to a Teuchos pointer to std::vector<double>
 %typemap(in) Teuchos::RCP<std::vector<double>> const&
 (Teuchos::RCP<std::vector<double>> tmp_ptr)
 {
@@ -56,14 +57,29 @@ using namespace ROL;
 // Apply 'double& tol'
 %apply double& INPUT { double& tol };
 
-%feature("notabstract") MyObjective;
 %include <ROL_Objective.hpp>
 %template(ObjectiveDouble) ROL::Objective<double>;
-%ignore MyObjective::value(const ROL::Vector<double>& x, double& tol);
-
-%include "ROLObjective.h"
 
 // -- ROL::Algorithm<double> --
+
+%typemap(in) Teuchos::ParameterList&
+(Teuchos::ParameterList parlist)
+{
+  // Need to create Parameterlist from python input, somehow.
+
+  parlist.sublist("Step").sublist("Line Search").sublist("Descent Method").set("Type", "Newton-Krylov");
+  parlist.sublist("Status Test").set("Gradient Tolerance",1.e-12);
+  parlist.sublist("Status Test").set("Step Tolerance",1.e-14);
+  parlist.sublist("Status Test").set("Iteration Limit",100);
+
+  $1 = &parlist;
+}
+
+%typemap(typecheck) Teuchos::ParameterList&
+{
+  // Always pass as true... FIXME
+  $1 = 1;
+}
 
 %include <ROL_Algorithm.hpp>
 %template(AlgorithmDouble) ROL::Algorithm<double>;
