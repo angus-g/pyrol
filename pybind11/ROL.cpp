@@ -6,7 +6,65 @@ namespace py = pybind11;
 #include <ROL_StdVector.hpp>
 #include <ROL_Objective.hpp>
 #include <ROL_Algorithm.hpp>
+#include <Eigen/Core>
 
+class EigenVector : public ROL::Vector<double>
+{
+	private:
+		std::shared_ptr<Eigen::VectorXd> _vec;
+	public:
+		EigenVector(int size)
+		{
+			_vec = std::make_shared<Eigen::VectorXd>(size);
+		}
+
+		EigenVector(std::shared_ptr<Eigen::VectorXd> vec)
+		{
+			_vec = vec;
+		}
+
+		virtual void plus(const ROL::Vector<double>& x)
+		{
+			//  std::cout << "plus-" << xx._vec->str(false) << " ";
+			const EigenVector& xx = Teuchos::dyn_cast<const EigenVector>(x);
+			*_vec += *(xx._vec);
+			//*_vec += *(xx._vec);
+		}
+
+		virtual void scale(const double alpha)
+		{
+			// std::cout << "scale-";
+			*_vec *= alpha; 
+		}
+
+		virtual double dot(const ROL::Vector<double> &x) const
+		{
+			//       std::cout << "dot-";
+			const EigenVector& xx = Teuchos::dyn_cast<const EigenVector>(x);
+			return _vec->dot(*(xx._vec));
+		}
+		/// Return L2 norm of ROLVector
+		virtual double norm() const
+		{
+			//      std::cout << "norm\n";
+			return _vec->norm();
+		}
+
+		virtual int dimension() const {
+			return _vec->size();
+		}
+
+		virtual Teuchos::RCP<ROL::Vector<double>> clone() const
+		{
+			//      std::cout << "clone\n";
+			auto new_vec = Teuchos::rcp(new EigenVector(std::make_shared<Eigen::VectorXd>(*_vec)));
+			return new_vec;
+		}
+
+		std::shared_ptr<Eigen::VectorXd> getVector() {
+			return _vec;
+		}
+};
 
 class PyObjective : public ROL::Objective<double>
 {
@@ -75,6 +133,41 @@ PYBIND11_PLUGIN(ROL)
 	  }
 	)
 	.def("scale", &ROL::StdVector<double>::scale);
+
+  // EigenVector
+  //
+  py::class_<EigenVector, ROL::Vector<double>>(m, "EigenVector")
+    .def("__init__",
+         [](EigenVector &instance, int n) {
+           new (&instance) EigenVector(n);
+         })
+	.def("norm", &EigenVector::norm)
+	.def("dimension", &EigenVector::dimension)
+	.def("__setitem__", [](EigenVector &vec, const int& idx, const double& val)
+	  {
+	  auto vvec = vec.getVector();
+		if(idx >= vvec->size())
+		{
+		  throw py::index_error();
+		}else
+		{
+		  (*vvec)[idx] = val;
+		}
+	  }
+	)
+	.def("__getitem__", [](EigenVector &vec, const int& idx)
+	  {
+	  auto vvec = vec.getVector();
+		if(idx >= vvec->size())
+		{
+		  throw py::index_error();
+		}else
+		{
+		  return (*vvec)[idx];
+		}
+	  }
+	)
+	.def("scale", &EigenVector::scale);
 
   // ROL::Objective<double>
   //

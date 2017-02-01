@@ -20,7 +20,7 @@ find_package(PythonLibs)
 find_package(MPI)
 
 #Bring the headers, such as Student.h into the project
-include_directories(pybind11/include ${PYTHON_INCLUDE_DIRS} ${ROL_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH})
+include_directories(pybind11/include eigen/ ${PYTHON_INCLUDE_DIRS} ${ROL_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH})
 
 add_compile_options(-std=c++11 -g)
 

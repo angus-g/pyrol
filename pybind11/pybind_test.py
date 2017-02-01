@@ -1,17 +1,4 @@
 import ROL
-vec = ROL.StdVector(2)
-# for v in vec:
-#     print v
-
-# print vec.norm()
-vec[0] = 0.0
-vec[1] = 0.0
-# for v in vec:
-#     print v
-# for v in vec:
-#     print v
-# print vec.norm()
-
 class MyObj(ROL.Objective):
     def __init__(self):
         ROL.Objective.__init__(self)
@@ -22,20 +9,27 @@ class MyObj(ROL.Objective):
     def gradient(self, g, x, tol):
         g[0] = 2 * (x[0] - 1)
         g[1] = 2 * x[1]
-
 obj = MyObj()
-print(obj.value(vec, 0))
-g = ROL.StdVector(2)
-g[0] = 0.0
-g[1] = 0.0
-obj.gradient(g, vec, 0.001)
-
-print(vec[0])
-print(vec[1])
 algo = ROL.Algorithm("Line Search", {"test":"test"})
-algo.run(vec, obj)
-print(vec[0])
-print(vec[1])
 
-# print(g[0])
-# print(g[1])
+x = ROL.StdVector(2)
+x[0] = -1.0
+x[1] = 2.0
+
+print(x[0])
+print(x[1])
+algo.run(x, obj)
+print(x[0])
+print(x[1])
+
+
+_x = ROL.EigenVector(2)
+_x[0] = -1.0
+_x[1] = 2.0
+
+print(_x[0])
+print(_x[1])
+algo = ROL.Algorithm("Line Search", {"test":"test"})
+algo.run(_x, obj)
+print(_x[0])
+print(_x[1])
