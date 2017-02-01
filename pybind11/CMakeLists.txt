@@ -22,7 +22,7 @@ find_package(MPI)
 #Bring the headers, such as Student.h into the project
 include_directories(pybind11/include ${PYTHON_INCLUDE_DIRS} ${ROL_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH})
 
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++11 -g)
 
 #Generate the shared library from the sources
 add_library(ROL MODULE ROL.cpp)
