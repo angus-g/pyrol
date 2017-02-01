@@ -18,4 +18,4 @@ print w.value(v, 0.1)
 algo = ROL.Algorithm("Line Search", {'example':'param'})
 print algo
 
-algo.run(v, w)
+algo.run(v, w, True, 0)

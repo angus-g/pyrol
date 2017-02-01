@@ -1,4 +1,4 @@
-%module ROL
+%module(directors="1") ROL
 %{
 #include "ROLVector.h"
 #include <ROL_Objective.hpp>
@@ -57,6 +57,8 @@ using namespace ROL;
 // Apply 'double& tol'
 %apply double& INPUT { double& tol };
 
+%feature("director") ROL::Objective<double>;
+
 %include <ROL_Objective.hpp>
 %template(ObjectiveDouble) ROL::Objective<double>;
 
@@ -76,6 +78,18 @@ using namespace ROL;
 }
 
 %typemap(typecheck) Teuchos::ParameterList&
+{
+  // Always pass as true... FIXME
+  $1 = 1;
+}
+
+%typemap(typecheck, precedence=SWIG_TYPECHECK_POINTER) ROL::Vector< double > &
+{
+  // Always pass as true... FIXME
+  $1 = 1;
+}
+
+%typemap(typecheck, precedence=SWIG_TYPECHECK_POINTER) ROL::Objective<double>&
 {
   // Always pass as true... FIXME
   $1 = 1;

@@ -15,7 +15,7 @@ PYBIND11_PLUGIN(ROL)
 
   // ROL::StdVector<double>
   //
-  py::class_<ROL::StdVector<double>>(m, "StdVector")
+  py::class_<ROL::StdVector<double>, ROL::Vector<double>>(m, "StdVector")
     .def("__init__",
          [](ROL::StdVector<double> &instance, int n) {
            Teuchos::RCP<std::vector<double>> tp = Teuchos::rcp<std::vector<double>>(new std::vector<double>(n, 1.0));
