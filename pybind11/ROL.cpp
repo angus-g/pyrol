@@ -91,14 +91,18 @@ PYBIND11_PLUGIN(ROL)
          {
            Teuchos::ParameterList parlist;
            parlist.sublist("Step").sublist("Line Search")
-             .sublist("Descent Method").set("Type", "Newton-Krylov");
+             .sublist("Descent Method").set("Type", "Quasi-Newton Method");
            parlist.sublist("Status Test").set("Gradient Tolerance",1.e-12);
            parlist.sublist("Status Test").set("Step Tolerance",1.e-14);
            parlist.sublist("Status Test").set("Iteration Limit",100);
 
            new (&instance) ROL::Algorithm<double>(str, parlist);
          })
-    .def("run", (std::vector<std::string> (ROL::Algorithm<double>::*)(ROL::Vector<double>&, ROL::Objective<double>&, bool, std::ostream&)) &ROL::Algorithm<double>::run);
+    //.def("run", (std::vector<std::string> (ROL::Algorithm<double>::*)(ROL::Vector<double>&, ROL::Objective<double>&, bool, std::ostream&)) &ROL::Algorithm<double>::run);
+    .def("run", [](ROL::Algorithm<double> &instance, ROL::Vector<double>& x, ROL::Objective<double>& obj)
+	  {
+	    instance.run(x, obj, true, std::cout);
+	  });
 
   return m.ptr();
 }
