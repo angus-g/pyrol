@@ -82,17 +82,17 @@ using namespace ROL;
   $1 = 1;
 }
 
-//%typemap(typecheck) ROL::Vector< double > &
-//{
-//  // Always pass as true... FIXME
-//  $1 = 1;
-//}
-
-//%typemap(typecheck) ROL::Objective<double>&
-//{
+%typemap(typecheck, precedence=SWIG_TYPECHECK_POINTER) ROL::Vector< double > &
+{
   // Always pass as true... FIXME
-//  $1 = 1;
-//}
+  $1 = 1;
+}
+
+%typemap(typecheck, precedence=SWIG_TYPECHECK_POINTER) ROL::Objective<double>&
+{
+  // Always pass as true... FIXME
+  $1 = 1;
+}
 
 %include <ROL_Algorithm.hpp>
 %template(AlgorithmDouble) ROL::Algorithm<double>;
