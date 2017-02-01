@@ -3,11 +3,6 @@ import ROL
 
 print dir(ROL)
 
-v = ROL.MyVector(200)
-print v, dir(v)
-
-print v.dimension()
-
 class GreatObjective(ROL.ObjectiveDouble):
     def __init__(self):
         pass
@@ -16,13 +11,13 @@ class GreatObjective(ROL.ObjectiveDouble):
         return vec.norm()
 
 obj = GreatObjective()
-v = ROL.StdVectorDouble([1,2])
+v = ROL.StdVectorDouble([1, 2, 3, 5])
 print obj, dir(obj)
-print obj.value(v, 0.1555)
+print obj.value(v, 1e-6)
 
-vdot = ROL.StdVectorDouble([0,0])
+vdot = ROL.StdVectorDouble([0, 0, 0, 0])
 
-print obj.gradient(v, vdot, 0.01)
+# print obj.gradient(v, vdot, 0.01)
 
 
 print v.norm()

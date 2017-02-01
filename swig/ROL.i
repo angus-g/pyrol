@@ -57,6 +57,7 @@ using namespace ROL;
 // Apply 'double& tol'
 %apply double& INPUT { double& tol };
 
+%feature("director") ROL::Objective<double>;
 %include <ROL_Objective.hpp>
 %template(ObjectiveDouble) ROL::Objective<double>;
 
@@ -80,6 +81,18 @@ using namespace ROL;
   // Always pass as true... FIXME
   $1 = 1;
 }
+
+//%typemap(typecheck) ROL::Vector< double > &
+//{
+//  // Always pass as true... FIXME
+//  $1 = 1;
+//}
+
+//%typemap(typecheck) ROL::Objective<double>&
+//{
+  // Always pass as true... FIXME
+//  $1 = 1;
+//}
 
 %include <ROL_Algorithm.hpp>
 %template(AlgorithmDouble) ROL::Algorithm<double>;
