@@ -1,6 +1,7 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/numpy.h>
 namespace py = pybind11;
 
 #include <ROL_StdVector.hpp>
@@ -79,11 +80,9 @@ PYBIND11_PLUGIN(ROL)
 
   // EigenVector
   //
-  py::class_<EigenVector, ROL::Vector<double>>(m, "EigenVector")
-    .def("__init__",
-         [](EigenVector &instance, int n) {
-           new (&instance) EigenVector(n);
-         })
+  py::class_<EigenVector, ROL::Vector<double>>(m, "EigenVector", py::buffer_protocol())
+	.def(py::init<const int>())
+	.def(py::init<const py::array_t<double>>())
 	.def("norm", &EigenVector::norm)
 	.def("dimension", &EigenVector::dimension)
 	.def("__setitem__", [](EigenVector &vec, const int& idx, const double& val)
