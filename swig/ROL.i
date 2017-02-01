@@ -57,9 +57,10 @@ using namespace ROL;
 // Apply 'double& tol'
 %apply double& INPUT { double& tol };
 
+%feature("director") ROL::Objective<double>;
+
 %include <ROL_Objective.hpp>
 %template(ObjectiveDouble) ROL::Objective<double>;
-%feature("director") ROL::Objective<double>;
 
 // -- ROL::Algorithm<double> --
 
