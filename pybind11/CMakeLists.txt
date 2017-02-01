@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(ROL)
 set(CMAKE_BUILD_TYPE Release)
-
+SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 message(STATUS "Checking for Trilinos")
 find_package(Trilinos PATHS ${TRILINOS_DIR} ${Trilinos_DIR}
@@ -25,6 +25,6 @@ include_directories(pybind11/include ${PYTHON_INCLUDE_DIRS} ${ROL_INCLUDE_DIRS} 
 add_compile_options(-std=c++11)
 
 #Generate the shared library from the sources
-add_library(ROL SHARED ROL.cpp)
-target_link_libraries(ROL ${MPI_LIBRARY} ${ROL_LIBRARIES})
+add_library(ROL MODULE ROL.cpp)
+target_link_libraries(ROL ${MPI_LIBRARY} ${ROL_LIBRARIES} ${PYTHON_LIBRARY})
 set_target_properties(ROL PROPERTIES PREFIX "")
