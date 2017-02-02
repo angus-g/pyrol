@@ -3,6 +3,7 @@
 #include <pybind11/stl.h>
 namespace py = pybind11;
 
+#include <Teuchos_XMLParameterListHelpers.hpp>
 #include <ROL_StdVector.hpp>
 #include <ROL_Objective.hpp>
 #include <ROL_Algorithm.hpp>
@@ -123,16 +124,12 @@ PYBIND11_PLUGIN(ROL)
   //
   py::class_<ROL::Algorithm<double>>(m, "Algorithm")
     .def("__init__",
-         [](ROL::Algorithm<double> &instance, const std::string& str, const std::map<std::string, std::string>& params)
+         [](ROL::Algorithm<double> &instance, const std::string& str, const std::string& xml_params)
          {
-           Teuchos::ParameterList parlist;
-           parlist.sublist("Step").sublist("Line Search")
-             .sublist("Descent Method").set("Type", "Quasi-Newton Method");
-           parlist.sublist("Status Test").set("Gradient Tolerance",1.e-12);
-           parlist.sublist("Status Test").set("Step Tolerance",1.e-14);
-           parlist.sublist("Status Test").set("Iteration Limit",100);
+           Teuchos::RCP<Teuchos::ParameterList> params =
+             Teuchos::getParametersFromXmlString(xml_params);
 
-           new (&instance) ROL::Algorithm<double>(str, parlist);
+           new (&instance) ROL::Algorithm<double>(str, *params);
          })
     //.def("run", (std::vector<std::string> (ROL::Algorithm<double>::*)(ROL::Vector<double>&, ROL::Objective<double>&, bool, std::ostream&)) &ROL::Algorithm<double>::run);
     .def("run", [](ROL::Algorithm<double> &instance, ROL::Vector<double>& x, ROL::Objective<double>& obj)
