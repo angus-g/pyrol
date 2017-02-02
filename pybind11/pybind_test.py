@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import ROL
 class MyObj(ROL.Objective):
     def __init__(self):
@@ -5,7 +7,7 @@ class MyObj(ROL.Objective):
 
     def value(self, x, tol):
         return (x[0] - 1)**2 + x[1]**2
-    
+
     def gradient(self, g, x, tol):
         g[0] = 2 * (x[0] - 1)
         g[1] = 2 * x[1]

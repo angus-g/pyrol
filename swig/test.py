@@ -17,12 +17,14 @@ print obj.value(v, 1e-6)
 
 vdot = ROL.StdVectorDouble([0, 0, 0, 0])
 
-print obj.gradient(v, vdot, 0.01)
+# print obj.gradient(v, vdot, 0.01)
 
 
 print v.norm()
 print v.dot(v)
 
-algo = ROL.AlgorithmDouble("hello", {'param':True})
+print v.getVector()
+
+algo = ROL.AlgorithmDouble("Line Search", {'param':True})
 
 algo.run(v, obj)
