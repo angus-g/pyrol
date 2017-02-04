@@ -1,6 +1,7 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/numpy.h>
 namespace py = pybind11;
 
 #include <Teuchos_XMLParameterListHelpers.hpp>
@@ -9,49 +10,25 @@ namespace py = pybind11;
 #include <ROL_Algorithm.hpp>
 
 #include "EigenVector.h"
-
-class PyObjective : public ROL::Objective<double>
-{
-	public:
-		//using ROL::Objective<double>::Objective;
-
-		double value( const ROL::Vector<double> &x, double &tol ) override
-		{
-			py::gil_scoped_acquire gil;
-			pybind11::function overload = py::get_overload(this, "value");
-			if (overload)
-				return overload.operator()<py::return_value_policy::reference>(x, tol).cast<double>();
-			else
-				py::pybind11_fail("Tried to call pure virtual function 'value'.");
-		}
-		void gradient( ROL::Vector<double> &g, const ROL::Vector<double> &x, double &tol ) override
-		{
-			py::gil_scoped_acquire gil;
-			pybind11::function overload = py::get_overload(this, "gradient");
-			if (overload)
-				return overload.operator()<py::return_value_policy::reference>(g, x, tol).cast<void>();
-			else
-				ROL::Objective<double>::gradient(g, x, tol);
-		}
-};
-
+#include "CustomLA.h"
+#include "PyObjective.h"
 
 PYBIND11_PLUGIN(ROL)
 {
   py::module m("ROL", "pybind11 ROL plugin");
-
-  py::class_<ROL::Vector<double>>(m, "Vector");
+  
+  py::class_<ROL::Vector<double>, std::shared_ptr<ROL::Vector<double>>>(m, "Vector");
 
   // ROL::StdVector<double>
   //
-  py::class_<ROL::StdVector<double>, ROL::Vector<double>>(m, "StdVector")
-    .def("__init__",
-         [](ROL::StdVector<double> &instance, int n) {
-           Teuchos::RCP<std::vector<double>> tp = Teuchos::rcp<std::vector<double>>(new std::vector<double>(n, 0.0));
-           new (&instance) ROL::StdVector<double>(tp);
-         })
-    .def("norm", &ROL::StdVector<double>::norm)
-    .def("dimension", &ROL::StdVector<double>::dimension)
+  py::class_<ROL::StdVector<double>, ROL::Vector<double>, std::shared_ptr<ROL::StdVector<double>>>(m, "StdVector")
+	.def("__init__",
+		 [](ROL::StdVector<double> &instance, int n) {
+		   Teuchos::RCP<std::vector<double>> tp = Teuchos::rcp<std::vector<double>>(new std::vector<double>(n, 0.0));
+		   new (&instance) ROL::StdVector<double>(tp);
+		 })
+	.def("norm", &ROL::StdVector<double>::norm)
+	.def("dimension", &ROL::StdVector<double>::dimension)
 	.def("__setitem__", [](ROL::StdVector<double> &vec, const int& idx, const double& val)
 	  {
 	  Teuchos::RCP<std::vector<double>> vvec = vec.getVector();
@@ -60,7 +37,20 @@ PYBIND11_PLUGIN(ROL)
 		  throw py::index_error();
 		}else
 		{
-	      (*vvec)[idx] = val;
+		  (*vvec)[idx] = val;
+		}
+	  }
+	)
+	.def("__getitem__", [](ROL::StdVector<double> &vec, const py::slice& slice)
+	  {
+		Teuchos::RCP<std::vector<double>> vvec = vec.getVector();
+		py::size_t start, stop, step, slicelength;
+		if (!slice.compute((py::size_t)(vvec->size()), &start, &stop, &step, &slicelength))
+		  throw py::error_already_set();
+		auto res = std::make_shared<std::vector<double>>();
+		res->resize(slicelength);
+		for (int i = start; i < stop; i=i+step) {
+		  res->push_back((*vvec)[i]);
 		}
 	  }
 	)
@@ -72,7 +62,7 @@ PYBIND11_PLUGIN(ROL)
 		  throw py::index_error();
 		}else
 		{
-	      return (*vvec)[idx];
+		  return (*vvec)[idx];
 		}
 	  }
 	)
@@ -80,11 +70,9 @@ PYBIND11_PLUGIN(ROL)
 
   // EigenVector
   //
-  py::class_<EigenVector, ROL::Vector<double>>(m, "EigenVector")
-    .def("__init__",
-         [](EigenVector &instance, int n) {
-           new (&instance) EigenVector(n);
-         })
+  py::class_<EigenVector, ROL::Vector<double>, std::shared_ptr<EigenVector>>(m, "EigenVector", py::buffer_protocol())
+	.def(py::init<const int>())
+	.def(py::init<const py::array_t<double>>())
 	.def("norm", &EigenVector::norm)
 	.def("dimension", &EigenVector::dimension)
 	.def("__setitem__", [](EigenVector &vec, const int& idx, const double& val)
@@ -113,6 +101,19 @@ PYBIND11_PLUGIN(ROL)
 	)
 	.def("scale", &EigenVector::scale);
 
+  py::class_<CustomLA, ROL::Vector<double>, std::shared_ptr<CustomLA>>(m, "CustomLA")
+  //py::class_<CustomLA, std::shared_ptr<CustomLA>>(m, "CustomLA")
+	.def(py::init<>())
+	//.def("dimension", &EigenVector::dimension)
+	.def("clone", &CustomLA::clone)
+	.def("norm", &CustomLA::norm)
+	.def("checkVector", [](std::shared_ptr<CustomLA>& x, std::shared_ptr<CustomLA>& y, std::shared_ptr<CustomLA>& z)
+	  {
+	    x->checkVector(*y, *z, true, std::cout);
+	  })
+    .def("cppScale", &CustomLA::scale)
+    .def("cppClone", &CustomLA::clone);
+
   // ROL::Objective<double>
   //
   py::class_<ROL::Objective<double>, PyObjective> objective(m, "Objective");
@@ -131,7 +132,6 @@ PYBIND11_PLUGIN(ROL)
 
            new (&instance) ROL::Algorithm<double>(str, *params);
          })
-    //.def("run", (std::vector<std::string> (ROL::Algorithm<double>::*)(ROL::Vector<double>&, ROL::Objective<double>&, bool, std::ostream&)) &ROL::Algorithm<double>::run);
     .def("run", [](ROL::Algorithm<double> &instance, ROL::Vector<double>& x, ROL::Objective<double>& obj)
 	  {
 	    instance.run(x, obj, true, std::cout);

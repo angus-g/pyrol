@@ -1,4 +1,9 @@
 #include <Eigen/Core>
+#include <ROL_Vector.hpp>
+
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
+namespace py = pybind11;
 
 class EigenVector : public ROL::Vector<double>
 {
@@ -8,6 +13,15 @@ class EigenVector : public ROL::Vector<double>
 		EigenVector(int size)
 		{
 			_vec = std::make_shared<Eigen::VectorXd>(size);
+		}
+
+		EigenVector(py::array_t<double> a)
+		{
+			auto buf = a.request();
+			if(buf.ndim != 1)
+				throw std::runtime_error("Dimension of numpy array must be one.");
+			Eigen::Map<Eigen::VectorXd> m(static_cast<double *>(buf.ptr), buf.shape[0]);
+			_vec = std::make_shared<Eigen::VectorXd>(m);
 		}
 
 		EigenVector(std::shared_ptr<Eigen::VectorXd> vec)
