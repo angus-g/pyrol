@@ -12,7 +12,25 @@ class MyObj(ROL.Objective):
         g[0] = 2 * (x[0] - 1)
         g[1] = 2 * x[1]
 obj = MyObj()
-algo = ROL.Algorithm("Line Search", {"test":"test"})
+
+params = """
+<ParameterList>
+  <ParameterList name="Step">
+    <ParameterList name="Line Search">
+      <ParameterList name="Descent Method">
+        <Parameter name="Type" type="string" value="Quasi-Newton Method"/>
+      </ParameterList>
+    </ParameterList>
+  </ParameterList>
+  <ParameterList name="Status Test">
+    <Parameter name="Gradient Tolerance" type="double" value="1e-12"/>
+    <Parameter name="Step Tolerance" type="double" value="1e-16"/>
+    <Parameter name="Iteration Limit" type="int" value="10"/>
+  </ParameterList>
+</ParameterList>
+"""
+
+algo = ROL.Algorithm("Line Search", params)
 
 import numpy as np
 class dolfin_BasedLA(ROL.CustomLA):
