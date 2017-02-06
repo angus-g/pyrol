@@ -11,13 +11,13 @@ class Objective(ROL.Objective):
     def value(self, x, tol):
         val = 0.0
         n = self.n
-        for i in range(len(x.data)):
+        for i in range(x.data.local_size()):
             val += (x[i] - i)**n
         return val
 
     def gradient(self, g, x, tol):
         n = self.n
-        for i in range(len(x.data)):
+        for i in range(x.data.local_size()):
             g[i] = n*(x[i] - i)**(n-1)
 
 obj = Objective()
