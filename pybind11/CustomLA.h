@@ -88,4 +88,42 @@ class CustomLA : public std::enable_shared_from_this<CustomLA>, public ROL::Vect
 				py::pybind11_fail("Tried to call pure virtual function 'clone'.");
 		}
 
+		virtual double reduce( const ROL::Elementwise::ReductionOp<double> &r ) const {
+			double res = r.initialValue();
+			for (int i = 0; i < this->dimension(); ++i) {
+				r.reduce(this->getitem(i), res);
+			}
+			return res;
+		}
+		void applyBinary( const ROL::Elementwise::BinaryFunction<double> &f, const ROL::Vector<double> &x ) {
+			TEUCHOS_TEST_FOR_EXCEPTION( dimension() != x.dimension(),
+					std::invalid_argument,
+					"Error: Vectors must have the same dimension." );
+
+			const CustomLA & ex = Teuchos::dyn_cast<const CustomLA>(x);
+			for (uint i=0; i<dimension(); i++) {
+				setitem(i, f.apply(getitem(i), ex.getitem(i)));
+			}
+		}
+
+		virtual double getitem(const int& i) const
+		{
+			py::gil_scoped_acquire gil;
+			pybind11::function overload = py::get_overload(this, "__getitem__");
+			if (overload)
+				return overload.operator()<py::return_value_policy::reference>(i).cast<double>();
+			else
+				py::pybind11_fail("Tried to call pure virtual function '__getitem__'.");
+		}
+		virtual void setitem(const int& i, const double& val) const
+		{
+			py::gil_scoped_acquire gil;
+			pybind11::function overload = py::get_overload(this, "__setitem__");
+			if (overload)
+				overload.operator()<py::return_value_policy::reference>(i, val).cast<void>();
+			else
+				py::pybind11_fail("Tried to call pure virtual function '__setitem__'.");
+		}
+
+
 };

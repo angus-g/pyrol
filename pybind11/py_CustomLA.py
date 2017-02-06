@@ -64,7 +64,13 @@ class NPBasedLA(ROL.CustomLA):
         res = NPBasedLA(self.size)
         res.data = np.copy(self.data)
         return res
-
+x_lo = NPBasedLA(2)
+x_lo[0] = -1
+x_lo[1] = -1
+x_up = NPBasedLA(2)
+x_up[0] = +0.7
+x_up[1] = +0.7
+bnd = ROL.BoundConstraint(x_lo, x_up, 1.0)
 x = NPBasedLA(2)
 y = NPBasedLA(2)
 z = NPBasedLA(2)
@@ -73,5 +79,6 @@ x.data[1] = 1.5
 
 x.checkVector(y, z)
 
-algo.run(x, obj)
+# algo.run(x, obj)
+algo.run(x, obj, bnd)
 print x.data

@@ -8,6 +8,8 @@ namespace py = pybind11;
 #include <ROL_StdVector.hpp>
 #include <ROL_Objective.hpp>
 #include <ROL_Algorithm.hpp>
+#include <ROL_BoundConstraint.hpp>
+#include "Teuchos_RCPStdSharedPtrConversions.hpp"
 
 #include "EigenVector.h"
 #include "CustomLA.h"
@@ -135,7 +137,22 @@ PYBIND11_PLUGIN(ROL)
     .def("run", [](ROL::Algorithm<double> &instance, ROL::Vector<double>& x, ROL::Objective<double>& obj)
 	  {
 	    instance.run(x, obj, true, std::cout);
+	  })
+    .def("run", [](ROL::Algorithm<double> &instance, ROL::Vector<double>& x, ROL::Objective<double>& obj, ROL::BoundConstraint<double>& bnd)
+	  {
+	    instance.run(x, obj, bnd, true, std::cout);
 	  });
+
+	// ROL::BoundConstraint
+	//
+	py::class_<ROL::BoundConstraint<double>>(m, "BoundConstraint")
+      .def("__init__",
+	    [](ROL::BoundConstraint<double> &instance, std::shared_ptr<ROL::Vector<double>> x_lo,
+		   std::shared_ptr<ROL::Vector<double>> x_up, double scale)
+		{
+		  new (&instance) ROL::BoundConstraint<double>(Teuchos::rcp(x_lo), Teuchos::rcp(x_up), scale);
+		});
+
 
   return m.ptr();
 }
