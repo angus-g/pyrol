@@ -19,8 +19,21 @@ message(STATUS "Found ROL: " ${ROL_INCLUDE_DIRS})
 find_package(PythonLibs)
 find_package(MPI)
 
+find_path(EIGEN_INCLUDE_DIR NAMES signature_of_eigen3_matrix_library
+  HINTS
+  ${EIGEN_DIR}
+  ENV EIGEN_DIR
+  ENV EIGEN3_ROOT
+  ENV EIGEN3_ROOT_DIR
+  PATHS
+  /usr/include/eigen3
+  ${CMAKE_INSTALL_PREFIX}/include
+  ${KDE4_INCLUDE_DIR}
+  PATH_SUFFIXES eigen3 eigen
+  )
+
 #Bring the headers, such as Student.h into the project
-include_directories(pybind11/include eigen/ ${PYTHON_INCLUDE_DIRS} ${ROL_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH})
+include_directories(pybind11/include ${EIGEN_INCLUDE_DIR} ${PYTHON_INCLUDE_DIRS} ${ROL_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH})
 
 add_compile_options(-std=c++11 -g)
 

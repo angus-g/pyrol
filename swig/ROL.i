@@ -56,9 +56,7 @@ using namespace ROL;
 
 // Apply 'double& tol'
 %apply double& INPUT { double& tol };
-
 %feature("director") ROL::Objective<double>;
-
 %include <ROL_Objective.hpp>
 %template(ObjectiveDouble) ROL::Objective<double>;
 
@@ -83,7 +81,7 @@ using namespace ROL;
   $1 = 1;
 }
 
-%typemap(typecheck, precedence=SWIG_TYPECHECK_POINTER) ROL::Vector< double > &
+%typemap(typecheck, precedence=SWIG_TYPECHECK_POINTER) ROL::Vector<double>&
 {
   // Always pass as true... FIXME
   $1 = 1;
