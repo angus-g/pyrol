@@ -1,17 +1,26 @@
+#!/usr/bin/env python
+from math import cos, pi
 import dolfin
-
 import ROL
-class MyObj(ROL.Objective):
+
+class Objective(ROL.Objective):
     def __init__(self):
         ROL.Objective.__init__(self)
+        self.n = 6.0
 
     def value(self, x, tol):
-        return (x[0] - 1)**2 + x[1]**2
+        val = 0.0
+        n = self.n
+        for i in range(len(x.data)):
+            val += (x[i] - i)**n
+        return val
 
     def gradient(self, g, x, tol):
-        g[0] = 2 * (x[0] - 1)
-        g[1] = 2 * x[1]
-obj = MyObj()
+        n = self.n
+        for i in range(len(x.data)):
+            g[i] = n*(x[i] - i)**(n-1)
+
+obj = Objective()
 
 params = """
 <ParameterList>
@@ -23,16 +32,15 @@ params = """
     </ParameterList>
   </ParameterList>
   <ParameterList name="Status Test">
-    <Parameter name="Gradient Tolerance" type="double" value="1e-12"/>
-    <Parameter name="Step Tolerance" type="double" value="1e-16"/>
-    <Parameter name="Iteration Limit" type="int" value="10"/>
+    <Parameter name="Gradient Tolerance" type="double" value="1e-20"/>
+    <Parameter name="Step Tolerance" type="double" value="1e-20"/>
+    <Parameter name="Iteration Limit" type="int" value="1000"/>
   </ParameterList>
 </ParameterList>
 """
 
 algo = ROL.Algorithm("Line Search", params)
 
-import numpy as np
 class dolfin_BasedLA(ROL.CustomLA):
     def __init__(self, n):
         ROL.CustomLA.__init__(self)
@@ -52,8 +60,10 @@ class dolfin_BasedLA(ROL.CustomLA):
         self.data[i] = v
 
     def dot(self, x):
-        val = self.data.inner(x.data)
-        return val
+        return self.data.inner(x.data)
+
+    def dimension(self):
+        return self.data.size()
 
     def dimension(self):
         return self.size
@@ -64,17 +74,20 @@ class dolfin_BasedLA(ROL.CustomLA):
         return res
 
     def clone(self):
-        res = dolfin_BasedLA(self.data.size())
-        res.data = self.data.copy()
-        return res
+        return dolfin_BasedLA(self.data.size())
+#        res = dolfin_BasedLA(self.data.size())
+#        res.data = self.data.copy()
+#        return res
 
-x = dolfin_BasedLA(2)
-y = dolfin_BasedLA(2)
-z = dolfin_BasedLA(2)
+x = dolfin_BasedLA(20)
+y = dolfin_BasedLA(20)
+z = dolfin_BasedLA(20)
 x.data[0] = 1.0
 x.data[1] = 1.5
 
 x.checkVector(y, z)
 
 algo.run(x, obj)
+import numpy
+numpy.set_printoptions(precision=4, suppress=True)
 print x.data.array()
