@@ -1,18 +1,16 @@
 import ROL
-print "import good"
 from firedrake import *
 
 class FiredrakeLA(ROL.CustomLA):
     def __init__(self, vec, inner):
+        ROL.CustomLA.__init__(self)
         self.data = vec
         self.inner = inner
 
     def plus(self, xx):
-        # pass
         self.data += xx.data
 
     def scale(self, alpha):
-        # print "here"
         self.data *= alpha
 
     def dot(self, xx):
@@ -25,5 +23,12 @@ class FiredrakeLA(ROL.CustomLA):
 mesh = UnitSquareMesh(10, 10)
 V = FunctionSpace(mesh, "CG", 1)
 u = Function(V)
+y = Function(V)
+z = Function(V)
 uvec = u.vector()
+yvec = y.vector()
+zvec = z.vector()
 x = FiredrakeLA(uvec, None)
+y = FiredrakeLA(yvec, None)
+z = FiredrakeLA(zvec, None)
+x.checkVector(y, z)
