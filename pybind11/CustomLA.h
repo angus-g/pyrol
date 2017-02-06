@@ -48,9 +48,30 @@ class CustomLA : public std::enable_shared_from_this<CustomLA>, public ROL::Vect
 			return std::sqrt(this->dot(*this));
 		}
 
-		//virtual int dimension() const {
-		//    return _vec->size();
-		//}
+		virtual int dimension() const {
+			py::gil_scoped_acquire gil;
+			pybind11::function overload = py::get_overload(this, "dimension");
+			if (overload)
+				return overload.operator()<py::return_value_policy::reference>().cast<int>();
+			else
+				py::pybind11_fail("Tried to call pure virtual function 'dimension'.");
+		}
+
+		Teuchos::RCP<ROL::Vector<double>> basis( const int i ) const {
+			if(i >= this->dimension())
+				throw py::index_error();
+			py::gil_scoped_acquire gil;
+			pybind11::function overload = py::get_overload(this, "basis");
+			if (overload)
+			{
+				auto res = overload.operator()<py::return_value_policy::reference>(i);
+				Py_INCREF(res.ptr());
+				return Teuchos::rcp(res.cast<std::shared_ptr<CustomLA>>());
+			}
+			else
+				py::pybind11_fail("Tried to call pure virtual function 'basis'.");
+		}
+
 
 		virtual Teuchos::RCP<ROL::Vector<double>> clone() const
 		{

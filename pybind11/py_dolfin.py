@@ -37,7 +37,7 @@ class dolfin_BasedLA(ROL.CustomLA):
     def __init__(self, n):
         ROL.CustomLA.__init__(self)
         self.data = dolfin.Vector(dolfin.mpi_comm_world(), n)
-        self.clones = []
+        self.size = n
 
     def plus(self, x):
         self.data += x.data
@@ -54,6 +54,14 @@ class dolfin_BasedLA(ROL.CustomLA):
     def dot(self, x):
         val = self.data.inner(x.data)
         return val
+
+    def dimension(self):
+        return self.size
+
+    def basis(self, i):
+        res = dolfin_BasedLA(self.size)
+        res[i] = 1.0
+        return res
 
     def clone(self):
         res = dolfin_BasedLA(self.data.size())

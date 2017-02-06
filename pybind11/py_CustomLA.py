@@ -32,18 +32,16 @@ algo = ROL.Algorithm("Line Search", params)
 
 import numpy as np
 class NPBasedLA(ROL.CustomLA):
-    def __init__(self):
+    def __init__(self, size):
         ROL.CustomLA.__init__(self)
-        self.data = np.asarray([0.0,0.0])
-        self.clones = []
+        self.data = np.zeros(size)
+        self.size = size
 
     def plus(self, xx):
-        self.data[0] += xx.data[0]
-        self.data[1] += xx.data[1]
+        self.data += xx.data
 
     def scale(self, alpha):
-        self.data[0] *= alpha
-        self.data[1] *= alpha
+        self.data *= alpha
 
     def __getitem__(self, i):
         return self.data[i]
@@ -52,17 +50,24 @@ class NPBasedLA(ROL.CustomLA):
         self.data[i] = v
 
     def dot(self, xx):
-        return self.data[0]*xx.data[0]+self.data[1]*xx.data[1]
+        return np.inner(self.data, xx.data)
 
-    def clone(self):
-        res = NPBasedLA()
-        res.data[0] = self.data[0]
-        res.data[1] = self.data[1]
+    def dimension(self):
+        return self.size
+
+    def basis(self, i):
+        res = NPBasedLA(self.size)
+        res[i] = 1.0
         return res
 
-x = NPBasedLA()
-y = NPBasedLA()
-z = NPBasedLA()
+    def clone(self):
+        res = NPBasedLA(self.size)
+        res.data = np.copy(self.data)
+        return res
+
+x = NPBasedLA(2)
+y = NPBasedLA(2)
+z = NPBasedLA(2)
 x.data[0] = 1.0
 x.data[1] = 1.5
 
