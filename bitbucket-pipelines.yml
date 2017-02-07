@@ -13,5 +13,5 @@ pipelines:
           - git clone https://github.com/pybind/pybind11.git
           - cmake -DPYTHON_INCLUDE_DIR=/usr/include/python2.7 .
           - make
-	  - export PYTHONPATH=$PWD
+          - export PYTHONPATH=$PWD
           - py.test -s test
