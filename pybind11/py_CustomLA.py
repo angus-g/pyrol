@@ -28,7 +28,9 @@ params = """
 </ParameterList>
 """
 
-algo = ROL.Algorithm("Line Search", params)
+# algo = ROL.Algorithm("Line Search", params)
+# algo = ROL.Algorithm("Trust Region", params)
+algo = ROL.Algorithm("Primal Dual Active Set", params)
 
 import numpy as np
 class NPBasedLA(ROL.CustomLA):
@@ -74,11 +76,13 @@ bnd = ROL.BoundConstraint(x_lo, x_up, 1.0)
 x = NPBasedLA(2)
 y = NPBasedLA(2)
 z = NPBasedLA(2)
-x.data[0] = 1.0
-x.data[1] = 1.5
+x.data[0] = 0.5
+x.data[1] = 0.5
 
 x.checkVector(y, z)
 
 # algo.run(x, obj)
-algo.run(x, obj, bnd)
+pen = ROL.MoreauYosidaPenalty(obj, bnd, x, 10)
+# algo.run(x, obj, bnd)
+algo.run(x, pen, bnd)
 print x.data

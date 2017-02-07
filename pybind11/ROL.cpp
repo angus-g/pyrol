@@ -118,10 +118,11 @@ PYBIND11_PLUGIN(ROL)
 
   // ROL::Objective<double>
   //
-  py::class_<ROL::Objective<double>, PyObjective> objective(m, "Objective");
+  py::class_<ROL::Objective<double>, PyObjective, std::shared_ptr<ROL::Objective<double>>> objective(m, "Objective");
   objective.def(py::init<>())
     .def("value", &ROL::Objective<double>::value)
-    .def("gradient", &ROL::Objective<double>::gradient);
+    .def("gradient", &ROL::Objective<double>::gradient)
+    .def("update", &ROL::Objective<double>::update);
 
   // ROL::Algorithm<double>
   //
@@ -145,13 +146,25 @@ PYBIND11_PLUGIN(ROL)
 
 	// ROL::BoundConstraint
 	//
-	py::class_<ROL::BoundConstraint<double>>(m, "BoundConstraint")
+	py::class_<ROL::BoundConstraint<double>, std::shared_ptr<ROL::BoundConstraint<double>>>(m, "BoundConstraint")
       .def("__init__",
 	    [](ROL::BoundConstraint<double> &instance, std::shared_ptr<ROL::Vector<double>> x_lo,
 		   std::shared_ptr<ROL::Vector<double>> x_up, double scale)
 		{
 		  new (&instance) ROL::BoundConstraint<double>(Teuchos::rcp(x_lo), Teuchos::rcp(x_up), scale);
 		});
+
+	// ROL::MoreauYosidaPenalty<double>
+	//
+	py::class_<ROL::MoreauYosidaPenalty<double>, ROL::Objective<double>, std::shared_ptr<ROL::MoreauYosidaPenalty<double>>>(m, "MoreauYosidaPenalty")
+	  .def("__init__",
+			  [](ROL::MoreauYosidaPenalty<double> &instance, std::shared_ptr<ROL::Objective<double>> obj,
+				 std::shared_ptr<ROL::BoundConstraint<double>> bnd,
+				 ROL::Vector<double>& x,
+				 const double mu)
+			  {
+			    new (&instance) ROL::MoreauYosidaPenalty<double>(Teuchos::rcp(obj), Teuchos::rcp(bnd), x, mu);
+		      });
 
 
   return m.ptr();

@@ -25,4 +25,13 @@ class PyObjective : public ROL::Objective<double>
 			else
 				ROL::Objective<double>::gradient(g, x, tol);
 		}
+		virtual void update( const ROL::Vector<double> &x, bool flag = true, int iter = -1 ) override
+		{
+			py::gil_scoped_acquire gil;
+			pybind11::function overload = py::get_overload(this, "update");
+			if (overload)
+				return overload.operator()<py::return_value_policy::reference>(x, flag, iter).cast<void>();
+			else
+				ROL::Objective<double>::update(x, flag, iter);
+		}
 };
