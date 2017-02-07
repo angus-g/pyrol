@@ -14,6 +14,7 @@ namespace py = pybind11;
 #include "EigenVector.h"
 #include "CustomLA.h"
 #include "PyObjective.h"
+#include "PyEqualityConstraint.h"
 
 PYBIND11_PLUGIN(ROL)
 {
@@ -166,6 +167,13 @@ PYBIND11_PLUGIN(ROL)
 			    new (&instance) ROL::MoreauYosidaPenalty<double>(Teuchos::rcp(obj), Teuchos::rcp(bnd), x, mu);
 		      });
 
+    // ROL::EqualityConstraint<double>
+	//
+	py::class_<ROL::EqualityConstraint<double>, PyEqualityConstraint, std::shared_ptr<ROL::EqualityConstraint<double>>>(m, "EqualityConstraint")
+	  .def(py::init<>())
+	  .def("value", &ROL::EqualityConstraint<double>::value)
+	  .def("applyJacobian", &ROL::EqualityConstraint<double>::applyJacobian)
+	  .def("applyAdjointJacobian", &ROL::EqualityConstraint<double>::applyAdjointJacobian);
 
   return m.ptr();
 }
