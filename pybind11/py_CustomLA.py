@@ -79,7 +79,10 @@ z = NPBasedLA(2)
 x.data[0] = 0.5
 x.data[1] = 0.5
 
-x.checkVector(y, z)
+u = x.checkVector(y, z)
+
+print u
+
 
 # algo.run(x, obj)
 pen = ROL.MoreauYosidaPenalty(obj, bnd, x, 10)

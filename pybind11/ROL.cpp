@@ -18,7 +18,7 @@ namespace py = pybind11;
 PYBIND11_PLUGIN(ROL)
 {
   py::module m("ROL", "pybind11 ROL plugin");
-  
+
   py::class_<ROL::Vector<double>, std::shared_ptr<ROL::Vector<double>>>(m, "Vector");
 
   // ROL::StdVector<double>
@@ -109,9 +109,9 @@ PYBIND11_PLUGIN(ROL)
 	//.def("dimension", &EigenVector::dimension)
 	.def("clone", &CustomLA::clone)
 	.def("norm", &CustomLA::norm)
-	.def("checkVector", [](std::shared_ptr<CustomLA>& x, std::shared_ptr<CustomLA>& y, std::shared_ptr<CustomLA>& z)
+    .def("checkVector", [](std::shared_ptr<CustomLA>& x, std::shared_ptr<CustomLA>& y, std::shared_ptr<CustomLA>& z)->std::vector<double>
 	  {
-	    x->checkVector(*y, *z, true, std::cout);
+	    return x->checkVector(*y, *z, true, std::cout);
 	  })
     .def("cppScale", &CustomLA::scale)
     .def("cppClone", &CustomLA::clone);
