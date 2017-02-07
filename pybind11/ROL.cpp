@@ -68,7 +68,14 @@ PYBIND11_PLUGIN(ROL)
 		}
 	  }
 	)
-	.def("scale", &ROL::StdVector<double>::scale);
+	.def("scale", &ROL::StdVector<double>::scale)
+        .def("checkVector", [](std::shared_ptr<ROL::StdVector<double>>& x,
+                               std::shared_ptr<ROL::StdVector<double>>& y,
+                               std::shared_ptr<ROL::StdVector<double>>& z)->std::vector<double>
+             {
+               return x->checkVector(*y, *z, true, std::cout);
+             });
+
 
   // EigenVector
   //
@@ -109,7 +116,7 @@ PYBIND11_PLUGIN(ROL)
 	//.def("dimension", &EigenVector::dimension)
 	.def("clone", &CustomLA::clone)
 	.def("norm", &CustomLA::norm)
-    .def("checkVector", [](std::shared_ptr<CustomLA>& x, std::shared_ptr<CustomLA>& y, std::shared_ptr<CustomLA>& z)->std::vector<double>
+        .def("checkVector", [](std::shared_ptr<CustomLA>& x, std::shared_ptr<CustomLA>& y, std::shared_ptr<CustomLA>& z)->std::vector<double>
 	  {
 	    return x->checkVector(*y, *z, true, std::cout);
 	  })

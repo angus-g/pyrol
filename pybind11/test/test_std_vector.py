@@ -15,7 +15,19 @@ class Objective(ROL.Objective):
         g[1] = 2 * x[1]
 obj = Objective()
 
-def test_std_vector():
+def test_std_vector_check():
+    x = ROL.StdVector(2)
+    y = ROL.StdVector(2)
+    z = ROL.StdVector(2)
+
+    x[0] = 1.5
+    x[1] = 0.5
+
+    u = x.checkVector(y, z)
+    assert sum(u) < 1e-12
+
+
+def test_std_vector_run():
 
     params = """
     <ParameterList>
