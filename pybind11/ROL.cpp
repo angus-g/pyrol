@@ -151,6 +151,14 @@ PYBIND11_PLUGIN(ROL)
     .def("run", [](ROL::Algorithm<double> &instance, ROL::Vector<double>& x, ROL::Objective<double>& obj, ROL::BoundConstraint<double>& bnd)
 	  {
 	    instance.run(x, obj, bnd, true, std::cout);
+	  })
+    .def("run", [](ROL::Algorithm<double> &instance, ROL::Vector<double>& x, ROL::Vector<double>& l, ROL::Objective<double>& obj, ROL::EqualityConstraint<double>& con)
+	  {
+	    instance.run(x, l, obj, con, true, std::cout);
+	  })
+    .def("run", [](ROL::Algorithm<double> &instance, ROL::Vector<double>& x, ROL::Vector<double>& l, ROL::Objective<double>& obj, ROL::EqualityConstraint<double>& con, ROL::BoundConstraint<double>& bnd)
+	  {
+	    instance.run(x, l, obj, con, bnd, true, std::cout);
 	  });
 
 	// ROL::BoundConstraint
@@ -161,6 +169,12 @@ PYBIND11_PLUGIN(ROL)
 		   std::shared_ptr<ROL::Vector<double>> x_up, double scale)
 		{
 		  new (&instance) ROL::BoundConstraint<double>(Teuchos::rcp(x_lo), Teuchos::rcp(x_up), scale);
+		})
+      .def("__init__",
+	    [](ROL::BoundConstraint<double> &instance)
+		{
+		  new (&instance) ROL::BoundConstraint<double>();
+		  instance.deactivate();
 		});
 
 	// ROL::MoreauYosidaPenalty<double>
@@ -186,6 +200,29 @@ PYBIND11_PLUGIN(ROL)
 		const ROL::Vector<double> &x, double &tol)
 		{
 		  instance.applyAdjointJacobian(ajv, v, x, tol);
+		});
+
+	// ROL::AugmentedLagrangian<double>
+	//
+
+	py::class_<ROL::AugmentedLagrangian<double>, ROL::Objective<double>, std::shared_ptr<ROL::AugmentedLagrangian<double>>>(m, "AugmentedLagrangian")
+	  .def("__init__",
+	    [](ROL::AugmentedLagrangian<double>& instance, 
+		  std::shared_ptr<ROL::Objective<double>> obj,
+		  std::shared_ptr<ROL::EqualityConstraint<double>> con,
+		  ROL::Vector<double>& multiplier,
+		  double penaltyParameter,
+		  ROL::Vector<double>& optVec,
+		  ROL::Vector<double>& conVec,
+		  std::string xml_params)
+		{
+		  new (&instance) ROL::AugmentedLagrangian<double>(Teuchos::rcp(obj),
+				  Teuchos::rcp(con),
+				  multiplier,
+				  penaltyParameter,
+				  optVec,
+				  conVec,
+				  *(Teuchos::getParametersFromXmlString(xml_params)));
 		});
 
 
