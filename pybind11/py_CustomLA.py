@@ -85,4 +85,4 @@ x.checkVector(y, z)
 pen = ROL.MoreauYosidaPenalty(obj, bnd, x, 10)
 # algo.run(x, obj, bnd)
 algo.run(x, pen, bnd)
-# print x.data
+print x.data

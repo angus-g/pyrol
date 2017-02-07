@@ -121,7 +121,8 @@ PYBIND11_PLUGIN(ROL)
   py::class_<ROL::Objective<double>, PyObjective, std::shared_ptr<ROL::Objective<double>>> objective(m, "Objective");
   objective.def(py::init<>())
     .def("value", &ROL::Objective<double>::value)
-    .def("gradient", &ROL::Objective<double>::gradient);
+    .def("gradient", &ROL::Objective<double>::gradient)
+    .def("update", &ROL::Objective<double>::update);
 
   // ROL::Algorithm<double>
   //
