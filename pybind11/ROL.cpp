@@ -9,6 +9,7 @@ namespace py = pybind11;
 #include <ROL_Objective.hpp>
 #include <ROL_Algorithm.hpp>
 #include <ROL_BoundConstraint.hpp>
+#include <ROL_EqualityConstraint.hpp>
 #include "Teuchos_RCPStdSharedPtrConversions.hpp"
 
 #include "EigenVector.h"
@@ -19,7 +20,7 @@ namespace py = pybind11;
 PYBIND11_PLUGIN(ROL)
 {
   py::module m("ROL", "pybind11 ROL plugin");
-  
+
   py::class_<ROL::Vector<double>, std::shared_ptr<ROL::Vector<double>>>(m, "Vector");
 
   // ROL::StdVector<double>
@@ -69,7 +70,14 @@ PYBIND11_PLUGIN(ROL)
 		}
 	  }
 	)
-	.def("scale", &ROL::StdVector<double>::scale);
+	.def("scale", &ROL::StdVector<double>::scale)
+        .def("checkVector", [](std::shared_ptr<ROL::StdVector<double>>& x,
+                               std::shared_ptr<ROL::StdVector<double>>& y,
+                               std::shared_ptr<ROL::StdVector<double>>& z)->std::vector<double>
+             {
+               return x->checkVector(*y, *z, true, std::cout);
+             });
+
 
   // EigenVector
   //
@@ -110,9 +118,9 @@ PYBIND11_PLUGIN(ROL)
 	//.def("dimension", &EigenVector::dimension)
 	.def("clone", &CustomLA::clone)
 	.def("norm", &CustomLA::norm)
-	.def("checkVector", [](std::shared_ptr<CustomLA>& x, std::shared_ptr<CustomLA>& y, std::shared_ptr<CustomLA>& z)
+        .def("checkVector", [](std::shared_ptr<CustomLA>& x, std::shared_ptr<CustomLA>& y, std::shared_ptr<CustomLA>& z)->std::vector<double>
 	  {
-	    x->checkVector(*y, *z, true, std::cout);
+	    return x->checkVector(*y, *z, true, std::cout);
 	  })
     .def("cppScale", &CustomLA::scale)
     .def("cppClone", &CustomLA::clone);
@@ -173,7 +181,13 @@ PYBIND11_PLUGIN(ROL)
 	  .def(py::init<>())
 	  .def("value", &ROL::EqualityConstraint<double>::value)
 	  .def("applyJacobian", &ROL::EqualityConstraint<double>::applyJacobian)
-	  .def("applyAdjointJacobian", &ROL::EqualityConstraint<double>::applyAdjointJacobian);
+	  .def("applyAdjointJacobian", [](ROL::EqualityConstraint<double>& instance,
+	    ROL::Vector<double> &ajv, const ROL::Vector<double> &v,
+		const ROL::Vector<double> &x, double &tol)
+		{
+		  instance.applyAdjointJacobian(ajv, v, x, tol);
+		});
+
 
   return m.ptr();
 }

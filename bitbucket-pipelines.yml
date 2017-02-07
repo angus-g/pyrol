@@ -11,6 +11,7 @@ pipelines:
         script: # Modify the commands below to build your repository.
           - cd pybind11
           - git clone https://github.com/pybind/pybind11.git
-          - cmake .
+          - cmake -DPYTHON_INCLUDE_DIR=/usr/include/python2.7 .
           - make
-#          - make test
+          - export PYTHONPATH=$PWD
+          - py.test -s test
