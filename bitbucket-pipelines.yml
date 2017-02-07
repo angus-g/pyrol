@@ -9,8 +9,8 @@ pipelines:
   default:
     - step:
         script: # Modify the commands below to build your repository.
-          - ls -l
-          - pwd
-          - # cmake .
-          - # make
+          - cd pybind11
+          - git clone https://github.com/pybind/pybind11.git
+          - cmake .
+          - make
 #          - make test
