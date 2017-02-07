@@ -36,7 +36,7 @@ class PyEqualityConstraint : public ROL::EqualityConstraint<double>
 			if (overload)
 				return overload.operator()<py::return_value_policy::reference>(ajv, v, x, tol).cast<void>();
 			else
-				ROL::EqualityConstraint<double>::applyJacobian(ajv, v, x, tol);
+				ROL::EqualityConstraint<double>::applyAdjointJacobian(ajv, v, x, tol);
 		}
 
 		virtual void update( const ROL::Vector<double> &x, bool flag = true, int iter = -1 ) override
