@@ -14,5 +14,5 @@ pipelines:
           - cmake -DPYTHON_INCLUDE_DIR=/usr/include/python2.7 .
           - make
           - export PYTHONPATH=$PWD
-	  - cd ..
+          - cd ..
           - py.test -s tests
