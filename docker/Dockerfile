@@ -17,5 +17,10 @@ RUN curl -O https://raw.githubusercontent.com/firedrakeproject/firedrake/master/
     unset PETSC_DIR && \
     unset PYTHONPATH && \
     python firedrake-install --disable-ssh
+
+RUN . firedrake/bin/activate && \
+    cd firedrake/src/h5py && \
+    python setup.py install && \
+    deactivate
     
 USER root
