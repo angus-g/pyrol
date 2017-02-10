@@ -15,5 +15,6 @@ pipelines:
           - cmake -DPYTHON_INCLUDE_DIR=/usr/include/python2.7 .
           - make
           - export PYTHONPATH=$PWD:/home/fenics/local/lib/python2.7/site-packages
+          - source /home/fenics/fenics.env.conf
           - cd ..
           - py.test -s tests
