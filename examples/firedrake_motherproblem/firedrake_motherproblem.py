@@ -124,6 +124,13 @@ inner_product = L2Inner()
 obj = Objective(inner_product)
 u = Function(M)
 opt = FiredrakeLA(u.vector(), inner_product)
+
+x_lo = FiredrakeLA(Function(M).interpolate(Constant(0.0)).vector(),
+                   inner_product)
+x_up = FiredrakeLA(Function(M).interpolate(Constant(0.9)).vector(),
+                   inner_product)
+bnd = ROL.BoundConstraint(x_lo, x_up, 1.0)
+
 algo = ROL.Algorithm("Line Search", params)
-algo.run(opt, obj)
+algo.run(opt, obj, bnd)
 File("res.pvd").write(Function(M, opt.vec))

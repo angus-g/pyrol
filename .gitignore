@@ -5,3 +5,6 @@ pybind11/
 *pyc
 compile_commands.json
 docs/_build/
+*.pvd
+*.vtu
+*.pvtu

@@ -22,3 +22,18 @@ class FiredrakeLA(ROL.CustomLA):
     def clone(self):
         res = FiredrakeLA(self.vec.copy(), self.inner)
         return res
+
+    def __getitem__(self, i):
+        return self.vec[i]
+
+    def __setitem__(self, i, v):
+        self.vec[i] = v
+
+    def dimension(self):
+        return len(self.vec)
+
+    def basis(self, i):
+        res = FiredrakeLA(self.vec.copy())
+        res.scale(0.0)
+        res[i] = 1.0
+        return res
