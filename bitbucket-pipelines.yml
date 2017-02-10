@@ -18,6 +18,6 @@ pipelines:
           - source /home/fenics/fenics.env.conf
           - cd ..
           - py.test -s tests
-          - . firedrake/bin/activate
+          - . home/fenics/firedrake/bin/activate
           - cd examples/firedrake_motherproblem/
           - python firedrake_motherproblem.py
