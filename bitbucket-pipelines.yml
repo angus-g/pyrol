@@ -3,16 +3,17 @@
 # Only use spaces to indent your .yml configuration.
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
-image: quay.io/fenicsproject/dev-env-trilinos:latest
+# image: quay.io/fenicsproject/dev-env-trilinos:latest
+image chrisrichardson/pyrol-testing:latest
 
 pipelines:
   default:
     - step:
         script: # Modify the commands below to build your repository.
-          - cd src
+          - cd src # FIXME - put all this into a Makefile target
           - git clone https://github.com/pybind/pybind11.git
           - cmake -DPYTHON_INCLUDE_DIR=/usr/include/python2.7 .
           - make
-          - export PYTHONPATH=$PWD
+          - export PYTHONPATH=$PWD:$PYTHONPATH
           - cd ..
           - py.test -s tests
