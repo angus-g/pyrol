@@ -21,7 +21,7 @@ class Objective(ROL.Objective):
 
 obj = Objective()
 
-params = """
+parameterXML = """
 <ParameterList>
   <ParameterList name="Step">
     <ParameterList name="Line Search">
@@ -37,6 +37,7 @@ params = """
   </ParameterList>
 </ParameterList>
 """
+params = ROL.ParameterList(parameterXML)
 
 algo = ROL.Algorithm("Line Search", params)
 
