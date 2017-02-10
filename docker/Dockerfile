@@ -2,8 +2,12 @@
 #
 # Author:
 # Chris Richardson
-FROM quay.io/fenicsproject/stable:latest
+FROM quay.io/fenicsproject/dev-env-trilinos:latest
 MAINTAINER Chris Richardson <chris@bpi.cam.ac.uk>
+
+USER fenics
+WORKDIR /home/fenics
+RUN . ./fenics.env.conf && fenics-update fiat dijitso instant ufl ffc dolfin
 
 USER root
 WORKDIR /tmp
@@ -16,11 +20,10 @@ WORKDIR /home/fenics
 RUN curl -O https://raw.githubusercontent.com/firedrakeproject/firedrake/master/scripts/firedrake-install && \
     unset PETSC_DIR && \
     unset PYTHONPATH && \
-    python firedrake-install --disable-ssh
-
-RUN . firedrake/bin/activate && \
+    python firedrake-install --disable-ssh && \
+    . firedrake/bin/activate && \
     cd firedrake/src/h5py && \
     python setup.py install && \
     deactivate
-    
+
 USER root
