@@ -4,7 +4,7 @@
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
 # image: quay.io/fenicsproject/dev-env-trilinos:latest
-image chrisrichardson/pyrol-testing:latest
+image: chrisrichardson/pyrol-testing:latest
 
 pipelines:
   default:
