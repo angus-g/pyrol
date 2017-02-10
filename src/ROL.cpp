@@ -11,6 +11,7 @@ namespace py = pybind11;
 #include <ROL_BoundConstraint.hpp>
 #include <ROL_EqualityConstraint.hpp>
 #include "Teuchos_RCPStdSharedPtrConversions.hpp"
+#include "Teuchos_ParameterList.hpp"
 
 #include "EigenVector.h"
 #include "CustomLA.h"
@@ -137,13 +138,10 @@ PYBIND11_PLUGIN(ROL)
   //
   py::class_<ROL::Algorithm<double>>(m, "Algorithm")
     .def("__init__",
-         [](ROL::Algorithm<double> &instance, const std::string& str, const std::string& xml_params)
-         {
-           Teuchos::RCP<Teuchos::ParameterList> params =
-             Teuchos::getParametersFromXmlString(xml_params);
-
-           new (&instance) ROL::Algorithm<double>(str, *params);
-         })
+      [](ROL::Algorithm<double> &instance, const std::string& str, Teuchos::ParameterList& params)
+      {
+        new (&instance) ROL::Algorithm<double>(str, params);
+      })
     .def("run", [](ROL::Algorithm<double> &instance, ROL::Vector<double>& x, ROL::Objective<double>& obj)
 	  {
 	    instance.run(x, obj, true, std::cout);
@@ -159,6 +157,9 @@ PYBIND11_PLUGIN(ROL)
     .def("run", [](ROL::Algorithm<double> &instance, ROL::Vector<double>& x, ROL::Vector<double>& l, ROL::Objective<double>& obj, ROL::EqualityConstraint<double>& con, ROL::BoundConstraint<double>& bnd)
 	  {
 	    instance.run(x, l, obj, con, bnd, true, std::cout);
+	  })
+    .def("run", [](ROL::Algorithm<double> &instance, ROL::OptimizationProblem<double>& opt) {
+	    instance.run(opt, true, std::cout);
 	  });
 
 	// ROL::BoundConstraint
@@ -200,7 +201,18 @@ PYBIND11_PLUGIN(ROL)
 		const ROL::Vector<double> &x, double &tol)
 		{
 		  instance.applyAdjointJacobian(ajv, v, x, tol);
-		});
+		})
+	  .def("checkApplyJacobian", [](ROL::EqualityConstraint<double>& instance,
+        ROL::Vector<double>& x, ROL::Vector<double>& v, ROL::Vector<double>& jv,
+        int steps, int order)
+        {
+          instance.checkApplyJacobian(x, v, jv, true, std::cout, steps, order);
+        })
+      .def("checkAdjointConsistencyJacobian", [](ROL::EqualityConstraint<double>& instance,
+        ROL::Vector<double>& w, ROL::Vector<double>& v, ROL::Vector<double>& x)
+        {
+          instance.checkAdjointConsistencyJacobian(w, v, x, true, std::cout);
+        });
 
 	// ROL::AugmentedLagrangian<double>
 	//
@@ -214,7 +226,7 @@ PYBIND11_PLUGIN(ROL)
 		  double penaltyParameter,
 		  ROL::Vector<double>& optVec,
 		  ROL::Vector<double>& conVec,
-		  std::string xml_params)
+		  Teuchos::ParameterList& params)
 		{
 		  new (&instance) ROL::AugmentedLagrangian<double>(Teuchos::rcp(obj),
 				  Teuchos::rcp(con),
@@ -222,8 +234,36 @@ PYBIND11_PLUGIN(ROL)
 				  penaltyParameter,
 				  optVec,
 				  conVec,
-				  *(Teuchos::getParametersFromXmlString(xml_params)));
+				  params);
 		});
+
+    // ROL::OptimizationProblem<double>
+    //
+    
+    py::class_<ROL::OptimizationProblem<double>, std::shared_ptr<ROL::OptimizationProblem<double>>>(m, "OptimizationProblem")
+      .def("__init__",
+        [](ROL::OptimizationProblem<double>& instance,
+           std::shared_ptr<ROL::Objective<double>> obj,
+           std::shared_ptr<ROL::Vector<double>> sol,
+           std::shared_ptr<ROL::BoundConstraint<double>> bnd,
+           std::shared_ptr<Teuchos::ParameterList> params)
+        {
+          new (&instance) ROL::OptimizationProblem<double>(Teuchos::rcp(obj),
+                  Teuchos::rcp(sol),
+                  Teuchos::rcp(bnd),
+				  Teuchos::rcp(params));
+		});
+
+    py::class_<Teuchos::ParameterList, std::shared_ptr<Teuchos::ParameterList>>(m, "ParameterList")
+      .def("__init__",
+        [](Teuchos::ParameterList& instance, 
+           std::string xml_params)
+        {
+          //new (&instance) Teuchos::ParameterList();
+          new (&instance) Teuchos::ParameterList(*(Teuchos::getParametersFromXmlString(xml_params)));
+        });
+
+
 
 
   return m.ptr();

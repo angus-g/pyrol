@@ -1,0 +1,6 @@
+build/
+tags
+.cache
+pybind11/
+*pyc
+compile_commands.json

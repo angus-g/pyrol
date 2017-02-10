@@ -29,7 +29,7 @@ def test_std_vector_check():
 
 def test_std_vector_run():
 
-    params = """
+    parameterXML = """
     <ParameterList>
       <ParameterList name="Step">
 	<ParameterList name="Line Search">
@@ -45,7 +45,7 @@ def test_std_vector_run():
       </ParameterList>
     </ParameterList>
     """
-
+    params = ROL.ParameterList(parameterXML)
     algo = ROL.Algorithm("Line Search", params)
     x = ROL.StdVector(2)
     x[0] = -1.0

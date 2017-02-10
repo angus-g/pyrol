@@ -75,7 +75,7 @@ class NPBasedLA(ROL.CustomLA):
         res.data = np.copy(self.data)
         return res
 
-params = """
+parameterXML = """
 <ParameterList>
   <ParameterList name="Step">
     <ParameterList name="Line Search">
@@ -83,10 +83,20 @@ params = """
         <Parameter name="Type" type="string" value="Quasi-Newton Method"/>
       </ParameterList>
     </ParameterList>
+    <Parameter name="Type" type="string" value="Interior Point"/>
+    <ParameterList name="Interior Point">
+        <Parameter name="Initial Barrier Penalty" type="double" value="0.01"/>
+        <Parameter name="Barrier Penalty Reduction Factor" type="double" value="0.15"/>
+        <Parameter name="Minimum Barrier Penalty" type="double" value="1e-8"/>
+    </ParameterList>
+    <ParameterList name="Composite Step">
+      <Parameter name="Output Level" type="int" value="0"/>
+    </ParameterList>
   </ParameterList>
   <ParameterList name="Status Test">
     <Parameter name="Gradient Tolerance" type="double" value="1e-12"/>
     <Parameter name="Step Tolerance" type="double" value="1e-16"/>
+    <Parameter name="Constraint Tolerance" type="double" value="1e-12"/>
     <Parameter name="Iteration Limit" type="int" value="10"/>
   </ParameterList>
 </ParameterList>
@@ -104,6 +114,7 @@ def test_checkVectorPassed():
 
 def test_unconstrained():
     obj = MyObj()
+    params = ROL.ParameterList(parameterXML)
     algo = ROL.Algorithm("Line Search", params)
     x = NPBasedLA(2)
     algo.run(x, obj)
@@ -112,6 +123,7 @@ def test_unconstrained():
 
 def runBoundConstrained(algo):
     obj = MyObj()
+    params = ROL.ParameterList(parameterXML)
     algo = ROL.Algorithm(algo, params)
     x = NPBasedLA(2)
     x_lo = NPBasedLA(2)
@@ -130,8 +142,40 @@ def test_boundConstrained():
     runBoundConstrained("Primal Dual Active Set")
     runBoundConstrained("Trust Region")
 
+def test_boundConstrainedInteriorPoint():
+    obj = MyObj()
+    params = ROL.ParameterList(parameterXML)
+    algo = ROL.Algorithm("Interior Point", params)
+    x = NPBasedLA(2)
+    x_lo = NPBasedLA(2)
+    x_lo[0] = -1
+    x_lo[1] = -1
+    x_up = NPBasedLA(2)
+    x_up[0] = +0.7
+    x_up[1] = +0.7
+    bnd = ROL.BoundConstraint(x_lo, x_up, 1.0)
+    optimProblem = ROL.OptimizationProblem(obj, x, bnd, params)
+    algo.run(optimProblem)
+    assert round(x[0] - 0.7, 4) == 0.0
+    assert round(x[1], 4) == 0.0
+
+def test_EqualityConstraintSatisfiesChecks():
+    con = EqConstraint()
+    x = NPBasedLA(2)
+    x[0] = 0.5 * 0.5**2
+    x[1] = 0.5 * 0.5**2
+    v = NPBasedLA(2)
+    v[0] = 1.0
+    v[1] = -0.5
+    jv = NPBasedLA(1)
+    w = NPBasedLA(1)
+    w[0] = 1.0
+    con.checkApplyJacobian(x, v, jv, 4, 1);
+    con.checkAdjointConsistencyJacobian(w, v, x)
+
 def test_equalityConstrainedCS():
     obj = MyObj2()
+    params = ROL.ParameterList(parameterXML)
     algo = ROL.Algorithm("Composite Step", params)
     x = NPBasedLA(2)
     x[0] = 0.5 * 0.5**2
@@ -144,6 +188,7 @@ def test_equalityConstrainedCS():
 
 def test_equalityConstrainedAL():
     obj = MyObj2()
+    params = ROL.ParameterList(parameterXML)
     algo = ROL.Algorithm("AugmentedLagrangian", params)
     x = NPBasedLA(2)
     x[0] = 0.5 * 0.5**2

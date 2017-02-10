@@ -95,6 +95,14 @@ class CustomLA : public std::enable_shared_from_this<CustomLA>, public ROL::Vect
 			}
 			return res;
 		}
+
+        void applyUnary( const ROL::Elementwise::UnaryFunction<double> &f ) {
+            uint dim  = dimension();
+            for(uint i=0; i<dim; ++i) {
+				setitem(i, f.apply(getitem(i)));
+            }
+        }
+
 		void applyBinary( const ROL::Elementwise::BinaryFunction<double> &f, const ROL::Vector<double> &x ) {
 			TEUCHOS_TEST_FOR_EXCEPTION( dimension() != x.dimension(),
 					std::invalid_argument,
@@ -115,6 +123,7 @@ class CustomLA : public std::enable_shared_from_this<CustomLA>, public ROL::Vect
 			else
 				py::pybind11_fail("Tried to call pure virtual function '__getitem__'.");
 		}
+
 		virtual void setitem(const int& i, const double& val) const
 		{
 			py::gil_scoped_acquire gil;
