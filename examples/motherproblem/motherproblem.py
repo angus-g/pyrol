@@ -1,10 +1,16 @@
 from firedrake import UnitSquareMesh, FunctionSpace, Function, \
     Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
     dx, Constant, solve, assemble, as_backend_type, File
-from firedrake_LA import FiredrakeLA
+from firedrake_LA import FiredrakeLA as LA
+backend = "firedrake"
+# from dolfin import UnitSquareMesh, FunctionSpace, Function, \
+    # Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
+    # dx, Constant, solve, assemble, as_backend_type, File
+# from dolfin_LA import dolfinLA as LA
+# backend = "dolfin"
 import ROL
 
-n = 64
+n = 32
 mesh = UnitSquareMesh(n, n)
 use_correct_riesz_and_inner = True
 outdir = "output_riesz_%s/" % use_correct_riesz_and_inner
@@ -12,9 +18,10 @@ V = FunctionSpace(mesh, "Lagrange", 1)  # space for state variable
 M = FunctionSpace(mesh, "DG", 0)  # space for control variable
 beta = 1e-4
 yd = Function(V)
-# yd.interpolate(Expression("(x[0] <= 0.5)*(x[1] <= 0.5)", degree=1))
 yd.interpolate(Expression("(1.0/(2*pi*pi)) * sin(pi*x[0]) * sin(pi*x[1])",
                degree=3))
+# uncomment this for a 'more difficult' target distribution
+# yd.interpolate(Expression("(x[0] <= 0.5)*(x[1] <= 0.5)", degree=1))
 
 
 def solve_state(u):
@@ -54,15 +61,24 @@ class L2Inner(object):
         return vpet.dot(A_u)
 
     def riesz_map(self, derivative):
-        rhs = Function(M, val=derivative.dat)
-        res = Function(M)
-        solve(self.A, res, rhs, bcs=self.bcs,
-              solver_parameters={
-                  'ksp_monitor': False,
-                  'ksp_rtol': 1e-9, 'ksp_atol': 1e-10, 'ksp_stol': 1e-16,
-                  'ksp_type': 'cg', 'pc_type': 'hypre',
-                  'pc_hypre_type': 'boomeramg'
-              })
+        if backend == "firedrake":
+            rhs = Function(M, val=derivative.dat)
+            res = Function(M)
+            solve(self.A, res, rhs, bcs=self.bcs)
+            # solve(self.A, res, rhs, bcs=self.bcs,
+            #       solver_parameters={
+            #           'ksp_monitor': False,
+            #           'ksp_rtol': 1e-9, 'ksp_atol': 1e-10, 'ksp_stol': 1e-16,
+            #           'ksp_type': 'cg', 'pc_type': 'hypre',
+            #           'pc_hypre_type': 'boomeramg'
+            #       })
+            return res.vector()
+        else:
+            self.bcs[0].apply(self.A)
+            res = Function(M)
+            rhs = Function(M, derivative)
+            solve(self.A, res.vector(), rhs.vector())
+
         return res.vector()
 
 
@@ -91,15 +107,20 @@ class Objective(ROL.Objective):
         L = beta * u * v * dx - lam * v * dx
         deriv = assemble(L)
         grad = self.inner_product.riesz_map(deriv)
-        grad.dat.copy(g.vec.dat)
+        g.scale(0)
+        g.vec += grad
 
     def update(self, x, flag, iteration):
         u = Function(M, x.vec)
-        u.vector().dat.copy(self.u.vector().dat)
-        control_file.write(self.u)
+        self.u.assign(u)
         y = solve_state(self.u)
-        y.vector().dat.copy(self.y.vector().dat)
-        state_file.write(self.y)
+        self.y.assign(y)
+        if backend == "firedrake":
+            control_file.write(self.u)
+            state_file.write(self.y)
+        else:
+            control_file << self.u
+            state_file << self.y
 
 
 parametersXML = """
@@ -123,14 +144,18 @@ params = ROL.ParameterList(parametersXML)
 inner_product = L2Inner()
 obj = Objective(inner_product)
 u = Function(M)
-opt = FiredrakeLA(u.vector(), inner_product)
-
-x_lo = FiredrakeLA(Function(M).interpolate(Constant(0.0)).vector(),
-                   inner_product)
-x_up = FiredrakeLA(Function(M).interpolate(Constant(0.9)).vector(),
-                   inner_product)
+opt = LA(u.vector(), inner_product)
+xlo = Function(M)
+xlo.interpolate(Constant(0.0))
+x_lo = LA(xlo.vector(), inner_product)
+xup = Function(M)
+xup.interpolate(Constant(0.9))
+x_up = LA(xup.vector(), inner_product)
 bnd = ROL.BoundConstraint(x_lo, x_up, 1.0)
 
 algo = ROL.Algorithm("Line Search", params)
 algo.run(opt, obj, bnd)
-File("res.pvd").write(Function(M, opt.vec))
+if backend == "firedrake":
+    File("res.pvd").write(Function(M, opt.vec))
+else:
+    File("res.pvd") << Function(M, opt.vec)
