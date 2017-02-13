@@ -15,6 +15,12 @@ Contents:
    installation
 
 
+.. toctree::
+   :maxdepth: 1
+
+   vectors
+   objectives
+   constraints
 
 Indices and tables
 ==================
