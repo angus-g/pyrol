@@ -1,19 +1,39 @@
-from firedrake import UnitSquareMesh, FunctionSpace, Function, \
-    Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
-    dx, Constant, solve, assemble, as_backend_type, File
-from firedrake_LA import FiredrakeLA as LA
-backend = "firedrake"
-# from dolfin import UnitSquareMesh, FunctionSpace, Function, \
+# from firedrake import UnitSquareMesh, FunctionSpace, Function, \
     # Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
     # dx, Constant, solve, assemble, as_backend_type, File
-# from dolfin_LA import dolfinLA as LA
-# backend = "dolfin"
+# from firedrake_LA import FiredrakeLA as LA
+# backend = "firedrake"
+from dolfin import UnitSquareMesh, FunctionSpace, Function, \
+    Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
+    dx, Constant, solve, assemble, as_backend_type, File, CellFunction, refine
+from dolfin_LA import dolfinLA as LA
+backend = "dolfin"
+
 import ROL
 
-n = 32
+n = 16
 mesh = UnitSquareMesh(n, n)
-use_correct_riesz_and_inner = True
-outdir = "output_riesz_%s/" % use_correct_riesz_and_inner
+
+if backend == "dolfin":
+    import numpy
+    numpy.random.seed(0)
+    def randomly_refine(initial_mesh, ratio_to_refine= .3):
+       cf = CellFunction('bool', initial_mesh)
+       for k in range(len(cf)):
+           if numpy.random.rand() < ratio_to_refine:
+               cf[k] = True
+       return refine(initial_mesh, cell_markers = cf)
+
+    k = 2
+    for i in range(k):
+       mesh = randomly_refine(mesh)
+else:
+    k = 0
+
+use_correct_riesz_and_inner = False
+
+outdir = "output_riesz_%s_refinements_%i/" % (use_correct_riesz_and_inner, k)
+
 V = FunctionSpace(mesh, "Lagrange", 1)  # space for state variable
 M = FunctionSpace(mesh, "DG", 0)  # space for control variable
 beta = 1e-4
@@ -106,7 +126,10 @@ class Objective(ROL.Objective):
         v = TestFunction(M)
         L = beta * u * v * dx - lam * v * dx
         deriv = assemble(L)
-        grad = self.inner_product.riesz_map(deriv)
+        if self.inner_product is not None:
+            grad = self.inner_product.riesz_map(deriv)
+        else:
+            grad = deriv
         g.scale(0)
         g.vec += grad
 
@@ -141,7 +164,10 @@ parametersXML = """
 </ParameterList>
 """
 params = ROL.ParameterList(parametersXML)
-inner_product = L2Inner()
+if use_correct_riesz_and_inner:
+    inner_product = L2Inner()
+else:
+    inner_product = None
 obj = Objective(inner_product)
 u = Function(M)
 opt = LA(u.vector(), inner_product)
