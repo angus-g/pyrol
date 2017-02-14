@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import dolfin
-import ROL
-
+import ROL 
 class Objective(ROL.Objective):
     def __init__(self):
         ROL.Objective.__init__(self)
@@ -47,7 +46,14 @@ class dolfinLA(ROL.CustomLA):
         self.data = vec 
 
     def plus(self, x):
-        self.data += x.data
+        # PETSc doesn't like adding vector to themselves,
+        # so we have to add this check
+        xpet = dolfin.as_backend_type(x.vec).vec()
+        thispet = dolfin.as_backend_type(self.vec).vec()
+        if xpet == thispet:
+            self.vec *= 2
+        else:
+            self.vec += x.vec
 
     def scale(self, alpha):
         self.data *= alpha
