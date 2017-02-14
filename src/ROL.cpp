@@ -119,7 +119,7 @@ PYBIND11_PLUGIN(ROL)
 	//.def("dimension", &EigenVector::dimension)
 	.def("clone", &CustomLA::clone)
 	.def("norm", &CustomLA::norm)
-        .def("checkVector", [](std::shared_ptr<CustomLA>& x, std::shared_ptr<CustomLA>& y, std::shared_ptr<CustomLA>& z)->std::vector<double>
+    .def("checkVector", [](std::shared_ptr<CustomLA>& x, std::shared_ptr<CustomLA>& y, std::shared_ptr<CustomLA>& z)->std::vector<double>
 	  {
 	    return x->checkVector(*y, *z, true, std::cout);
 	  })
@@ -132,7 +132,12 @@ PYBIND11_PLUGIN(ROL)
   objective.def(py::init<>())
     .def("value", &ROL::Objective<double>::value)
     .def("gradient", &ROL::Objective<double>::gradient)
-    .def("update", &ROL::Objective<double>::update);
+    .def("update", &ROL::Objective<double>::update)
+    .def("checkGradient", [](ROL::Objective<double>& instance, ROL::Vector<double>& x, ROL::Vector<double>& d, int steps, int order)->std::vector<double>
+	  {
+	    auto res = instance.checkGradient(x, d, true, std::cout, steps, order);
+        return res[0];
+	  });
 
   // ROL::Algorithm<double>
   //
