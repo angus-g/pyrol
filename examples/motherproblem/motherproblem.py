@@ -171,6 +171,11 @@ else:
 obj = Objective(inner_product)
 u = Function(M)
 opt = LA(u.vector(), inner_product)
+d = Function(M)
+d.interpolate(Expression("sin(x[0]*pi)*sin(x[1]*pi)", degree=1))
+d = LA(d.vector(), inner_product)
+if backend == "firedrake":
+    obj.checkGradient(opt, d, 3, 1)
 xlo = Function(M)
 xlo.interpolate(Constant(0.0))
 x_lo = LA(xlo.vector(), inner_product)
