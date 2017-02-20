@@ -31,7 +31,7 @@ PYBIND11_PLUGIN(ROL)
 		   Teuchos::RCP<std::vector<double>> tp = Teuchos::rcp<std::vector<double>>(new std::vector<double>(n, 0.0));
 		   new (&instance) ROL::StdVector<double>(tp);
 		 })
-	.def("norm", &ROL::StdVector<double>::norm)
+    .def("norm", &ROL::StdVector<double>::norm, "L2 norm of the vector")
 	.def("dimension", &ROL::StdVector<double>::dimension)
 	.def("__setitem__", [](ROL::StdVector<double> &vec, const int& idx, const double& val)
 	  {

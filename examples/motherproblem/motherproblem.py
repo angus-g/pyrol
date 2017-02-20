@@ -3,10 +3,10 @@
     # dx, Constant, solve, assemble, as_backend_type, File
 # from firedrake_LA import FiredrakeLA as LA
 # backend = "firedrake"
+from dolfin_LA import dolfinLA as LA
 from dolfin import UnitSquareMesh, FunctionSpace, Function, \
     Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
     dx, Constant, solve, assemble, as_backend_type, File, CellFunction, refine
-from dolfin_LA import dolfinLA as LA
 backend = "dolfin"
 
 import ROL
@@ -30,7 +30,7 @@ if backend == "dolfin":
 else:
     k = 0
 
-use_correct_riesz_and_inner = False
+use_correct_riesz_and_inner = True
 
 outdir = "output_riesz_%s_refinements_%i/" % (use_correct_riesz_and_inner, k)
 
@@ -70,15 +70,13 @@ class L2Inner(object):
 
     def __init__(self):
         self.A = assemble(TrialFunction(M)*TestFunction(M)*dx)
-        self.Ap = as_backend_type(self.A).mat()
         self.bcs = [DirichletBC(M, Constant(0.0), "on_boundary")]
 
     def eval(self, _u, _v):
-        upet = as_backend_type(_u).vec()
-        vpet = as_backend_type(_v).vec()
-        A_u = self.Ap.createVecLeft()
-        self.Ap.mult(upet, A_u)
-        return vpet.dot(A_u)
+        y = _v.copy()
+        y.zero()
+        self.A.mult(_u, y)
+        return _v.inner(y)
 
     def riesz_map(self, derivative):
         if backend == "firedrake":
