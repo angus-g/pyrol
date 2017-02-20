@@ -12,6 +12,7 @@ pipelines:
         script: # Modify the commands below to build your repository.
           - cd src # FIXME - put all this into a Makefile target
           - git clone https://github.com/pybind/pybind11.git
+          - export TRILINOS_DIR=/usr/local
           - python setup.py install
           - source /home/fenics/fenics.env.conf
           - cd ..
