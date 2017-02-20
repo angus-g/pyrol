@@ -19,20 +19,21 @@ namespace py = pybind11;
 
 PYBIND11_PLUGIN(ROL)
 {
-  py::module m("ROL", "pybind11 ROL plugin");
+  py::module m("ROL", "PyROL provides Python wrappers for a subset of the Trilinos ROL library.");
 
   py::class_<ROL::Vector<double>, std::shared_ptr<ROL::Vector<double>>>(m, "Vector");
 
+  //
   // ROL::StdVector<double>
   //
   py::class_<ROL::StdVector<double>, ROL::Vector<double>, std::shared_ptr<ROL::StdVector<double>>>(m, "StdVector")
-	.def("__init__",
-		 [](ROL::StdVector<double> &instance, int n) {
-		   Teuchos::RCP<std::vector<double>> tp = Teuchos::rcp<std::vector<double>>(new std::vector<double>(n, 0.0));
-		   new (&instance) ROL::StdVector<double>(tp);
-		 })
+    .def("__init__",
+         [](ROL::StdVector<double> &instance, int n) {
+           Teuchos::RCP<std::vector<double>> tp = Teuchos::rcp<std::vector<double>>(new std::vector<double>(n, 0.0));
+           new (&instance) ROL::StdVector<double>(tp);
+         })
     .def("norm", &ROL::StdVector<double>::norm, "L2 norm of the vector")
-	.def("dimension", &ROL::StdVector<double>::dimension)
+    .def("dimension", &ROL::StdVector<double>::dimension, "Size of the vector")
 	.def("__setitem__", [](ROL::StdVector<double> &vec, const int& idx, const double& val)
 	  {
 	  Teuchos::RCP<std::vector<double>> vvec = vec.getVector();
@@ -70,15 +71,18 @@ PYBIND11_PLUGIN(ROL)
 		}
 	  }
 	)
-	.def("scale", &ROL::StdVector<double>::scale)
+    .def("scale", &ROL::StdVector<double>::scale, "Multiply the vector by a scalar")
         .def("checkVector", [](std::shared_ptr<ROL::StdVector<double>>& x,
                                std::shared_ptr<ROL::StdVector<double>>& y,
                                std::shared_ptr<ROL::StdVector<double>>& z)->std::vector<double>
              {
                return x->checkVector(*y, *z, true, std::cout);
-             });
+             }, "Check the accuracy of the linear algebra implementation");
 
-  py::class_<CustomLA, ROL::Vector<double>, std::shared_ptr<CustomLA>>(m, "CustomLA")
+  //
+  // ROL::CustomLA
+  //
+  py::class_<CustomLA, ROL::Vector<double>, std::shared_ptr<CustomLA>>(m, "CustomLA", "Custom Vector and Linear Algebra base class")
   //py::class_<CustomLA, std::shared_ptr<CustomLA>>(m, "CustomLA")
 	.def(py::init<>())
 	.def("clone", &CustomLA::clone)
@@ -86,10 +90,11 @@ PYBIND11_PLUGIN(ROL)
         .def("checkVector", [](std::shared_ptr<CustomLA>& x, std::shared_ptr<CustomLA>& y, std::shared_ptr<CustomLA>& z)->std::vector<double>
 	  {
 	    return x->checkVector(*y, *z, true, std::cout);
-	  })
-    .def("cppScale", &CustomLA::scale)
-    .def("cppClone", &CustomLA::clone);
+	  });
+  //    .def("cppScale", &CustomLA::scale)
+  //    .def("cppClone", &CustomLA::clone);
 
+  //
   // ROL::Objective<double>
   //
   py::class_<ROL::Objective<double>, PyObjective, std::shared_ptr<ROL::Objective<double>>> objective(m, "Objective");
@@ -218,17 +223,14 @@ PYBIND11_PLUGIN(ROL)
 				  Teuchos::rcp(params));
 		});
 
-    py::class_<Teuchos::ParameterList, std::shared_ptr<Teuchos::ParameterList>>(m, "ParameterList")
-      .def("__init__",
-        [](Teuchos::ParameterList& instance,
-           std::string xml_params)
-        {
-          //new (&instance) Teuchos::ParameterList();
-          new (&instance) Teuchos::ParameterList(*(Teuchos::getParametersFromXmlString(xml_params)));
-        });
-
-
-
+    py::class_<Teuchos::ParameterList, std::shared_ptr<Teuchos::ParameterList>>(m, "ParameterList",
+                                                   "Create a ParameterList object from an XML string")
+        .def("__init__",
+             [](Teuchos::ParameterList& instance,
+                std::string xml_params)
+             {
+               new (&instance) Teuchos::ParameterList(*(Teuchos::getParametersFromXmlString(xml_params)));
+             });
 
   return m.ptr();
 }
