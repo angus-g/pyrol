@@ -21,7 +21,7 @@ setup(name="PyROL",
                     include_dirs = [pybind11.get_include(), trilinos_dir+"/include", "/usr/include/mpi"],
                     library_dirs = [trilinos_dir+"/lib"],
                     runtime_library_dirs = [trilinos_dir+"/lib"],
-                    libraries = ["teuchoscore", "teuchosnumerics", "teuchosparameterlist", "teuchoscomm"],
+                    libraries = ["teuchoscore", "teuchosnumerics", "teuchosparameterlist", "teuchoscomm", "mpi_cxx"],
                     extra_compile_args = ["-std=c++11"]
                     )],
       )
