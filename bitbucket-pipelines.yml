@@ -10,7 +10,7 @@ pipelines:
   default:
     - step:
         script:
-          - pip install pybind11
+          - pip2 install pybind11           # FIXME - python2/3 issue
           - export TRILINOS_DIR=/usr/local
           - cd src
           - python setup.py install
