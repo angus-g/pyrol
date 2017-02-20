@@ -13,7 +13,6 @@ namespace py = pybind11;
 #include "Teuchos_RCPStdSharedPtrConversions.hpp"
 #include "Teuchos_ParameterList.hpp"
 
-#include "EigenVector.h"
 #include "CustomLA.h"
 #include "PyObjective.h"
 #include "PyEqualityConstraint.h"
@@ -79,44 +78,9 @@ PYBIND11_PLUGIN(ROL)
                return x->checkVector(*y, *z, true, std::cout);
              });
 
-
-  // EigenVector
-  //
-  py::class_<EigenVector, ROL::Vector<double>, std::shared_ptr<EigenVector>>(m, "EigenVector", py::buffer_protocol())
-	.def(py::init<const int>())
-	.def(py::init<const py::array_t<double>>())
-	.def("norm", &EigenVector::norm)
-	.def("dimension", &EigenVector::dimension)
-	.def("__setitem__", [](EigenVector &vec, const int& idx, const double& val)
-	  {
-	  auto vvec = vec.getVector();
-		if(idx >= vvec->size())
-		{
-		  throw py::index_error();
-		}else
-		{
-		  (*vvec)[idx] = val;
-		}
-	  }
-	)
-	.def("__getitem__", [](EigenVector &vec, const int& idx)
-	  {
-	  auto vvec = vec.getVector();
-		if(idx >= vvec->size())
-		{
-		  throw py::index_error();
-		}else
-		{
-		  return (*vvec)[idx];
-		}
-	  }
-	)
-	.def("scale", &EigenVector::scale);
-
   py::class_<CustomLA, ROL::Vector<double>, std::shared_ptr<CustomLA>>(m, "CustomLA")
   //py::class_<CustomLA, std::shared_ptr<CustomLA>>(m, "CustomLA")
 	.def(py::init<>())
-	//.def("dimension", &EigenVector::dimension)
 	.def("clone", &CustomLA::clone)
 	.def("norm", &CustomLA::norm)
         .def("checkVector", [](std::shared_ptr<CustomLA>& x, std::shared_ptr<CustomLA>& y, std::shared_ptr<CustomLA>& z)->std::vector<double>
@@ -219,7 +183,7 @@ PYBIND11_PLUGIN(ROL)
 
 	py::class_<ROL::AugmentedLagrangian<double>, ROL::Objective<double>, std::shared_ptr<ROL::AugmentedLagrangian<double>>>(m, "AugmentedLagrangian")
 	  .def("__init__",
-	    [](ROL::AugmentedLagrangian<double>& instance, 
+	    [](ROL::AugmentedLagrangian<double>& instance,
 		  std::shared_ptr<ROL::Objective<double>> obj,
 		  std::shared_ptr<ROL::EqualityConstraint<double>> con,
 		  ROL::Vector<double>& multiplier,
@@ -239,7 +203,7 @@ PYBIND11_PLUGIN(ROL)
 
     // ROL::OptimizationProblem<double>
     //
-    
+
     py::class_<ROL::OptimizationProblem<double>, std::shared_ptr<ROL::OptimizationProblem<double>>>(m, "OptimizationProblem")
       .def("__init__",
         [](ROL::OptimizationProblem<double>& instance,
@@ -256,7 +220,7 @@ PYBIND11_PLUGIN(ROL)
 
     py::class_<Teuchos::ParameterList, std::shared_ptr<Teuchos::ParameterList>>(m, "ParameterList")
       .def("__init__",
-        [](Teuchos::ParameterList& instance, 
+        [](Teuchos::ParameterList& instance,
            std::string xml_params)
         {
           //new (&instance) Teuchos::ParameterList();
