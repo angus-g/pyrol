@@ -12,9 +12,7 @@ pipelines:
         script: # Modify the commands below to build your repository.
           - cd src # FIXME - put all this into a Makefile target
           - git clone https://github.com/pybind/pybind11.git
-          - cmake -DPYTHON_INCLUDE_DIR=/usr/include/python2.7 .
-          - make
-          - export PYTHONPATH=$PWD:/home/fenics/local/lib/python2.7/site-packages
+          - python setup.py install
           - source /home/fenics/fenics.env.conf
           - cd ..
           - py.test -s tests
