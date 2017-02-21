@@ -20,6 +20,7 @@ namespace py = pybind11;
 PYBIND11_PLUGIN(ROL)
 {
   py::module m("ROL", "PyROL provides Python wrappers for a subset of the Trilinos ROL library.");
+  m.attr("__version__") = "0.1.1";
 
   py::class_<ROL::Vector<double>, std::shared_ptr<ROL::Vector<double>>>(m, "Vector");
 
