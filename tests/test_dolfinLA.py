@@ -48,12 +48,12 @@ class dolfinLA(ROL.CustomLA):
     def plus(self, x):
         # PETSc doesn't like adding vector to themselves,
         # so we have to add this check
-        xpet = dolfin.as_backend_type(x.vec).vec()
-        thispet = dolfin.as_backend_type(self.vec).vec()
+        xpet = dolfin.as_backend_type(x.data).vec()
+        thispet = dolfin.as_backend_type(self.data).vec()
         if xpet == thispet:
-            self.vec *= 2
+            self.data *= 2
         else:
-            self.vec += x.vec
+            self.data += x.data
 
     def scale(self, alpha):
         self.data *= alpha
