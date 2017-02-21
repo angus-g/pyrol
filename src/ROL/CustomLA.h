@@ -99,7 +99,7 @@ class CustomLA : public std::enable_shared_from_this<CustomLA>, public ROL::Vect
         void applyUnary( const ROL::Elementwise::UnaryFunction<double> &f ) {
             uint dim  = dimension();
             for(uint i=0; i<dim; ++i) {
-				setitem(i, f.apply(getitem(i)));
+              setitem(i, f.apply(getitem(i)));
             }
         }
 
@@ -109,7 +109,7 @@ class CustomLA : public std::enable_shared_from_this<CustomLA>, public ROL::Vect
 					"Error: Vectors must have the same dimension." );
 
 			const CustomLA & ex = Teuchos::dyn_cast<const CustomLA>(x);
-			for (uint i=0; i<dimension(); i++) {
+			for (int i = 0; i < dimension(); ++i) {
 				setitem(i, f.apply(getitem(i), ex.getitem(i)));
 			}
 		}

@@ -20,6 +20,7 @@ namespace py = pybind11;
 PYBIND11_PLUGIN(ROL)
 {
   py::module m("ROL", "PyROL provides Python wrappers for a subset of the Trilinos ROL library.");
+  m.attr("__version__") = "0.1.1";
 
   py::class_<ROL::Vector<double>, std::shared_ptr<ROL::Vector<double>>>(m, "Vector");
 
@@ -37,7 +38,7 @@ PYBIND11_PLUGIN(ROL)
 	.def("__setitem__", [](ROL::StdVector<double> &vec, const int& idx, const double& val)
 	  {
 	  Teuchos::RCP<std::vector<double>> vvec = vec.getVector();
-		if(idx >= vvec->size())
+          if(idx >= (int)vvec->size())
 		{
 		  throw py::index_error();
 		}else
@@ -54,7 +55,7 @@ PYBIND11_PLUGIN(ROL)
 		  throw py::error_already_set();
 		auto res = std::make_shared<std::vector<double>>();
 		res->resize(slicelength);
-		for (int i = start; i < stop; i=i+step) {
+		for (unsigned int i = start; i < stop; i=i+step) {
 		  res->push_back((*vvec)[i]);
 		}
 	  }
@@ -62,7 +63,7 @@ PYBIND11_PLUGIN(ROL)
 	.def("__getitem__", [](ROL::StdVector<double> &vec, const int& idx)
 	  {
 	  Teuchos::RCP<std::vector<double>> vvec = vec.getVector();
-		if(idx >= vvec->size())
+          if(idx >= (int)vvec->size())
 		{
 		  throw py::index_error();
 		}else

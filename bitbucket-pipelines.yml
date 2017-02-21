@@ -9,14 +9,13 @@ image: chrisrichardson/pyrol-testing:latest
 pipelines:
   default:
     - step:
-        script: # Modify the commands below to build your repository.
-          - cd src # FIXME - put all this into a Makefile target
-          - git clone https://github.com/pybind/pybind11.git
-          - cmake -DPYTHON_INCLUDE_DIR=/usr/include/python2.7 .
-          - make
-          - export PYTHONPATH=$PWD:/home/fenics/local/lib/python2.7/site-packages
-          - source /home/fenics/fenics.env.conf
+        script:
+          - pip2 install pybind11           # FIXME - python2/3 issue
+          - export TRILINOS_DIR=/usr/local
+          - cd src
+          - python setup.py install
           - cd ..
+          - source /home/fenics/fenics.env.conf
           - py.test -s tests
             #           - . /home/fenics/firedrake/bin/activate
             #           - cd examples/firedrake_motherproblem/
