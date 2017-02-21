@@ -1,7 +1,6 @@
 import ROL
 from dolfin import as_backend_type
 
-
 class dolfinLA(ROL.CustomLA):
     def __init__(self, vec, inner):
         ROL.CustomLA.__init__(self)
@@ -33,15 +32,15 @@ class dolfinLA(ROL.CustomLA):
         else:
             return self.vec.inner(xx.vec)
 
+    def clone(self):
+        res = dolfinLA(self.vec.copy(), self.inner)
+        return res
+
     def dimension(self):
-        return self.vec.size()
+        return len(self.vec)
 
     def basis(self, i):
         res = dolfinLA(self.vec.copy(), self.inner)
         res.scale(0.0)
         res[i] = 1.0
-        return res
-
-    def clone(self):
-        res = dolfinLA(self.vec.copy(), self.inner)
         return res

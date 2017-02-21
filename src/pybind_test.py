@@ -32,41 +32,6 @@ params = """
 
 algo = ROL.Algorithm("Line Search", params)
 
-# x = ROL.StdVector(2)
-# x[0] = -1.0
-# x[1] = 2.0
-
-# print x[0]
-# print x[1]
-# algo.run(x, obj)
-# print x[0]
-# print x[1]
-
-
-# _x = ROL.EigenVector(2)
-# _x[0] = -1.0
-# _x[1] = 2.0
-
-# print _x[0]
-# print _x[1]
-# algo = ROL.Algorithm("Line Search", {"test":"test"})
-# algo.run(_x, obj)
-# print _x[0]
-# print _x[1]
-
-# import numpy as np
-# a = np.asarray([0, 1, 2, 3])
-# evec = ROL.EigenVector(a)
-# print evec[0]
-# print evec[1]
-# print evec[2]
-# print evec[3]
-# a[3] = 5.0
-# print evec[3]
-# evec[3]=3.1
-# print a[3]
-
-# import ROL
 import numpy as np
 def iplus(x, y):
     x.data[0] += y.data[0]

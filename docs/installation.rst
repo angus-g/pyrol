@@ -1,7 +1,7 @@
 Installation
 ============
 
-We assume that you have Trilinos as well as eigen installed on your machine.
+We assume that you have Trilinos 12.10 or later installed on your machine.
 
 .. code-block:: bash
 
@@ -10,7 +10,7 @@ We assume that you have Trilinos as well as eigen installed on your machine.
     git clone https://github.com/pybind/pybind11
 
 We use cmake for the configuration. Sometime there are issues with finding the correct python version.
-On macOS, try running 
+On macOS, try running
 
 .. code-block:: bash
 
@@ -21,5 +21,3 @@ on Ubuntu run
 .. code-block:: bash
 
     cmake -DTRILINOS_DIR="/path/to/Trilinos/" -DPYTHON_EXECUTABLE:FILEPATH=/usr/bin/python2.7 -DPYTHON_INCLUDE_DIR:PATH=/usr/include/python2.7 -DPYTHON_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libpython2.7.so ..
-
-

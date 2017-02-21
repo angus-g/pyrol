@@ -18,4 +18,4 @@ Let's say we want to minimize the function :math:`f(x,y) = (x-1)^2 + y^2`.
             g[0] = 2 * (x[0] - 1)
             g[1] = 2 * x[1]
 
-If we ommit the definition of the `gradient` function, then ROL with use a finite difference approximation instead.
+If we omit the definition of the `gradient` function, then ROL will use a finite difference approximation instead.
