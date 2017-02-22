@@ -13,11 +13,13 @@ pipelines:
           - pip2 install pybind11           # FIXME - python2/3 issue
           - export TRILINOS_DIR=/usr/local
           - cd src
-          - python setup.py install
+          - python setup.py build
+          - export PYTHONPATH=$(pwd)/build/lib.linux-x86_64-2.7:$PYTHONPATH
           - cd ..
           - source /home/fenics/fenics.env.conf
           - py.test -s tests
           - . /home/fenics/firedrake/bin/activate
+          - export PYTHONPATH=
           - cd examples/motherproblem/
           - python ../../utils/pylit/pylit.py motherproblem.py.rst
           - python motherproblem.py
