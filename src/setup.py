@@ -21,8 +21,9 @@ except IOError:
 
 # Make sure we are using c++11
 ex_flags.append("-std=c++11")
-ex_libs = []
 
+# Collect up libraries needed by mpi
+ex_libs = [x[2:] for x in ex_flags if x[:2]=='-l']
 
 if "TRILINOS_DIR" not in os.environ:
     print "Please set the TRILINOS_DIR environment variable to point to the Trilinos"
@@ -35,8 +36,6 @@ if not os.path.exists(trilinos_dir+"/include/ROL_config.h"):
     quit()
 
 ex_libs.extend(["teuchoscore", "teuchosnumerics", "teuchosparameterlist", "teuchoscomm"])
-print ex_libs
-quit()
 
 setup(name="PyROL",
       version="0.1.1",
