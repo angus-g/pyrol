@@ -209,8 +209,8 @@ Create vectors for the optimization and perform a linear algebra check::
     d = Function(M)
     d.interpolate(Expression("sin(x[0]*pi)*sin(x[1]*pi)", degree=1))
     d = LA(d.vector(), inner_product)
-    if backend == "firedrake":
-        obj.checkGradient(opt, d, 3, 1)
+    # if backend == "firedrake":
+    #     obj.checkGradient(opt, d, 3, 1)
 
 Create the upper and lower bound constraints ::
 
