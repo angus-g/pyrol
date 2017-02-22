@@ -19,7 +19,6 @@ pipelines:
           - source /home/fenics/fenics.env.conf
           - py.test -s tests
           - . /home/fenics/firedrake/bin/activate
-          - export PYTHONPATH=
           - cd examples/motherproblem/
           - python ../../utils/pylit/pylit.py motherproblem.py.rst
           - python motherproblem.py
