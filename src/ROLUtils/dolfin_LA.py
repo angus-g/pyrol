@@ -2,7 +2,7 @@ import ROL
 from dolfin import as_backend_type
 
 class dolfinLA(ROL.CustomLA):
-    def __init__(self, vec, inner):
+    def __init__(self, vec, inner=None):
         ROL.CustomLA.__init__(self)
         self.vec = vec
         self.inner = inner
