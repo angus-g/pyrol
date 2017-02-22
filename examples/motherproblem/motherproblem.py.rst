@@ -2,7 +2,7 @@ Poisson Motherproblem
 =====================
 
 We want to solve the motherproblem of PDE Constrained Optimization as described at `dolfin-adjoint <http://www.dolfin-adjoint.org/en/latest/documentation/poisson-mother/poisson-mother.html/>`_.
-We can use either dolfin or firedrake to do this. 
+We can use either dolfin or firedrake to do this.
 
 Begin by including either of the two finite element libraries and the corresponding vector class from ROL ::
 
@@ -20,6 +20,7 @@ Begin by including either of the two finite element libraries and the correspond
 Import ROL ::
 
     import ROL
+
 Define a mesh and in the case of dolfin, optionally perform some random mesh refinement in order to show of the mesh indenpendent behaviour ::
 
     n = 16
@@ -51,6 +52,7 @@ Set an output directory ::
     outdir = "output_riesz_%s_refinements_%i/" % (use_correct_riesz_and_inner, k)
 
 Define the function space, regularity parameter and target function ::
+
     V = FunctionSpace(mesh, "Lagrange", 1)  # space for state variable
     M = FunctionSpace(mesh, "DG", 0)  # space for control variable
     beta = 1e-4
@@ -194,9 +196,10 @@ Create the inner product ::
     else:
         inner_product = None
 
-Create the objective :: 
+Create the objective ::
 
     obj = Objective(inner_product)
+
 Create vectors for the optimization and perform a linear algebra check::
 
     u = Function(M)
@@ -218,6 +221,7 @@ Create the upper and lower bound constraints ::
     bnd = ROL.BoundConstraint(x_lo, x_up, 1.0)
 
 Run the optimization ::
+
     algo = ROL.Algorithm("Line Search", params)
     algo.run(opt, obj, bnd)
     if backend == "firedrake":
