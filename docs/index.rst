@@ -22,6 +22,9 @@ Contents:
    objectives
    constraints
 
+   examples/motherproblem.py
+   examples/stokes_topology_optimization.py
+
 Indices and tables
 ==================
 

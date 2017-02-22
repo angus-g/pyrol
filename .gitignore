@@ -8,3 +8,5 @@ docs/_build/
 *.pvd
 *.vtu
 *.pvtu
+docs/examples
+src/PyROL.egg-info

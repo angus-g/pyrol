@@ -47,12 +47,23 @@ help:
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 	@echo "  coverage   to run coverage check of the documentation (if enabled)"
 
+GENERATED_FILES = examples
+
 .PHONY: clean
 clean:
 	rm -rf $(BUILDDIR)/*
 
+.PHONY: copy_examples
+
+examples: copy_examples
+
+copy_examples:
+	install -d examples/
+	cp ../examples/*/*.rst examples
+	for file in examples/*.py.rst; do python ../utils/pylit/pylit.py $$file; done
+
 .PHONY: html
-html:
+html: copy_examples
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
