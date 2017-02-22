@@ -18,7 +18,7 @@ pipelines:
           - source /home/fenics/fenics.env.conf
           - py.test -s tests
           - . /home/fenics/firedrake/bin/activate
-	      - for file in examples/*/*.py.rst; do python utils/pylit/pylit.py $$file; done
+          - for file in examples/*/*.py.rst; do python utils/pylit/pylit.py $$file; done
           - cd examples/motherproblem/
           - python motherproblem.py
           - deactivate
