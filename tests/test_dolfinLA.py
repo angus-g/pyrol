@@ -10,13 +10,13 @@ class Objective(ROL.Objective):
     def value(self, x, tol):
         val = 0.0
         n = self.n
-        for i in range(x.data.local_size()):
+        for i in range(x.vec.local_size()):
             val += (x[i] - i)**n
         return val
 
     def gradient(self, g, x, tol):
         n = self.n
-        for i in range(x.data.local_size()):
+        for i in range(x.vec.local_size()):
             g[i] = n*(x[i] - i)**(n-1)
 
 obj = Objective()
@@ -45,8 +45,8 @@ def test_dolfin_la_checkvector():
     x = dolfinLA(dolfin.Vector(dolfin.mpi_comm_world(), 2))
     y = dolfinLA(dolfin.Vector(dolfin.mpi_comm_world(), 2))
     z = dolfinLA(dolfin.Vector(dolfin.mpi_comm_world(), 2))
-    x.data[0] = 1.0
-    x.data[1] = 1.5
+    x.vec[0] = 1.0
+    x.vec[1] = 1.5
 
     x.checkVector(y, z)
 
@@ -55,4 +55,4 @@ def test_dolfin_la_objective():
     m = n*(n-1)/2
     x = dolfinLA(dolfin.Vector(dolfin.mpi_comm_world(), n))
     algo.run(x, obj)
-    assert abs((sum(x.data.array()) - m)/m) < 1e-6
+    assert abs((sum(x.vec.array()) - m)/m) < 1e-6
