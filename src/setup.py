@@ -25,8 +25,9 @@ ex_libs = []
 
 
 if "TRILINOS_DIR" not in os.environ:
-    print "Please set the TRILINOS_DIR environment variable to point to the Trilinos\n"
+    print "Please set the TRILINOS_DIR environment variable to point to the Trilinos"
     print "installation directory containing ROL and Teuchos\n"
+    quit()
 
 trilinos_dir = os.environ["TRILINOS_DIR"]
 if not os.path.exists(trilinos_dir+"/include/ROL_config.h"):
