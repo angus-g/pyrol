@@ -21,6 +21,8 @@ except IOError:
 
 # Make sure we are using c++11
 ex_flags.append("-std=c++11")
+ex_libs = []
+
 
 if "TRILINOS_DIR" not in os.environ:
     print "Please set the TRILINOS_DIR environment variable to point to the Trilinos\n"
@@ -30,6 +32,10 @@ trilinos_dir = os.environ["TRILINOS_DIR"]
 if not os.path.exists(trilinos_dir+"/include/ROL_config.h"):
     print "Cannot find Trilinos include directory with ROL. Make sure TRILINOS_DIR is set correctly.\n"
     quit()
+
+ex_libs.extend(["teuchoscore", "teuchosnumerics", "teuchosparameterlist", "teuchoscomm"])
+print ex_libs
+quit()
 
 setup(name="PyROL",
       version="0.1.1",
@@ -45,7 +51,7 @@ setup(name="PyROL",
                     include_dirs = [trilinos_dir+"/include"],
                     library_dirs = [trilinos_dir+"/lib"],
                     runtime_library_dirs = [trilinos_dir+"/lib"],
-                    libraries = ["teuchoscore", "teuchosnumerics", "teuchosparameterlist", "teuchoscomm"],
+                    libraries = ex_libs,
                     extra_compile_args = ex_flags,
                  )],
       )
