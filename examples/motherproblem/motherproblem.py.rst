@@ -94,10 +94,11 @@ Define the proper inner product based on the L^2 inner product on the function s
             self.bcs = [DirichletBC(M, Constant(0.0), "on_boundary")]
 
         def eval(self, _u, _v):
-            y = _v.copy()
-            # y.zero()
-            self.A.mult(_u, y)
-            return _v.inner(y)
+            upet = as_backend_type(_u).vec()
+            vpet = as_backend_type(_v).vec()
+            A_u = self.Ap.createVecLeft()
+            self.Ap.mult(upet, A_u)
+            return vpet.dot(A_u)
 
         def riesz_map(self, derivative):
             if backend == "firedrake":

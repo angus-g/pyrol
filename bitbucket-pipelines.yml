@@ -18,5 +18,9 @@ pipelines:
           - source /home/fenics/fenics.env.conf
           - py.test -s tests
           - . /home/fenics/firedrake/bin/activate
-            #           - cd examples/firedrake_motherproblem/
-            #           - python firedrake_motherproblem.py
+	      - for file in examples/*/*.py.rst; do python utils/pylit/pylit.py $$file; done
+          - cd examples/motherproblem/
+          - python motherproblem.py
+          - deactivate
+          - cd ../stokes_topology_optimization
+          - python stokes_topology_optimization.py
