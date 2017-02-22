@@ -15,13 +15,14 @@ pipelines:
           - cd src
           - python setup.py build
           - export PYTHONPATH=$(pwd)/build/lib.linux-x86_64-2.7:$PYTHONPATH
-          - cd ..
-          - source /home/fenics/fenics.env.conf
-          - py.test -s tests
           - . /home/fenics/firedrake/bin/activate
-          - cd examples/motherproblem/
+          - cd ../examples/motherproblem/
           - python ../../utils/pylit/pylit.py motherproblem.py.rst
           - python motherproblem.py
+          - deactivate
+          - cd ../..
+          - source /home/fenics/fenics.env.conf
+          - py.test -s tests
           #- deactivate
           #- cd ../stokes_topology_optimization
           #- python stokes_topology_optimization.py
