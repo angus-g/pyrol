@@ -56,15 +56,15 @@ def solve_state(rho):
     solve(lhs(F) == rhs(F), w, bcs=bc)
     return w
 
-def solve_adjoint(rho, w): 
+def solve_adjoint(rho, w):
     (u, p) = split(w)
     (v, q) = TrialFunctions(W)
     (du, dp) = TestFunctions(W)
     F = inner(alpha(rho) * u, du) * dx
-    F += inner(2 * mu * grad(u), grad(du)) * dx 
-    F += inner(alpha(rho) * du, v) * dx 
-    F += inner(mu * grad(du), grad(v)) * dx 
-    F += inner(grad(dp), v) * dx 
+    F += inner(2 * mu * grad(u), grad(du)) * dx
+    F += inner(alpha(rho) * du, v) * dx
+    F += inner(mu * grad(du), grad(v)) * dx
+    F += inner(grad(dp), v) * dx
     F += inner(div(du), q) * dx
     bc = DirichletBC(W.sub(0), Constant((0,0)), "on_boundary")
     adj = Function(W)
@@ -75,14 +75,11 @@ class L2Inner(object):
 
     def __init__(self):
         self.A = assemble(TrialFunction(A)*TestFunction(A)*dx)
-        self.Ap = as_backend_type(self.A).mat()
 
     def eval(self, _u, _v):
-        upet = as_backend_type(_u).vec()
-        vpet = as_backend_type(_v).vec()
-        A_u = self.Ap.createVecLeft()
-        self.Ap.mult(upet, A_u)
-        return vpet.dot(A_u)
+        A_u = _v.copy()
+        self.A.mult(_u, A_u)
+        return _v.inner(A_u)
 
     def riesz_map(self, derivative):
         res = Function(A)
@@ -196,7 +193,7 @@ set_log_level(30)
 params = ROL.ParameterList(parametersXML)
 bound_constraint = ROL.BoundConstraint(lower, upper, 1.0)
 
-alg2 = ROL.Algorithm("Augmented Lagrangian", params) 
+alg2 = ROL.Algorithm("Augmented Lagrangian", params)
 penaltyParam = 1
 augLag = ROL.AugmentedLagrangian(obj, volConstr, l, penaltyParam, x, c, params)
 alg2.run(x, l, augLag, volConstr, bound_constraint)

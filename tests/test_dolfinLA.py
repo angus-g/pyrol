@@ -47,7 +47,7 @@ def test_dolfin_la_checkvector():
     z = dolfinLA(dolfin.Vector(dolfin.mpi_comm_world(), 2))
     x.data[0] = 1.0
     x.data[1] = 1.5
-    
+
     x.checkVector(y, z)
 
 def test_dolfin_la_objective():
