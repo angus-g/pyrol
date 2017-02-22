@@ -73,12 +73,12 @@ PYBIND11_PLUGIN(ROL)
 	  }
 	)
     .def("scale", &ROL::StdVector<double>::scale, "Multiply the vector by a scalar")
-        .def("checkVector", [](std::shared_ptr<ROL::StdVector<double>>& x,
-                               std::shared_ptr<ROL::StdVector<double>>& y,
-                               std::shared_ptr<ROL::StdVector<double>>& z)->std::vector<double>
-             {
-               return x->checkVector(*y, *z, true, std::cout);
-             }, "Check the accuracy of the linear algebra implementation");
+    .def("checkVector", [](std::shared_ptr<ROL::StdVector<double>>& x,
+                           std::shared_ptr<ROL::StdVector<double>>& y,
+                           std::shared_ptr<ROL::StdVector<double>>& z)->std::vector<double>
+      {
+        return x->checkVector(*y, *z, true, std::cout);
+      }, "Check the accuracy of the linear algebra implementation");
 
   //
   // ROL::CustomLA
@@ -86,7 +86,7 @@ PYBIND11_PLUGIN(ROL)
   py::class_<CustomLA, ROL::Vector<double>, std::shared_ptr<CustomLA>>(m, "CustomLA", "Custom Vector and Linear Algebra base class")
   //py::class_<CustomLA, std::shared_ptr<CustomLA>>(m, "CustomLA")
 	.def(py::init<>())
-	.def("clone", &CustomLA::clone)
+	//.def("clone", &CustomLA::clone)
 	.def("norm", &CustomLA::norm)
     .def("checkVector", [](std::shared_ptr<CustomLA>& x, std::shared_ptr<CustomLA>& y, std::shared_ptr<CustomLA>& z)->std::vector<double>
 	  {
@@ -98,11 +98,11 @@ PYBIND11_PLUGIN(ROL)
   //
   // ROL::Objective<double>
   //
-  py::class_<ROL::Objective<double>, PyObjective, std::shared_ptr<ROL::Objective<double>>> objective(m, "Objective");
+  py::class_<ROL::Objective<double>, PyObjective, std::shared_ptr<ROL::Objective<double>>> objective(m, "Objective", "Base class for the objective class. Python objectives need to inherit from this class.");
   objective.def(py::init<>())
-    .def("value", &ROL::Objective<double>::value)
-    .def("gradient", &ROL::Objective<double>::gradient)
-    .def("update", &ROL::Objective<double>::update)
+    //.def("value", &ROL::Objective<double>::value)
+    //.def("gradient", &ROL::Objective<double>::gradient)
+    //.def("update", &ROL::Objective<double>::update)
     .def("checkGradient", [](ROL::Objective<double>& instance, ROL::Vector<double>& x, ROL::Vector<double>& d, int steps, int order)->std::vector<double>
 	  {
 	    auto res = instance.checkGradient(x, d, true, std::cout, steps, order);
@@ -169,14 +169,14 @@ PYBIND11_PLUGIN(ROL)
 	//
 	py::class_<ROL::EqualityConstraint<double>, PyEqualityConstraint, std::shared_ptr<ROL::EqualityConstraint<double>>>(m, "EqualityConstraint")
 	  .def(py::init<>())
-	  .def("value", &ROL::EqualityConstraint<double>::value)
-	  .def("applyJacobian", &ROL::EqualityConstraint<double>::applyJacobian)
-	  .def("applyAdjointJacobian", [](ROL::EqualityConstraint<double>& instance,
-	    ROL::Vector<double> &ajv, const ROL::Vector<double> &v,
-		const ROL::Vector<double> &x, double &tol)
-		{
-		  instance.applyAdjointJacobian(ajv, v, x, tol);
-		})
+	  //.def("value", &ROL::EqualityConstraint<double>::value)
+	  //.def("applyJacobian", &ROL::EqualityConstraint<double>::applyJacobian)
+	  //.def("applyAdjointJacobian", [](ROL::EqualityConstraint<double>& instance,
+	  //  ROL::Vector<double> &ajv, const ROL::Vector<double> &v,
+	  //  const ROL::Vector<double> &x, double &tol)
+	  //  {
+	  //    instance.applyAdjointJacobian(ajv, v, x, tol);
+	  //  })
 	  .def("checkApplyJacobian", [](ROL::EqualityConstraint<double>& instance,
         ROL::Vector<double>& x, ROL::Vector<double>& v, ROL::Vector<double>& jv,
         int steps, int order)

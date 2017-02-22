@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import dolfin
 import ROL 
+from ROLUtils.dolfin_LA import dolfinLA
 class Objective(ROL.Objective):
     def __init__(self):
         ROL.Objective.__init__(self)
@@ -39,47 +40,6 @@ parameterXML = """
 params = ROL.ParameterList(parameterXML)
 
 algo = ROL.Algorithm("Line Search", params)
-
-class dolfinLA(ROL.CustomLA):
-    def __init__(self, vec):
-        ROL.CustomLA.__init__(self)
-        self.data = vec 
-
-    def plus(self, x):
-        # PETSc doesn't like adding vector to themselves,
-        # so we have to add this check
-        xpet = dolfin.as_backend_type(x.data).vec()
-        thispet = dolfin.as_backend_type(self.data).vec()
-        if xpet == thispet:
-            self.data *= 2
-        else:
-            self.data += x.data
-
-    def scale(self, alpha):
-        self.data *= alpha
-
-    def __getitem__(self, i):
-        return self.data[i][0]
-
-    def __setitem__(self, i, v):
-        self.data[i] = v
-
-    def dot(self, x):
-        return self.data.inner(x.data)
-
-    def dimension(self):
-        return self.data.size()
-
-    def dimension(self):
-        return self.size
-
-    def basis(self, i):
-        res = dolfinLA(self.size)
-        res[i] = 1.0
-        return res
-
-    def clone(self):
-        return dolfinLA(self.data.copy())
 
 def test_dolfin_la_checkvector():
     x = dolfinLA(dolfin.Vector(dolfin.mpi_comm_world(), 2))

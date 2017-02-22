@@ -13,6 +13,7 @@ setup(name="PyROL",
       author="Chris Richardson and Florian Wechsung",
       author_email="pyrol-dev@googlemail.com",
       license="LGPLv3",
+      packages=['ROLUtils'],
       install_requires=["pybind11"],
       ext_modules=[
           Extension("ROL",
