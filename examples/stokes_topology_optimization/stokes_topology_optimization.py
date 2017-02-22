@@ -15,7 +15,7 @@ def alpha(rho):
 def alphadash(rho):
     return (alphaunderbar - alphabar) * (1 * (1 + q) / (rho + q) - rho * (1 + q)/((rho + q)*(rho + q)))
 
-N = 100
+N = 30
 delta = 1.5  # The aspect ratio of the domain, 1 high and \delta wide
 V = (1.0/3) * delta  # want the fluid to occupy 1/3 of the domain
 

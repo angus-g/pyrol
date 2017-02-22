@@ -1,5 +1,5 @@
 import ROL
-from dolfin import as_backend_type
+# from dolfin import as_backend_type
 
 class dolfinLA(ROL.CustomLA):
     def __init__(self, vec, inner):
@@ -10,12 +10,12 @@ class dolfinLA(ROL.CustomLA):
     def plus(self, x):
         # PETSc doesn't like adding vector to themselves,
         # so we have to add this check
-        xpet = as_backend_type(x.vec).vec()
-        thispet = as_backend_type(self.vec).vec()
-        if xpet == thispet:
-            self.vec *= 2
-        else:
-            self.vec += x.vec
+  #      xpet = as_backend_type(x.vec).vec()
+#        thispet = as_backend_type(self.vec).vec()
+ #       if xpet == thispet:
+#            self.vec *= 2
+#        else:
+        self.vec += x.vec.copy()
 
     def scale(self, alpha):
         self.vec *= alpha
