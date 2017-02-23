@@ -106,7 +106,8 @@
       <Parameter name="Feasibility Tolerance Decrease Exponent" type="double" value="0.9"          />
       <!-- ===========  SUBPROBLEM SOLVER  =========== -->
       <Parameter name="Print Intermediate Optimization History" type="bool"   value="false"        />
-      <Parameter name="Subproblem Step Type"                    type="string" value="Trust Region" />
+      <!--<Parameter name="Subproblem Step Type"                    type="string" value="Trust Region" />-->
+      <Parameter name="Subproblem Step Type"                    type="string" value="Line Search" />
       <Parameter name="Subproblem Iteration Limit"              type="int"    value="10"           />
     </ParameterList>
   </ParameterList>

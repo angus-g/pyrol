@@ -11,7 +11,7 @@ mu = E / (2*(1 + nu))
 V = 0.3 # Maximum volume allowed
 p = Constant(4.0)
 gamma = Constant(1e-6)
-beta = Constant(1e-6)
+beta = Constant(1e-8)
 
 def alpha(rho):
     return rho**p + gamma
@@ -21,7 +21,7 @@ def alphadash(rho):
 
 def eps(v): return sym(grad(v))
 
-N = 30
+N = 100
 mesh = RectangleMesh(Point(0.0, 0.0), Point(1.6, 1.0), N, N)
 V0 = FunctionSpace(mesh, "CG", 1) # for the control
 V1 = VectorFunctionSpace(mesh, "CG", 1) # for the displacement
@@ -174,9 +174,9 @@ upper = LA(upper.vector(), dot_product)
 
 # Instantiate Objective class for poisson problem
 obj = ObjR(dot_product)
-obj.checkGradient(x, d, 4, 2)
+obj.checkGradient(x, d, 7, 1)
 volConstr = VolConstraint(dot_product)
-volConstr.checkApplyJacobian(x, d, jd, 3, 1)
+volConstr.checkApplyJacobian(x, d, jd, 6, 1)
 volConstr.checkAdjointConsistencyJacobian(v, d, x)
 
 with open('input.xml', 'r') as myfile:
