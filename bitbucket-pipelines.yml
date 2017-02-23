@@ -16,6 +16,7 @@ pipelines:
           - python setup.py build
           - export PYTHONPATH=$(pwd)/build/lib.linux-x86_64-2.7:$PYTHONPATH
           - . /home/fenics/firedrake/bin/activate
+          - unset PETSC_DIR
           - cd ../examples/motherproblem/
           - python ../../utils/pylit/pylit.py motherproblem.py.rst
           - python motherproblem.py
