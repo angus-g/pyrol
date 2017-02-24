@@ -32,7 +32,7 @@ class dolfinLA(ROL.CustomLA):
         return res
 
     def dimension(self):
-        return len(self.vec)
+        return self.vec.local_size()#len(self.vec)
 
     def basis(self, i):
         res = self.clone()
