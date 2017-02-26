@@ -1,5 +1,7 @@
-from dolfin import *
-from ROLUtils.dolfin_LA import dolfinLA as LA
+# from dolfin import *
+from firedrake import *
+# from ROLUtils.dolfin_LA import dolfinLA as LA
+from ROLUtils.firedrake_LA import FiredrakeLA as LA
 import numpy
 import ROL
 
@@ -22,7 +24,8 @@ def alphadash(rho):
 def eps(v): return sym(grad(v))
 
 N = 100
-mesh = RectangleMesh(Point(0.0, 0.0), Point(1.6, 1.0), N, N)
+# mesh = RectangleMesh(Point(0.0, 0.0), Point(1.6, 1.0), N, N)
+mesh = RectangleMesh(N, N, 1.6, 1)
 V0 = FunctionSpace(mesh, "CG", 1) # for the control
 V1 = VectorFunctionSpace(mesh, "CG", 1) # for the displacement
 
@@ -41,7 +44,12 @@ f = interpolate(SourceExpression(degree=1), V1)
 
 class InitialExpressionA(Expression):
     def eval(self, values, x):
-        values[0] = V
+        values[0] = V/1.6
+
+solver_parameters = {'ksp_rtol': 1e-9, 'ksp_atol': 1e-10, 'ksp_stol': 1e-16,
+        'ksp_type': 'cg', 'pc_type': 'hypre',
+        'pc_hypre_type': 'boomeramg'
+        }
 
 def solve_state(rho):
     """Solve the forward problem for a given fluid distribution rho(x)."""
@@ -49,38 +57,41 @@ def solve_state(rho):
     v = TestFunction(V1)
 
     F = alpha(rho) * 2 * mu * inner(eps(u), eps(v)) * dx
-    F += lmbda * div(u) * div(v) * dx
+    F += alpha(rho) * lmbda * div(u) * div(v) * dx
     F -= inner(f, v) * dx
-    bcs = [DirichletBC(V1, (0.0, 0.0), "x[0] < DOLFIN_EPS")]
+    bcs = [DirichletBC(V1, (0.0, 0.0), 1)]
     u = Function(V1)
-    solve(lhs(F) == rhs(F), u, bcs=bcs)
+    solve(lhs(F) == rhs(F), u, bcs=bcs, solver_parameters=solver_parameters)
     return u
 
 def solve_adjoint(rho, u):
     v = TrialFunction(V1)
     du = TestFunction(V1)
     F = alpha(rho) * 2 * mu * inner(eps(du), eps(v)) * dx
-    F += lmbda * div(du) * div(v) * dx
+    F += alpha(rho) * lmbda * div(du) * div(v) * dx
     F += inner(f, du) * dx
-    bcs = [DirichletBC(V1, (0.0, 0.0), "x[0] < DOLFIN_EPS")]
+    bcs = [DirichletBC(V1, (0.0, 0.0), 1)]
     adj = Function(V1)
-    solve(lhs(F) == rhs(F), adj, bcs=bcs)
+    solve(lhs(F) == rhs(F), adj, bcs=bcs, solver_parameters=solver_parameters)
     return adj
 
 class L2Inner(object):
 
     def __init__(self):
         self.A = assemble(TrialFunction(V0)*TestFunction(V0)*dx)
+        self.Ap = as_backend_type(self.A).mat()
 
     def eval(self, _u, _v):
-        A_u = _v.copy()
-        self.A.mult(_u, A_u)
-        return _v.inner(A_u)
+        upet = as_backend_type(_u).vec()
+        vpet = as_backend_type(_v).vec()
+        A_u = self.Ap.createVecLeft()
+        self.Ap.mult(upet, A_u)
+        return vpet.dot(A_u)
 
     def riesz_map(self, derivative):
         res = Function(V0)
-        rhs = Function(V0, derivative)
-        solve(self.A, res.vector(), rhs.vector())
+        rhs = Function(V0, val=derivative.dat)
+        solve(self.A, res, rhs)
         return res.vector()
 
 dot_product = L2Inner()
@@ -105,7 +116,9 @@ class ObjR(ROL.Objective):
         u = self.state
         v = solve_adjoint(rho, u)
         drho = TestFunction(V0)
-        L = alphadash(rho) * drho * 2 * mu * inner(eps(u), eps(v)) * dx + 2 * beta * inner(grad(rho), grad(drho)) * dx
+        L = alphadash(rho) * drho * 2 * mu * inner(eps(u), eps(v)) * dx 
+        L += alphadash(rho) * drho * lmbda * div(u) * div(v) * dx
+        L += 2 * beta * inner(grad(rho), grad(drho)) * dx
         deriv = assemble(L)
         if self.inner_product is not None:
             gra = self.inner_product.riesz_map(deriv)
@@ -119,8 +132,11 @@ class ObjR(ROL.Objective):
         self.rho.assign(rho)
         state = solve_state(self.rho)
         self.state.assign(state)
-        control_file << self.rho
-        state_file << self.state
+        if iteration >= 0:
+            control_file.write(self.rho)
+            state_file.write(self.state)
+            # control_file << self.rho
+            # state_file << self.state
 
 class VolConstraint(ROL.EqualityConstraint):
 
