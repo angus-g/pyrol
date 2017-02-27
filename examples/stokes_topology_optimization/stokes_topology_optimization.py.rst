@@ -20,7 +20,7 @@ We consider the topology optimization example from `dolfin-adjoint <http://www.d
     def alphadash(rho):
         return (alphaunderbar - alphabar) * (1 * (1 + q) / (rho + q) - rho * (1 + q)/((rho + q)*(rho + q)))
 
-    N = 30
+    N = 100
     delta = 1.5  # The aspect ratio of the domain, 1 high and \delta wide
     V = (1.0/3) * delta  # want the fluid to occupy 1/3 of the domain
 
@@ -127,12 +127,14 @@ We consider the topology optimization example from `dolfin-adjoint <http://www.d
             g.vec += grad
 
         def update(self, x, flag, iteration):
+            print "iteration %s" % iteration
             rho = Function(A, x.vec)
             self.rho.assign(rho)
             state = solve_state(self.rho)
             self.state.assign(state)
-            control_file << self.rho
-            state_file << self.state
+            if iteration >= 0:
+                control_file << self.rho
+                state_file << self.state
 
     class VolConstraint(ROL.EqualityConstraint):
 
