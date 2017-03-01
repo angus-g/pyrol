@@ -1,23 +1,33 @@
-import os, subprocess
+import os, sys, subprocess
 from setuptools import setup, Extension
 
-# Detect pybind11 installation and add include path
-from setuptools.command.build_ext import build_ext
-class build_ext_pybind11(build_ext):
-    def finalize_options(self):
-        build_ext.finalize_options(self)
-        import pybind11
-        self.include_dirs.append(pybind11.get_include())
+if "TRILINOS_DIR" not in os.environ:
+    print "Please set the TRILINOS_DIR environment variable to point to the Trilinos"
+    print "installation directory containing ROL and Teuchos\n"
+    sys.exit(1)
+
+trilinos_dir = os.environ["TRILINOS_DIR"]
+
+if (sys.platform == 'darwin'):
+    os.environ.setdefault('LDFLAGS','')
+    os.environ['LDFLAGS'] += os.path.expandvars(' -Wl,-rpath,$TRILINOS_DIR/lib')
+
+try:
+    import pybind11
+except ImportError:
+    raise ImportError("Please pip install pybind11 first")
+else:
+    pybind11_get_include = pybind11.get_include()
 
 # Try to get the MPI flags
 try:
-    mpicxx = subprocess.check_output(["mpicxx","-show"])
+    mpicxx = subprocess.check_output(["mpicxx", "-show"])
     ex_flags = mpicxx.strip()
     ex_flags = ex_flags.split(" ")[1:]
 except IOError:
     print 'Cannot query mpicxx compiler used to compile Trilinos\n'
     print 'Make sure that mpicxx exists, and returns flags with "mpicxx -show"'
-    quit()
+    sys.exit(1)
 
 # Make sure we are using c++11
 ex_flags.append("-std=c++11")
@@ -25,15 +35,9 @@ ex_flags.append("-std=c++11")
 # Collect up libraries needed by mpi
 ex_libs = [x[2:] for x in ex_flags if x[:2]=='-l']
 
-if "TRILINOS_DIR" not in os.environ:
-    print "Please set the TRILINOS_DIR environment variable to point to the Trilinos"
-    print "installation directory containing ROL and Teuchos\n"
-    quit()
-
-trilinos_dir = os.environ["TRILINOS_DIR"]
 if not os.path.exists(trilinos_dir+"/include/ROL_config.h"):
     print "Cannot find Trilinos include directory with ROL. Make sure TRILINOS_DIR is set correctly.\n"
-    quit()
+    sys.exit(1)
 
 ex_libs.extend(["teuchoscore", "teuchosnumerics", "teuchosparameterlist", "teuchoscomm"])
 
@@ -42,13 +46,12 @@ setup(name="PyROL",
       author="Chris Richardson and Florian Wechsung",
       author_email="pyrol-dev@googlemail.com",
       license="LGPLv3",
-      packages=['ROLUtils'],
-      install_requires=["pybind11"],
-      cmdclass={'build_ext': build_ext_pybind11},
+      packages=['ROL'],
+      # setup_requires=["pybind11"],
       ext_modules=[
-          Extension("ROL",
+          Extension("_ROL",
                     ["ROL/ROL.cpp"],
-                    include_dirs = [trilinos_dir+"/include"],
+                    include_dirs = [pybind11_get_include] + [trilinos_dir+"/include"],
                     library_dirs = [trilinos_dir+"/lib"],
                     runtime_library_dirs = [trilinos_dir+"/lib"],
                     libraries = ex_libs,

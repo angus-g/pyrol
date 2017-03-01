@@ -9,9 +9,9 @@ Begin by including either of the two finite element libraries and the correspond
     from firedrake import UnitSquareMesh, FunctionSpace, Function, \
         Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
         dx, Constant, solve, assemble, as_backend_type, File
-    from ROLUtils.firedrake_LA import FiredrakeLA as LA
+    from ROL.firedrake_LA import FiredrakeLA as LA
     backend = "firedrake"
-    # from ROLUtils.dolfin_LA import dolfinLA as LA
+    # from ROL.dolfin_LA import dolfinLA as LA
     # from dolfin import UnitSquareMesh, FunctionSpace, Function, \
     #     Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
     #     dx, Constant, solve, assemble, as_backend_type, File, CellFunction, refine

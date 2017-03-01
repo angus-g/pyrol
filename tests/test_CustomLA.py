@@ -1,7 +1,7 @@
 #!/usr/bin/env py.test
 import ROL
 import numpy as np
-from ROLUtils.NPBasedLA import NPBasedLA
+from ROL.NPBasedLA import NPBasedLA
 
 class MyObj(ROL.Objective):
     def __init__(self):
