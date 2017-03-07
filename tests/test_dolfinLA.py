@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import dolfin
-import ROL 
-from ROLUtils.dolfin_LA import dolfinLA
+import ROL
+from ROL.dolfin_LA import dolfinLA
 class Objective(ROL.Objective):
     def __init__(self):
         ROL.Objective.__init__(self)

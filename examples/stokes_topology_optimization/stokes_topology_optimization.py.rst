@@ -4,7 +4,7 @@ Stokes Topology Optimization
 We consider the topology optimization example from `dolfin-adjoint <http://www.dolfin-adjoint.org/en/latest/documentation/stokes-topology/stokes-topology.html/>`_ ::
 
     from dolfin import *
-    from ROLUtils.dolfin_LA import dolfinLA as LA
+    from ROL.dolfin_LA import dolfinLA as LA
     import numpy
     import ROL
 

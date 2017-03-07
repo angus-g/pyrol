@@ -2,16 +2,16 @@ Poisson Motherproblem
 =====================
 
 We want to solve the motherproblem of PDE Constrained Optimization as described at `dolfin-adjoint <http://www.dolfin-adjoint.org/en/latest/documentation/poisson-mother/poisson-mother.html/>`_.
-We can use either dolfin or firedrake to do this. 
+We can use either dolfin or firedrake to do this.
 
 Begin by including either of the two finite element libraries and the corresponding vector class from ROL ::
 
     from firedrake import UnitSquareMesh, FunctionSpace, Function, \
         Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
         dx, Constant, solve, assemble, as_backend_type, File
-    from ROLUtils.firedrake_LA import FiredrakeLA as LA
+    from ROL.firedrake_LA import FiredrakeLA as LA
     backend = "firedrake"
-    # from ROLUtils.dolfin_LA import dolfinLA as LA
+    # from ROL.dolfin_LA import dolfinLA as LA
     # from dolfin import UnitSquareMesh, FunctionSpace, Function, \
     #     Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
     #     dx, Constant, solve, assemble, as_backend_type, File, CellFunction, refine
@@ -198,7 +198,7 @@ Create the inner product ::
     else:
         inner_product = None
 
-Create the objective :: 
+Create the objective ::
 
     obj = Objective(inner_product)
 

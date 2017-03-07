@@ -1,5 +1,5 @@
 from dolfin import *
-from ROLUtils.dolfin_LA import dolfinLA as LA
+from ROL.dolfin_LA import dolfinLA as LA
 import numpy
 import ROL
 

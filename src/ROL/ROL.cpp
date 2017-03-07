@@ -17,9 +17,9 @@ namespace py = pybind11;
 #include "PyObjective.h"
 #include "PyEqualityConstraint.h"
 
-PYBIND11_PLUGIN(ROL)
+PYBIND11_PLUGIN(_ROL)
 {
-  py::module m("ROL", "PyROL provides Python wrappers for a subset of the Trilinos ROL library.");
+  py::module m("_ROL", "PyROL provides Python wrappers for a subset of the Trilinos ROL library.");
   m.attr("__version__") = "0.1.1";
 
   py::class_<ROL::Vector<double>, std::shared_ptr<ROL::Vector<double>>>(m, "Vector");
