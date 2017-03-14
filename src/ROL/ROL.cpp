@@ -16,6 +16,7 @@ namespace py = pybind11;
 #include "CustomLA.h"
 #include "PyObjective.h"
 #include "PyEqualityConstraint.h"
+#include "PyBoundConstraint.h"
 
 PYBIND11_PLUGIN(_ROL)
 {
@@ -139,19 +140,26 @@ PYBIND11_PLUGIN(_ROL)
 
 	// ROL::BoundConstraint
 	//
-	py::class_<ROL::BoundConstraint<double>, std::shared_ptr<ROL::BoundConstraint<double>>>(m, "BoundConstraint")
+    py::class_<ROL::BoundConstraint<double>, PyBoundConstraint, std::shared_ptr<ROL::BoundConstraint<double>>>(m, "BoundConstraint")
+	//py::class_<ROL::BoundConstraint<double>, std::shared_ptr<ROL::BoundConstraint<double>>>(m, "BoundConstraint")
+      //.def(py::init<>())
       .def("__init__",
 	    [](ROL::BoundConstraint<double> &instance, std::shared_ptr<ROL::Vector<double>> x_lo,
 		   std::shared_ptr<ROL::Vector<double>> x_up, double scale)
 		{
-		  new (&instance) ROL::BoundConstraint<double>(Teuchos::rcp(x_lo), Teuchos::rcp(x_up), scale);
+		  //new (&instance) ROL::BoundConstraint<double>(Teuchos::rcp(x_lo), Teuchos::rcp(x_up), scale);
+		  new (&instance) PyBoundConstraint(Teuchos::rcp(x_lo), Teuchos::rcp(x_up), scale);
 		})
+      .def("test", [](ROL::BoundConstraint<double> &instance, ROL::Vector<double>& x)
+        {
+          instance.project(x);
+        })
       .def("__init__",
-	    [](ROL::BoundConstraint<double> &instance)
-		{
-		  new (&instance) ROL::BoundConstraint<double>();
-		  instance.deactivate();
-		});
+        [](ROL::BoundConstraint<double> &instance)
+        {
+          new (&instance) PyBoundConstraint();
+          instance.deactivate();
+        });
 
 	// ROL::MoreauYosidaPenalty<double>
 	//
