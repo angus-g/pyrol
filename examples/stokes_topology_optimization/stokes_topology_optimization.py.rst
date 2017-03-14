@@ -54,7 +54,7 @@ We consider the topology optimization example from `dolfin-adjoint <http://www.d
         (u, p) = TrialFunctions(W)
         (v, q) = TestFunctions(W)
 
-        F = (alpha(rho) * inner(u, v) * dx + inner(grad(u), grad(v)) * dx +
+        F = (alpha(rho) * inner(u, v) * dx + mu * inner(grad(u), grad(v)) * dx +
              inner(grad(p), v) * dx  + inner(div(u), q) * dx + Constant(0) * q * dx)
         bc = DirichletBC(W.sub(0), InflowOutflow(degree=1), "on_boundary")
         w = Function(W)
@@ -82,6 +82,7 @@ We consider the topology optimization example from `dolfin-adjoint <http://www.d
             self.A = assemble(TrialFunction(A)*TestFunction(A)*dx)
 
         def eval(self, _u, _v):
+            _v.apply('insert')
             A_u = _v.copy()
             self.A.mult(_u, A_u)
             return _v.inner(A_u)
