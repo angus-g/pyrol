@@ -2,6 +2,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
+#include <stdexcept>
 namespace py = pybind11;
 
 #include <Teuchos_XMLParameterListHelpers.hpp>
@@ -10,6 +11,7 @@ namespace py = pybind11;
 #include <ROL_Algorithm.hpp>
 #include <ROL_BoundConstraint.hpp>
 #include <ROL_EqualityConstraint.hpp>
+#include <ROL_Types.hpp>
 #include "Teuchos_RCPStdSharedPtrConversions.hpp"
 #include "Teuchos_ParameterList.hpp"
 
@@ -18,6 +20,34 @@ namespace py = pybind11;
 #include "PyEqualityConstraint.h"
 #include "PyBoundConstraint.h"
 
+void dictToParameterList(py::dict param_dict, Teuchos::ParameterList &parlist)
+{
+    for(auto item : param_dict)
+    {
+        auto key = item.first;
+        auto value = item.second;
+        if(py::str(key, true).check())
+        {
+            if(py::str(value, true).check())
+                parlist.set(std::string(py::str(key)), std::string(py::str(value)));
+            else if(py::int_(value, true).check())
+                parlist.set(std::string(py::str(key)), value.cast<int>());
+            else if(py::float_(value, true).check())
+                parlist.set(std::string(py::str(key)), value.cast<double>());
+            else if(py::bool_(value, true).check())
+                parlist.set(std::string(py::str(key)), value.cast<bool>());
+            else if(py::dict(value, true).check())
+            {
+                auto &sublist = parlist.sublist(std::string(py::str(key)));
+                dictToParameterList(value.cast<py::dict>(), sublist);
+            }
+            else
+                throw std::runtime_error(std::string("Don't know what to do with value."));
+        }
+        else
+            throw std::runtime_error(std::string("Don't know what to do with key."));
+    }
+}
 PYBIND11_PLUGIN(_ROL)
 {
   py::module m("_ROL", "PyROL provides Python wrappers for a subset of the Trilinos ROL library.");
@@ -136,7 +166,18 @@ PYBIND11_PLUGIN(_ROL)
 	  })
     .def("run", [](ROL::Algorithm<double> &instance, ROL::OptimizationProblem<double>& opt) {
 	    instance.run(opt, true, std::cout);
-	  });
+	  })
+    
+    .def("get_state", [](ROL::Algorithm<double> &instance)
+    {
+        return Teuchos::get_shared_ptr(instance.getState());   
+    });
+
+    py::class_<ROL::AlgorithmState<double>, std::shared_ptr<ROL::AlgorithmState<double>>>(m, "AlgorithmState")
+        .def_readwrite("gnorm", &ROL::AlgorithmState<double>::gnorm)
+        .def_readwrite("cnorm", &ROL::AlgorithmState<double>::cnorm)
+        .def_readwrite("snorm", &ROL::AlgorithmState<double>::snorm)
+        .def_readwrite("value", &ROL::AlgorithmState<double>::value);
 
 	// ROL::BoundConstraint
 	//
@@ -244,7 +285,17 @@ PYBIND11_PLUGIN(_ROL)
                 std::string xml_params)
              {
                new (&instance) Teuchos::ParameterList(*(Teuchos::getParametersFromXmlString(xml_params)));
-             });
+             })
+        .def("__init__",
+                [](Teuchos::ParameterList& instance,
+                   py::dict param_dict,
+                   std::string name)
+            {
+                auto res = new (&instance) Teuchos::ParameterList(name);
+                dictToParameterList(param_dict, *res);
+            })
+        .def("print", [](Teuchos::ParameterList &instance){instance.print();});
+
 
   return m.ptr();
 }
