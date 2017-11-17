@@ -6,9 +6,11 @@
 namespace py = pybind11;
 
 #include <ROL_Algorithm.hpp>
+#include <ROL_BoundConstraint.hpp>
 #include <ROL_Bounds.hpp>
 #include <ROL_Constraint.hpp>
 #include <ROL_Objective.hpp>
+#include <ROL_OptimizationSolver.hpp>
 #include <ROL_StdVector.hpp>
 #include <ROL_Types.hpp>
 #include <Teuchos_XMLParameterListHelpers.hpp>
@@ -190,9 +192,14 @@ PYBIND11_MODULE(_ROL, m) {
       .def_readwrite("snorm", &ROL::AlgorithmState<double>::snorm)
       .def_readwrite("value", &ROL::AlgorithmState<double>::value);
 
+  // ROL::BoundConstraint
+  //
+  py::class_<ROL::BoundConstraint<double>,
+             std::shared_ptr<ROL::BoundConstraint<double>>>(m,
+                                                            "BoundConstraint");
   // ROL::Bounds
   //
-  py::class_<ROL::Bounds<double>, PyBounds,
+  py::class_<ROL::Bounds<double>, ROL::BoundConstraint<double>, PyBounds,
              std::shared_ptr<ROL::Bounds<double>>>(m, "Bounds")
       // py::class_<ROL::Bounds<double>,
       // std::shared_ptr<ROL::Bounds<double>>>(m, "Bounds")
@@ -200,11 +207,8 @@ PYBIND11_MODULE(_ROL, m) {
       .def("__init__",
            [](ROL::Bounds<double>& instance,
               std::shared_ptr<ROL::Vector<double>> x_lo,
-              std::shared_ptr<ROL::Vector<double>> x_up, double scale) {
-             // new (&instance) ROL::Bounds<double>(Teuchos::rcp(x_lo),
-             // Teuchos::rcp(x_up), scale);
-             new (&instance) PyBounds(x_lo, x_up, scale);
-           })
+              std::shared_ptr<ROL::Vector<double>> x_up,
+              double scale) { new (&instance) PyBounds(x_lo, x_up, scale); })
       .def("test", [](ROL::Bounds<double>& instance, ROL::Vector<double>& x) {
         instance.project(x);
       });
@@ -273,21 +277,50 @@ PYBIND11_MODULE(_ROL, m) {
   // ROL::OptimizationProblem<double>
   //
 
-  // py::class_<ROL::OptimizationProblem<double>,
-  // std::shared_ptr<ROL::OptimizationProblem<double>>>(m,
-  // "OptimizationProblem")
-  //  .def("__init__",
-  //    [](ROL::OptimizationProblem<double>& instance,
-  //       std::shared_ptr<ROL::Objective<double>> obj,
-  //       std::shared_ptr<ROL::Vector<double>> sol,
-  //       std::shared_ptr<ROL::Bounds<double>> bnd,
-  //       std::shared_ptr<Teuchos::ParameterList> params)
-  //    {
-  //      new (&instance) ROL::OptimizationProblem<double>(obj,
-  //              sol,
-  //              bnd,
-  //              params);
-  //    });
+  py::class_<ROL::OptimizationProblem<double>,
+             std::shared_ptr<ROL::OptimizationProblem<double>>>(
+      m, "OptimizationProblem")
+      .def("__init__", [](ROL::OptimizationProblem<double>& instance,
+                          std::shared_ptr<ROL::Objective<double>> obj,
+                          std::shared_ptr<ROL::Vector<double>> sol,
+                          py::kwargs kwargs) {
+
+        std::shared_ptr<ROL::BoundConstraint<double>> bnd = nullptr;
+        std::shared_ptr<ROL::Constraint<double>> econ = nullptr;
+        std::shared_ptr<ROL::Vector<double>> emul = nullptr;
+
+        if (kwargs) {
+          for (auto item : kwargs) {
+            auto key = item.first.cast<std::string>();
+            if (key == "bnd") {
+              bnd = item.second
+                        .cast<std::shared_ptr<ROL::BoundConstraint<double>>>();
+            } else if (key == "econ") {
+              econ =
+                  item.second.cast<std::shared_ptr<ROL::Constraint<double>>>();
+            } else if (key == "emul") {
+              emul = item.second.cast<std::shared_ptr<ROL::Vector<double>>>();
+            }
+          }
+        }
+        new (&instance) ROL::OptimizationProblem<double>(obj, sol, bnd);
+      });
+
+  // ROL::OptimizationSolver<double>
+  //
+
+  py::class_<ROL::OptimizationSolver<double>,
+             std::shared_ptr<ROL::OptimizationSolver<double>>>(
+      m, "OptimizationSolver")
+      .def("__init__",
+           [](ROL::OptimizationSolver<double>& instance,
+              std::shared_ptr<ROL::OptimizationProblem<double>> opt,
+              std::shared_ptr<Teuchos::ParameterList> parlist) {
+             new (&instance) ROL::OptimizationSolver<double>(*opt, *parlist);
+           })
+      .def("solve", [](ROL::OptimizationSolver<double>& instance) {
+        instance.solve(std::cout);
+      });
 
   py::class_<Teuchos::ParameterList, std::shared_ptr<Teuchos::ParameterList>>(
       m, "ParameterList", "Create a ParameterList object from an XML string")
