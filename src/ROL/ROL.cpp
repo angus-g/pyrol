@@ -16,10 +16,10 @@ namespace py = pybind11;
 #include <Teuchos_XMLParameterListHelpers.hpp>
 #include "Teuchos_ParameterList.hpp"
 
-#include "CustomLA.h"
 #include "PyBounds.h"
 #include "PyConstraint.h"
 #include "PyObjective.h"
+#include "PyVector.h"
 
 void dictToParameterList(py::dict param_dict, Teuchos::ParameterList& parlist) {
   for (auto item : param_dict) {
@@ -53,8 +53,9 @@ PYBIND11_MODULE(_ROL, m) {
       "Trilinos ROL library.";
   m.attr("__version__") = "0.1.1";
 
-  py::class_<ROL::Vector<double>, std::shared_ptr<ROL::Vector<double>>>(
-      m, "Vector");
+  py::class_<ROL::Vector<double>, std::shared_ptr<ROL::Vector<double>>,
+             PyVector>(m, "Vector")
+      .def(py::init<>());
 
   //
   // ROL::StdVector<double>
@@ -109,22 +110,6 @@ PYBIND11_MODULE(_ROL, m) {
              return x->checkVector(*y, *z, true, std::cout);
            },
            "Check the accuracy of the linear algebra implementation");
-
-  //
-  // ROL::CustomLA
-  //
-  py::class_<CustomLA, ROL::Vector<double>, std::shared_ptr<CustomLA>>(
-      m, "CustomLA", "Custom Vector and Linear Algebra base class")
-      .def(py::init<>())
-      //.def("clone", &CustomLA::clone)
-      .def("norm", &CustomLA::norm)
-      .def("checkVector",
-           [](std::shared_ptr<CustomLA>& x, std::shared_ptr<CustomLA>& y,
-              std::shared_ptr<CustomLA>& z) -> std::vector<double> {
-             return x->checkVector(*y, *z, true, std::cout);
-           });
-  //    .def("cppScale", &CustomLA::scale)
-  //    .def("cppClone", &CustomLA::clone);
 
   //
   // ROL::Objective<double>
