@@ -9,16 +9,15 @@ namespace py = pybind11;
 #include <ROL_StdVector.hpp>
 #include <ROL_Objective.hpp>
 #include <ROL_Algorithm.hpp>
-#include <ROL_BoundConstraint.hpp>
-#include <ROL_EqualityConstraint.hpp>
+#include <ROL_Bounds.hpp>
+#include <ROL_Constraint.hpp>
 #include <ROL_Types.hpp>
-#include "Teuchos_RCPStdSharedPtrConversions.hpp"
 #include "Teuchos_ParameterList.hpp"
 
 #include "CustomLA.h"
 #include "PyObjective.h"
-#include "PyEqualityConstraint.h"
-#include "PyBoundConstraint.h"
+#include "PyConstraint.h"
+#include "PyBounds.h"
 
 void dictToParameterList(py::dict param_dict, Teuchos::ParameterList &parlist)
 {
@@ -30,12 +29,12 @@ void dictToParameterList(py::dict param_dict, Teuchos::ParameterList &parlist)
         {
             if(py::str(value, true).check())
                 parlist.set(std::string(py::str(key)), std::string(py::str(value)));
+            else if(py::bool_(value, true).check())
+                parlist.set(std::string(py::str(key)), value.cast<bool>());
             else if(py::int_(value, true).check())
                 parlist.set(std::string(py::str(key)), value.cast<int>());
             else if(py::float_(value, true).check())
                 parlist.set(std::string(py::str(key)), value.cast<double>());
-            else if(py::bool_(value, true).check())
-                parlist.set(std::string(py::str(key)), value.cast<bool>());
             else if(py::dict(value, true).check())
             {
                 auto &sublist = parlist.sublist(std::string(py::str(key)));
@@ -61,14 +60,14 @@ PYBIND11_PLUGIN(_ROL)
   py::class_<ROL::StdVector<double>, ROL::Vector<double>, std::shared_ptr<ROL::StdVector<double>>>(m, "StdVector")
     .def("__init__",
          [](ROL::StdVector<double> &instance, int n) {
-           Teuchos::RCP<std::vector<double>> tp = Teuchos::rcp<std::vector<double>>(new std::vector<double>(n, 0.0));
+            auto tp = std::make_shared<std::vector<double>>(n, 0.0);
            new (&instance) ROL::StdVector<double>(tp);
          })
     .def("norm", &ROL::StdVector<double>::norm, "L2 norm of the vector")
     .def("dimension", &ROL::StdVector<double>::dimension, "Size of the vector")
 	.def("__setitem__", [](ROL::StdVector<double> &vec, const int& idx, const double& val)
 	  {
-	  Teuchos::RCP<std::vector<double>> vvec = vec.getVector();
+	  auto vvec = vec.getVector();
           if(idx >= (int)vvec->size())
 		{
 		  throw py::index_error();
@@ -80,7 +79,7 @@ PYBIND11_PLUGIN(_ROL)
 	)
 	.def("__getitem__", [](ROL::StdVector<double> &vec, const py::slice& slice)
 	  {
-		Teuchos::RCP<std::vector<double>> vvec = vec.getVector();
+		auto vvec = vec.getVector();
 		py::size_t start, stop, step, slicelength;
 		if (!slice.compute((py::size_t)(vvec->size()), &start, &stop, &step, &slicelength))
 		  throw py::error_already_set();
@@ -93,7 +92,7 @@ PYBIND11_PLUGIN(_ROL)
 	)
 	.def("__getitem__", [](ROL::StdVector<double> &vec, const int& idx)
 	  {
-	  Teuchos::RCP<std::vector<double>> vvec = vec.getVector();
+	  auto vvec = vec.getVector();
           if(idx >= (int)vvec->size())
 		{
 		  throw py::index_error();
@@ -152,15 +151,15 @@ PYBIND11_PLUGIN(_ROL)
 	  {
 	    instance.run(x, obj, true, std::cout);
 	  })
-    .def("run", [](ROL::Algorithm<double> &instance, ROL::Vector<double>& x, ROL::Objective<double>& obj, ROL::BoundConstraint<double>& bnd)
+    .def("run", [](ROL::Algorithm<double> &instance, ROL::Vector<double>& x, ROL::Objective<double>& obj, ROL::Bounds<double>& bnd)
 	  {
 	    instance.run(x, obj, bnd, true, std::cout);
 	  })
-    .def("run", [](ROL::Algorithm<double> &instance, ROL::Vector<double>& x, ROL::Vector<double>& l, ROL::Objective<double>& obj, ROL::EqualityConstraint<double>& con)
+    .def("run", [](ROL::Algorithm<double> &instance, ROL::Vector<double>& x, ROL::Vector<double>& l, ROL::Objective<double>& obj, ROL::Constraint<double>& con)
 	  {
 	    instance.run(x, l, obj, con, true, std::cout);
 	  })
-    .def("run", [](ROL::Algorithm<double> &instance, ROL::Vector<double>& x, ROL::Vector<double>& l, ROL::Objective<double>& obj, ROL::EqualityConstraint<double>& con, ROL::BoundConstraint<double>& bnd)
+    .def("run", [](ROL::Algorithm<double> &instance, ROL::Vector<double>& x, ROL::Vector<double>& l, ROL::Objective<double>& obj, ROL::Constraint<double>& con, ROL::Bounds<double>& bnd)
 	  {
 	    instance.run(x, l, obj, con, bnd, true, std::cout);
 	  })
@@ -170,7 +169,7 @@ PYBIND11_PLUGIN(_ROL)
     
     .def("get_state", [](ROL::Algorithm<double> &instance)
     {
-        return Teuchos::get_shared_ptr(instance.getState());   
+        return instance.getState();   
     });
 
     py::class_<ROL::AlgorithmState<double>, std::shared_ptr<ROL::AlgorithmState<double>>>(m, "AlgorithmState")
@@ -179,60 +178,60 @@ PYBIND11_PLUGIN(_ROL)
         .def_readwrite("snorm", &ROL::AlgorithmState<double>::snorm)
         .def_readwrite("value", &ROL::AlgorithmState<double>::value);
 
-	// ROL::BoundConstraint
+	// ROL::Bounds
 	//
-    py::class_<ROL::BoundConstraint<double>, PyBoundConstraint, std::shared_ptr<ROL::BoundConstraint<double>>>(m, "BoundConstraint")
-	//py::class_<ROL::BoundConstraint<double>, std::shared_ptr<ROL::BoundConstraint<double>>>(m, "BoundConstraint")
+    py::class_<ROL::Bounds<double>, PyBounds, std::shared_ptr<ROL::Bounds<double>>>(m, "Bounds")
+	//py::class_<ROL::Bounds<double>, std::shared_ptr<ROL::Bounds<double>>>(m, "Bounds")
       //.def(py::init<>())
       .def("__init__",
-	    [](ROL::BoundConstraint<double> &instance, std::shared_ptr<ROL::Vector<double>> x_lo,
+	    [](ROL::Bounds<double> &instance, std::shared_ptr<ROL::Vector<double>> x_lo,
 		   std::shared_ptr<ROL::Vector<double>> x_up, double scale)
 		{
-		  //new (&instance) ROL::BoundConstraint<double>(Teuchos::rcp(x_lo), Teuchos::rcp(x_up), scale);
-		  new (&instance) PyBoundConstraint(Teuchos::rcp(x_lo), Teuchos::rcp(x_up), scale);
+		  //new (&instance) ROL::Bounds<double>(Teuchos::rcp(x_lo), Teuchos::rcp(x_up), scale);
+		  new (&instance) PyBounds(x_lo, x_up, scale);
 		})
-      .def("test", [](ROL::BoundConstraint<double> &instance, ROL::Vector<double>& x)
+      .def("test", [](ROL::Bounds<double> &instance, ROL::Vector<double>& x)
         {
           instance.project(x);
-        })
-      .def("__init__",
-        [](ROL::BoundConstraint<double> &instance)
-        {
-          new (&instance) PyBoundConstraint();
-          instance.deactivate();
         });
+      //.def("__init__",
+      //  [](ROL::Bounds<double> &instance)
+      //  {
+      //    new (&instance) PyBounds();
+      //    instance.deactivate();
+      //  });
 
 	// ROL::MoreauYosidaPenalty<double>
 	//
 	py::class_<ROL::MoreauYosidaPenalty<double>, ROL::Objective<double>, std::shared_ptr<ROL::MoreauYosidaPenalty<double>>>(m, "MoreauYosidaPenalty")
 	  .def("__init__",
 			  [](ROL::MoreauYosidaPenalty<double> &instance, std::shared_ptr<ROL::Objective<double>> obj,
-				 std::shared_ptr<ROL::BoundConstraint<double>> bnd,
+				 std::shared_ptr<ROL::Bounds<double>> bnd,
 				 ROL::Vector<double>& x,
 				 const double mu)
 			  {
-			    new (&instance) ROL::MoreauYosidaPenalty<double>(Teuchos::rcp(obj), Teuchos::rcp(bnd), x, mu);
+			    new (&instance) ROL::MoreauYosidaPenalty<double>(obj, bnd, x, mu);
 		      });
 
-    // ROL::EqualityConstraint<double>
+    // ROL::Constraint<double>
 	//
-	py::class_<ROL::EqualityConstraint<double>, PyEqualityConstraint, std::shared_ptr<ROL::EqualityConstraint<double>>>(m, "EqualityConstraint")
+	py::class_<ROL::Constraint<double>, PyConstraint, std::shared_ptr<ROL::Constraint<double>>>(m, "Constraint")
 	  .def(py::init<>())
-	  //.def("value", &ROL::EqualityConstraint<double>::value)
-	  //.def("applyJacobian", &ROL::EqualityConstraint<double>::applyJacobian)
-	  //.def("applyAdjointJacobian", [](ROL::EqualityConstraint<double>& instance,
+	  //.def("value", &ROL::Constraint<double>::value)
+	  //.def("applyJacobian", &ROL::Constraint<double>::applyJacobian)
+	  //.def("applyAdjointJacobian", [](ROL::Constraint<double>& instance,
 	  //  ROL::Vector<double> &ajv, const ROL::Vector<double> &v,
 	  //  const ROL::Vector<double> &x, double &tol)
 	  //  {
 	  //    instance.applyAdjointJacobian(ajv, v, x, tol);
 	  //  })
-	  .def("checkApplyJacobian", [](ROL::EqualityConstraint<double>& instance,
+	  .def("checkApplyJacobian", [](ROL::Constraint<double>& instance,
         ROL::Vector<double>& x, ROL::Vector<double>& v, ROL::Vector<double>& jv,
         int steps, int order)
         {
           instance.checkApplyJacobian(x, v, jv, true, std::cout, steps, order);
         })
-      .def("checkAdjointConsistencyJacobian", [](ROL::EqualityConstraint<double>& instance,
+      .def("checkAdjointConsistencyJacobian", [](ROL::Constraint<double>& instance,
         ROL::Vector<double>& w, ROL::Vector<double>& v, ROL::Vector<double>& x)
         {
           instance.checkAdjointConsistencyJacobian(w, v, x, true, std::cout);
@@ -245,15 +244,15 @@ PYBIND11_PLUGIN(_ROL)
 	  .def("__init__",
 	    [](ROL::AugmentedLagrangian<double>& instance,
 		  std::shared_ptr<ROL::Objective<double>> obj,
-		  std::shared_ptr<ROL::EqualityConstraint<double>> con,
+		  std::shared_ptr<ROL::Constraint<double>> con,
 		  ROL::Vector<double>& multiplier,
 		  double penaltyParameter,
 		  ROL::Vector<double>& optVec,
 		  ROL::Vector<double>& conVec,
 		  Teuchos::ParameterList& params)
 		{
-		  new (&instance) ROL::AugmentedLagrangian<double>(Teuchos::rcp(obj),
-				  Teuchos::rcp(con),
+		  new (&instance) ROL::AugmentedLagrangian<double>(obj,
+				  con,
 				  multiplier,
 				  penaltyParameter,
 				  optVec,
@@ -264,19 +263,19 @@ PYBIND11_PLUGIN(_ROL)
     // ROL::OptimizationProblem<double>
     //
 
-    py::class_<ROL::OptimizationProblem<double>, std::shared_ptr<ROL::OptimizationProblem<double>>>(m, "OptimizationProblem")
-      .def("__init__",
-        [](ROL::OptimizationProblem<double>& instance,
-           std::shared_ptr<ROL::Objective<double>> obj,
-           std::shared_ptr<ROL::Vector<double>> sol,
-           std::shared_ptr<ROL::BoundConstraint<double>> bnd,
-           std::shared_ptr<Teuchos::ParameterList> params)
-        {
-          new (&instance) ROL::OptimizationProblem<double>(Teuchos::rcp(obj),
-                  Teuchos::rcp(sol),
-                  Teuchos::rcp(bnd),
-				  Teuchos::rcp(params));
-		});
+    //py::class_<ROL::OptimizationProblem<double>, std::shared_ptr<ROL::OptimizationProblem<double>>>(m, "OptimizationProblem")
+    //  .def("__init__",
+    //    [](ROL::OptimizationProblem<double>& instance,
+    //       std::shared_ptr<ROL::Objective<double>> obj,
+    //       std::shared_ptr<ROL::Vector<double>> sol,
+    //       std::shared_ptr<ROL::Bounds<double>> bnd,
+    //       std::shared_ptr<Teuchos::ParameterList> params)
+    //    {
+    //      new (&instance) ROL::OptimizationProblem<double>(obj,
+    //              sol,
+    //              bnd,
+	//              params);
+	//    });
 
     py::class_<Teuchos::ParameterList, std::shared_ptr<Teuchos::ParameterList>>(m, "ParameterList",
                                                    "Create a ParameterList object from an XML string")

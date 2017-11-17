@@ -3,7 +3,6 @@
 namespace py = pybind11;
 
 #include <ROL_Vector.hpp>
-#include "Teuchos_RCPStdSharedPtrConversions.hpp"
 class CustomLA : public std::enable_shared_from_this<CustomLA>, public ROL::Vector<double>
 {
 	public:
@@ -13,7 +12,7 @@ class CustomLA : public std::enable_shared_from_this<CustomLA>, public ROL::Vect
 
 		virtual void plus(const ROL::Vector<double>& x)
 		{
-			const CustomLA& xx = Teuchos::dyn_cast<const CustomLA>(x);
+			const CustomLA& xx = dynamic_cast<const CustomLA&>(x);
 			py::gil_scoped_acquire gil;
 			pybind11::function overload = py::get_overload(this, "plus");
 			if (overload)
@@ -34,7 +33,7 @@ class CustomLA : public std::enable_shared_from_this<CustomLA>, public ROL::Vect
 
 		virtual double dot(const ROL::Vector<double> &x) const
 		{
-			const CustomLA& xx = Teuchos::dyn_cast<const CustomLA>(x);
+			const CustomLA& xx = dynamic_cast<const CustomLA&>(x);
 			py::gil_scoped_acquire gil;
 			pybind11::function overload = py::get_overload(this, "dot");
 			if (overload)
@@ -57,7 +56,7 @@ class CustomLA : public std::enable_shared_from_this<CustomLA>, public ROL::Vect
 				py::pybind11_fail("Tried to call pure virtual function 'dimension'.");
 		}
 
-		Teuchos::RCP<ROL::Vector<double>> basis( const int i ) const {
+		std::shared_ptr<ROL::Vector<double>> basis( const int i ) const {
 			if(i >= this->dimension())
 				throw py::index_error();
 			py::gil_scoped_acquire gil;
@@ -66,14 +65,14 @@ class CustomLA : public std::enable_shared_from_this<CustomLA>, public ROL::Vect
 			{
 				auto res = overload.operator()<py::return_value_policy::reference>(i);
 				Py_INCREF(res.ptr());
-				return Teuchos::rcp(res.cast<std::shared_ptr<CustomLA>>());
+				return res.cast<std::shared_ptr<CustomLA>>();
 			}
 			else
 				py::pybind11_fail("Tried to call pure virtual function 'basis'.");
 		}
 
 
-		virtual Teuchos::RCP<ROL::Vector<double>> clone() const
+		virtual std::shared_ptr<ROL::Vector<double>> clone() const
 		{
 			py::gil_scoped_acquire gil;
 			pybind11::function overload = py::get_overload(this, "clone");
@@ -82,7 +81,7 @@ class CustomLA : public std::enable_shared_from_this<CustomLA>, public ROL::Vect
 				auto res = overload.operator()<py::return_value_policy::reference>();
 				// A wiser man than me maybe knows why this ref count increase is necessary...
 				Py_INCREF(res.ptr());
-				return Teuchos::rcp(res.cast<std::shared_ptr<CustomLA>>());
+				return res.cast<std::shared_ptr<CustomLA>>();
 			}
 			else
 				py::pybind11_fail("Tried to call pure virtual function 'clone'.");
@@ -104,11 +103,11 @@ class CustomLA : public std::enable_shared_from_this<CustomLA>, public ROL::Vect
         }
 
 		void applyBinary( const ROL::Elementwise::BinaryFunction<double> &f, const ROL::Vector<double> &x ) {
-			TEUCHOS_TEST_FOR_EXCEPTION( dimension() != x.dimension(),
-					std::invalid_argument,
-					"Error: Vectors must have the same dimension." );
+			//TEUCHOS_TEST_FOR_EXCEPTION( dimension() != x.dimension(),
+			//        std::invalid_argument,
+			//        "Error: Vectors must have the same dimension." );
 
-			const CustomLA & ex = Teuchos::dyn_cast<const CustomLA>(x);
+			const CustomLA & ex = dynamic_cast<const CustomLA&>(x);
 			for (int i = 0; i < dimension(); ++i) {
 				setitem(i, f.apply(getitem(i), ex.getitem(i)));
 			}

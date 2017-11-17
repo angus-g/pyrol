@@ -1,9 +1,9 @@
 #include <pybind11/pybind11.h>
 namespace py = pybind11;
 
-#include <ROL_EqualityConstraint.hpp>
+#include <ROL_Constraint.hpp>
 
-class PyEqualityConstraint : public ROL::EqualityConstraint<double>
+class PyConstraint : public ROL::Constraint<double>
 {
 	public:
 
@@ -25,7 +25,7 @@ class PyEqualityConstraint : public ROL::EqualityConstraint<double>
 			if (overload)
 				return overload.operator()<py::return_value_policy::reference>(jv, v, x, tol).cast<void>();
 			else
-				ROL::EqualityConstraint<double>::applyJacobian(jv, v, x, tol);
+				ROL::Constraint<double>::applyJacobian(jv, v, x, tol);
 		}
 
 		virtual void applyAdjointJacobian(ROL::Vector<double> &ajv, const ROL::Vector<double> &v,
@@ -36,7 +36,7 @@ class PyEqualityConstraint : public ROL::EqualityConstraint<double>
 			if (overload)
 				return overload.operator()<py::return_value_policy::reference>(ajv, v, x, tol).cast<void>();
 			else
-				ROL::EqualityConstraint<double>::applyAdjointJacobian(ajv, v, x, tol);
+				ROL::Constraint<double>::applyAdjointJacobian(ajv, v, x, tol);
 		}
 
 		virtual void update( const ROL::Vector<double> &x, bool flag = true, int iter = -1 ) override
@@ -46,6 +46,6 @@ class PyEqualityConstraint : public ROL::EqualityConstraint<double>
 			if (overload)
 				return overload.operator()<py::return_value_policy::reference>(x, flag, iter).cast<void>();
 			else
-				ROL::EqualityConstraint<double>::update(x, flag, iter);
+				ROL::Constraint<double>::update(x, flag, iter);
 		}
 };
