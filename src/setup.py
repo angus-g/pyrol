@@ -52,6 +52,7 @@ setup(name="PyROL",
       ext_modules=[
           Extension("_ROL",
                     ["ROL/ROL.cpp"],
+                    define_macros = [("ROL_SHARED_POINTER", 1)],
                     include_dirs = [pybind11_get_include] + [trilinos_dir+"/include"],
                     library_dirs = [trilinos_dir+"/lib"],
                     runtime_library_dirs = [trilinos_dir+"/lib"],
