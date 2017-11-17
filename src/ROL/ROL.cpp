@@ -44,10 +44,11 @@ void dictToParameterList(py::dict param_dict, Teuchos::ParameterList& parlist) {
       throw std::runtime_error(std::string("Don't know what to do with key."));
   }
 }
-PYBIND11_PLUGIN(_ROL) {
-  py::module m("_ROL",
-               "PyROL provides Python wrappers for a subset of the Trilinos "
-               "ROL library.");
+
+PYBIND11_MODULE(_ROL, m) {
+  m.doc() =
+      "PyROL provides Python wrappers for a subset of the"
+      "Trilinos ROL library.";
   m.attr("__version__") = "0.1.1";
 
   py::class_<ROL::Vector<double>, std::shared_ptr<ROL::Vector<double>>>(
@@ -69,11 +70,10 @@ PYBIND11_PLUGIN(_ROL) {
       .def("__setitem__",
            [](ROL::StdVector<double>& vec, const int& idx, const double& val) {
              auto vvec = vec.getVector();
-             if (idx >= (int)vvec->size()) {
+             if (idx >= (int)vvec->size())
                throw py::index_error();
-             } else {
+             else
                (*vvec)[idx] = val;
-             }
            })
       .def("__getitem__",
            [](ROL::StdVector<double>& vec, const py::slice& slice) {
@@ -113,7 +113,6 @@ PYBIND11_PLUGIN(_ROL) {
   //
   py::class_<CustomLA, ROL::Vector<double>, std::shared_ptr<CustomLA>>(
       m, "CustomLA", "Custom Vector and Linear Algebra base class")
-      // py::class_<CustomLA, std::shared_ptr<CustomLA>>(m, "CustomLA")
       .def(py::init<>())
       //.def("clone", &CustomLA::clone)
       .def("norm", &CustomLA::norm)
@@ -131,7 +130,7 @@ PYBIND11_PLUGIN(_ROL) {
   py::class_<ROL::Objective<double>, PyObjective,
              std::shared_ptr<ROL::Objective<double>>>
       objective(m, "Objective",
-                "Base class for the objective class. Python objectives need to "
+                "Base class for the objective class. Python objectives need to"
                 "inherit from this class.");
   objective
       .def(py::init<>())
@@ -180,7 +179,6 @@ PYBIND11_PLUGIN(_ROL) {
               ROL::OptimizationProblem<double>& opt) {
              instance.run(opt, true, std::cout);
            })
-
       .def("get_state", [](ROL::Algorithm<double>& instance) {
         return instance.getState();
       });
@@ -305,6 +303,4 @@ PYBIND11_PLUGIN(_ROL) {
              dictToParameterList(param_dict, *res);
            })
       .def("print", [](Teuchos::ParameterList& instance) { instance.print(); });
-
-  return m.ptr();
 }
