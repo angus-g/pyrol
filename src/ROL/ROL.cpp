@@ -25,17 +25,19 @@ void dictToParameterList(py::dict param_dict, Teuchos::ParameterList &parlist)
     {
         auto key = item.first;
         auto value = item.second;
-        if(py::str(key, true).check())
+
+        if(py::isinstance<py::str>(key))
         {
-            if(py::str(value, true).check())
-                parlist.set(std::string(py::str(key)), std::string(py::str(value)));
-            else if(py::bool_(value, true).check())
-                parlist.set(std::string(py::str(key)), value.cast<bool>());
-            else if(py::int_(value, true).check())
-                parlist.set(std::string(py::str(key)), value.cast<int>());
-            else if(py::float_(value, true).check())
-                parlist.set(std::string(py::str(key)), value.cast<double>());
-            else if(py::dict(value, true).check())
+            auto key_ = std::string(py::str(key));
+            if(py::isinstance<py::str>(value))
+                parlist.set(key_, std::string(py::str(value)));
+            else if(py::isinstance<py::bool_>(value))
+                parlist.set(key_, value.cast<bool>());
+            else if(py::isinstance<py::int_>(value))
+                parlist.set(key_, value.cast<int>());
+            else if(py::isinstance<py::float_>(value))
+                parlist.set(key_, value.cast<double>());
+            else if(py::isinstance<py::dict>(value))
             {
                 auto &sublist = parlist.sublist(std::string(py::str(key)));
                 dictToParameterList(value.cast<py::dict>(), sublist);
