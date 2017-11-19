@@ -72,6 +72,21 @@ class PyVector : public ROL::Vector<double> {
             ROL::Vector<double>::axpy(alpha, x);
     }
 
+    virtual void zero() {
+        PYBIND11_OVERLOAD(void, ROL::Vector<double>, zero, );
+    }
+
+    virtual void set(const ROL::Vector<double>& x) {
+        const PyVector& xx = dynamic_cast<const PyVector&>(x);
+        py::gil_scoped_acquire gil;
+        pybind11::function overload = py::get_overload(this, "set");
+        if (overload)
+            return overload.operator()<py::return_value_policy::reference>(xx)
+                .cast<void>();
+        else
+            ROL::Vector<double>::set(x);
+    }
+
     virtual double reduce(
         const ROL::Elementwise::ReductionOp<double>& r) const {
         double res = r.initialValue();
