@@ -5,17 +5,8 @@ namespace py = pybind11;
 #include <ROL_Vector.hpp>
 class PyVector : public ROL::Vector<double> {
    public:
-    PyVector() {}
-
     virtual void plus(const ROL::Vector<double>& x) {
-        const PyVector& xx = dynamic_cast<const PyVector&>(x);
-        py::gil_scoped_acquire gil;
-        pybind11::function overload = py::get_overload(this, "plus");
-        if (overload)
-            return overload.operator()<py::return_value_policy::reference>(xx)
-                .cast<void>();
-        else
-            py::pybind11_fail("Tried to call pure virtual function 'plus'.");
+        PYBIND11_OVERLOAD_PURE(void, ROL::Vector<double>, plus, x);
     }
 
     virtual void scale(const double alpha) override {
@@ -23,14 +14,7 @@ class PyVector : public ROL::Vector<double> {
     }
 
     virtual double dot(const ROL::Vector<double>& x) const {
-        const PyVector& xx = dynamic_cast<const PyVector&>(x);
-        py::gil_scoped_acquire gil;
-        pybind11::function overload = py::get_overload(this, "dot");
-        if (overload)
-            return overload.operator()<py::return_value_policy::reference>(xx)
-                .cast<double>();
-        else
-            py::pybind11_fail("Tried to call pure virtual function 'dot'.");
+        PYBIND11_OVERLOAD_PURE(double, ROL::Vector<double>, dot, x);
     }
 
     virtual double norm() const { return std::sqrt(this->dot(*this)); }
@@ -60,16 +44,7 @@ class PyVector : public ROL::Vector<double> {
     }
 
     virtual void axpy(const double alpha, const ROL::Vector<double>& x) {
-        const PyVector& xx = dynamic_cast<const PyVector&>(x);
-        py::gil_scoped_acquire gil;
-        pybind11::function overload = py::get_overload(this, "axpy");
-        if (overload)
-            return overload
-                .
-                operator()<py::return_value_policy::reference>(alpha, xx)
-                .cast<void>();
-        else
-            ROL::Vector<double>::axpy(alpha, x);
+        PYBIND11_OVERLOAD(void, ROL::Vector<double>, axpy, alpha, x);
     }
 
     virtual void zero() {
@@ -77,14 +52,7 @@ class PyVector : public ROL::Vector<double> {
     }
 
     virtual void set(const ROL::Vector<double>& x) {
-        const PyVector& xx = dynamic_cast<const PyVector&>(x);
-        py::gil_scoped_acquire gil;
-        pybind11::function overload = py::get_overload(this, "set");
-        if (overload)
-            return overload.operator()<py::return_value_policy::reference>(xx)
-                .cast<void>();
-        else
-            ROL::Vector<double>::set(x);
+        PYBIND11_OVERLOAD(void, ROL::Vector<double>, set, x);
     }
 
     virtual double reduce(
@@ -123,5 +91,9 @@ class PyVector : public ROL::Vector<double> {
     virtual void setitem(const int& i, const double& val) const {
         PYBIND11_OVERLOAD_PURE_NAME(void, ROL::Vector<double>, "__setitem__",
                                     setitem, i, val);
+    }
+
+    virtual void print(std::ostream& outStream) const {
+        PYBIND11_OVERLOAD(void, ROL::Vector<double>, print, outStream);
     }
 };

@@ -55,7 +55,10 @@ PYBIND11_MODULE(_ROL, m) {
 
   py::class_<ROL::Vector<double>, std::shared_ptr<ROL::Vector<double>>,
              PyVector>(m, "Vector")
-      .def(py::init<>());
+      .def(py::init<>())
+      .def("cppClone", &ROL::Vector<double>::clone)
+      .def("cppPlus", &ROL::Vector<double>::plus)
+      .def("cppPrint", &ROL::Vector<double>::print);
 
   //
   // ROL::StdVector<double>
