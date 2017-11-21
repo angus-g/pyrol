@@ -1,8 +1,8 @@
-#include <Python.h>
 #include <pybind11/pybind11.h>
 namespace py = pybind11;
 
 #include <ROL_Vector.hpp>
+
 class PyVector : public ROL::Vector<double> {
    public:
     virtual void plus(const ROL::Vector<double>& x) {
@@ -97,3 +97,9 @@ class PyVector : public ROL::Vector<double> {
         PYBIND11_OVERLOAD(void, ROL::Vector<double>, print, outStream);
     }
 };
+
+void init_vector(py::module& m) {
+    py::class_<ROL::Vector<double>, std::shared_ptr<ROL::Vector<double>>,
+               PyVector>(m, "Vector")
+        .def(py::init<>());
+}
