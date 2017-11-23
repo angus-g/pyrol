@@ -12,23 +12,24 @@ void init_optimizationproblem(py::module& m) {
                std::shared_ptr<ROL::OptimizationProblem<double>>>(
         m, "OptimizationProblem")
         .def(py::init<std::shared_ptr<ROL::Objective<double>>,
-                      std::shared_ptr<ROL::Vector<double>>>())
+                      std::shared_ptr<ROL::Vector<double>>>(),
+             py::arg("obj"), py::arg("sol"))
+        .def(py::init<std::shared_ptr<ROL::Objective<double>>,
+                      std::shared_ptr<ROL::Vector<double>>,
+                      std::shared_ptr<ROL::BoundConstraint<double>>>(),
+             py::arg("obj"), py::arg("sol"), py::arg("bnd"))
         .def(py::init<std::shared_ptr<ROL::Objective<double>>,
                       std::shared_ptr<ROL::Vector<double>>,
                       std::shared_ptr<ROL::BoundConstraint<double>>,
                       std::shared_ptr<ROL::Constraint<double>>,
                       std::shared_ptr<ROL::Vector<double>>>(),
-             py::arg("obj"), py::arg("sol"),
-             py::arg("bnd") = (ROL::BoundConstraint<double>*)nullptr,
-             py::arg("econ") = (ROL::Constraint<double>*)nullptr,
-             py::arg("emul") = (ROL::Vector<double>*)nullptr)
+             py::arg("obj"), py::arg("sol"), py::arg("bnd"), py::arg("econ"),
+             py::arg("emul"))
         .def(py::init<std::shared_ptr<ROL::Objective<double>>,
                       std::shared_ptr<ROL::Vector<double>>,
                       std::shared_ptr<ROL::BoundConstraint<double>>,
                       std::vector<std::shared_ptr<ROL::Constraint<double>>>,
                       std::vector<std::shared_ptr<ROL::Vector<double>>>>(),
-             py::arg("obj"), py::arg("sol"),
-             py::arg("bnd") = (ROL::BoundConstraint<double>*)nullptr,
-             py::arg("econ") = (std::vector<ROL::Constraint<double>>*)nullptr,
-             py::arg("emul") = (std::vector<ROL::Vector<double>>*)nullptr);
+             py::arg("obj"), py::arg("sol"), py::arg("bnd"), py::arg("econ"),
+             py::arg("emul"));
 }
