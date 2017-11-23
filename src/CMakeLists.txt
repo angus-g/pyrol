@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(_ROL)
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
@@ -32,8 +32,7 @@ endif()
 find_package(MPI)
 
 add_subdirectory(pybind11)
-include_directories(${ROL_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH})
-
+#find_package(pybind11 REQUIRED) # if not including pybind11 in subdirectory
 
 pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/algorithm.cpp 
@@ -48,6 +47,7 @@ pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/parameterlist.cpp 
   ROL/stdvector.cpp
   ROL/vector.cpp)
-target_link_libraries(_ROL PRIVATE ${MPI_LIBRARY} ${ROL_LIBRARIES})
 
+target_include_directories(_ROL PRIVATE ${ROL_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH})
+target_link_libraries(_ROL PRIVATE ${MPI_LIBRARY} ${ROL_LIBRARIES})
 install(TARGETS _ROL DESTINATION ${CMAKE_INSTALL_PREFIX})

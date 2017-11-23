@@ -10,35 +10,24 @@ void init_optimizationproblem(py::module& m) {
     py::class_<ROL::OptimizationProblem<double>,
                std::shared_ptr<ROL::OptimizationProblem<double>>>(
         m, "OptimizationProblem")
-        .def("__init__",
-             [](ROL::OptimizationProblem<double>& instance,
-                std::shared_ptr<ROL::Objective<double>> obj,
-                std::shared_ptr<ROL::Vector<double>> sol, py::kwargs kwargs) {
-
-                 std::shared_ptr<ROL::BoundConstraint<double>> bnd = nullptr;
-                 std::shared_ptr<ROL::Constraint<double>> econ = nullptr;
-                 std::shared_ptr<ROL::Vector<double>> emul = nullptr;
-
-                 if (kwargs) {
-                     for (auto item : kwargs) {
-                         auto key = item.first.cast<std::string>();
-                         if (key == "bnd") {
-                             bnd = item.second.cast<std::shared_ptr<
-                                 ROL::BoundConstraint<double>>>();
-                         } else if (key == "econ") {
-                             econ = item.second.cast<
-                                 std::shared_ptr<ROL::Constraint<double>>>();
-                         } else if (key == "emul") {
-                             emul = item.second.cast<
-                                 std::shared_ptr<ROL::Vector<double>>>();
-                         }
-                     }
-                 }
-                 new (&instance) ROL::OptimizationProblem<double>(obj, sol, bnd,
-                                                                  econ, emul);
-             },
-             "Creates an OptimizationProblem object. \n"
-             "Arguments:\nobj: Objective\nsol: Vector\nOptional "
-             "Arguments:\nbnd: "
-             "BoundConstraint\necon: Constraint\nemul: Vector");
+        .def(py::init<std::shared_ptr<ROL::Objective<double>>,
+                      std::shared_ptr<ROL::Vector<double>>>())
+        .def(py::init<std::shared_ptr<ROL::Objective<double>>,
+                      std::shared_ptr<ROL::Vector<double>>,
+                      std::shared_ptr<ROL::BoundConstraint<double>>,
+                      std::shared_ptr<ROL::Constraint<double>>,
+                      std::shared_ptr<ROL::Vector<double>>>(),
+             py::arg("obj"), py::arg("sol"),
+             py::arg("bnd") = (ROL::BoundConstraint<double>*)nullptr,
+             py::arg("econ") = (ROL::Constraint<double>*)nullptr,
+             py::arg("emul") = (ROL::Vector<double>*)nullptr)
+        .def(py::init<std::shared_ptr<ROL::Objective<double>>,
+                      std::shared_ptr<ROL::Vector<double>>,
+                      std::shared_ptr<ROL::BoundConstraint<double>>,
+                      std::vector<std::shared_ptr<ROL::Constraint<double>>>,
+                      std::vector<std::shared_ptr<ROL::Vector<double>>>>(),
+             py::arg("obj"), py::arg("sol"),
+             py::arg("bnd") = (ROL::BoundConstraint<double>*)nullptr,
+             py::arg("econ") = (std::vector<ROL::Constraint<double>>*)nullptr,
+             py::arg("emul") = (std::vector<ROL::Vector<double>>*)nullptr);
 }

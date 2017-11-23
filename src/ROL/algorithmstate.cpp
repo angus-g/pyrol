@@ -2,6 +2,7 @@
 namespace py = pybind11;
 
 #include <ROL_Types.hpp>
+
 void init_algorithmstate(py::module& m) {
     py::class_<ROL::AlgorithmState<double>,
                std::shared_ptr<ROL::AlgorithmState<double>>>(m,
