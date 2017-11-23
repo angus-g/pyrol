@@ -1,5 +1,5 @@
-#include <pybind11/pybind11.h>
 #include <pybind11/iostream.h>
+#include <pybind11/pybind11.h>
 
 #include <ROL_OptimizationProblem.hpp>
 #include <ROL_OptimizationSolver.hpp>
@@ -8,19 +8,15 @@
 
 namespace py = pybind11;
 void init_optimizationsolver(py::module& m) {
-  // ROL::OptimizationSolver<double>
-  //
+    // ROL::OptimizationSolver<double>
+    //
 
-  py::class_<ROL::OptimizationSolver<double>,
-             std::shared_ptr<ROL::OptimizationSolver<double>>>(
-      m, "OptimizationSolver")
-      .def("__init__",
-           [](ROL::OptimizationSolver<double>& instance,
-              std::shared_ptr<ROL::OptimizationProblem<double>> opt,
-              std::shared_ptr<Teuchos::ParameterList> parlist) {
-             new (&instance) ROL::OptimizationSolver<double>(*opt, *parlist);
-           })
-      .def("solve", [](ROL::OptimizationSolver<double>& instance) {
-          instance.solve(std::cout);
-      });
+    py::class_<ROL::OptimizationSolver<double>,
+               std::shared_ptr<ROL::OptimizationSolver<double>>>(
+        m, "OptimizationSolver")
+        .def(py::init<ROL::OptimizationProblem<double>&,
+                      Teuchos::ParameterList&>())
+        .def("solve", [](ROL::OptimizationSolver<double>& instance) {
+            instance.solve(std::cout);
+        });
 }

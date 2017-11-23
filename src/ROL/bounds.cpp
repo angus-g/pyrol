@@ -20,23 +20,15 @@ class PyBounds : public ROL::Bounds<double> {
 };
 
 void init_bounds(py::module& m) {
-
-    py::class_<ROL::BoundConstraint<double>, std::shared_ptr<ROL::BoundConstraint<double>>>(m, "BoundConstraint");
+    py::class_<ROL::BoundConstraint<double>,
+               std::shared_ptr<ROL::BoundConstraint<double>>>(
+        m, "BoundConstraint");
 
     //
     // ROL::Bounds
     //
     py::class_<ROL::Bounds<double>, ROL::BoundConstraint<double>, PyBounds,
                std::shared_ptr<ROL::Bounds<double>>>(m, "Bounds")
-        // py::class_<ROL::Bounds<double>,
-        // std::shared_ptr<ROL::Bounds<double>>>(m, "Bounds")
-        //.def(py::init<>())
-        .def("__init__",
-             [](ROL::Bounds<double>& instance,
-                std::shared_ptr<ROL::Vector<double>> x_lo,
-                std::shared_ptr<ROL::Vector<double>> x_up,
-                double scale) { new (&instance) PyBounds(x_lo, x_up, scale); })
-        .def("test", [](ROL::Bounds<double>& instance, ROL::Vector<double>& x) {
-            instance.project(x);
-        });
+        .def(py::init<std::shared_ptr<ROL::Vector<double>>,
+                      std::shared_ptr<ROL::Vector<double>>, double>());
 }

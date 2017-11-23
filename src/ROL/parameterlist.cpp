@@ -34,17 +34,15 @@ void dictToParameterList(py::dict param_dict, Teuchos::ParameterList& parlist) {
 void init_parameterlist(py::module& m) {
     py::class_<Teuchos::ParameterList, std::shared_ptr<Teuchos::ParameterList>>(
         m, "ParameterList", "Create a ParameterList object from an XML string")
-        .def("__init__",
-             [](Teuchos::ParameterList& instance, std::string xml_params) {
-                 new (&instance) Teuchos::ParameterList(
-                     *(Teuchos::getParametersFromXmlString(xml_params)));
-             })
-        .def("__init__",
-             [](Teuchos::ParameterList& instance, py::dict param_dict,
-                std::string name) {
-                 auto res = new (&instance) Teuchos::ParameterList(name);
-                 dictToParameterList(param_dict, *res);
-             })
+        .def(py::init([](std::string xml_params) {
+            return new Teuchos::ParameterList(
+                *(Teuchos::getParametersFromXmlString(xml_params)));
+        }))
+        .def(py::init([](py::dict param_dict, std::string name) {
+            auto res = new Teuchos::ParameterList(name);
+            dictToParameterList(param_dict, *res);
+            return res;
+        }))
         .def("print",
              [](Teuchos::ParameterList& instance) { instance.print(); });
 }

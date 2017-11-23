@@ -5,7 +5,7 @@ namespace py = pybind11;
 
 class PyVector : public ROL::Vector<double> {
    public:
-    virtual void plus(const ROL::Vector<double>& x) {
+    virtual void plus(const ROL::Vector<double>& x) override {
         PYBIND11_OVERLOAD_PURE(void, ROL::Vector<double>, plus, x);
     }
 
@@ -13,23 +13,23 @@ class PyVector : public ROL::Vector<double> {
         PYBIND11_OVERLOAD_PURE(void, ROL::Vector<double>, scale, alpha);
     }
 
-    virtual double dot(const ROL::Vector<double>& x) const {
+    virtual double dot(const ROL::Vector<double>& x) const override {
         PYBIND11_OVERLOAD_PURE(double, ROL::Vector<double>, dot, x);
     }
 
-    virtual double norm() const { return std::sqrt(this->dot(*this)); }
+    virtual double norm() const override { return std::sqrt(this->dot(*this)); }
 
-    virtual int dimension() const {
+    virtual int dimension() const override {
         PYBIND11_OVERLOAD_PURE(int, ROL::Vector<double>, dimension, );
     }
 
-    std::shared_ptr<ROL::Vector<double>> basis(const int i) const {
+    std::shared_ptr<ROL::Vector<double>> basis(const int i) const override {
         if (i >= this->dimension()) throw py::index_error();
         PYBIND11_OVERLOAD_PURE(std::shared_ptr<ROL::Vector<double>>,
                                ROL::Vector<double>, basis, i);
     }
 
-    virtual std::shared_ptr<ROL::Vector<double>> clone() const {
+    virtual std::shared_ptr<ROL::Vector<double>> clone() const override {
         // see https://github.com/pybind/pybind11/issues/1049
         auto self = py::cast(this);
         auto cloned = self.attr("clone")();
@@ -43,20 +43,21 @@ class PyVector : public ROL::Vector<double> {
                                                     ptr);
     }
 
-    virtual void axpy(const double alpha, const ROL::Vector<double>& x) {
+    virtual void axpy(const double alpha,
+                      const ROL::Vector<double>& x) override {
         PYBIND11_OVERLOAD(void, ROL::Vector<double>, axpy, alpha, x);
     }
 
-    virtual void zero() {
+    virtual void zero() override {
         PYBIND11_OVERLOAD(void, ROL::Vector<double>, zero, );
     }
 
-    virtual void set(const ROL::Vector<double>& x) {
+    virtual void set(const ROL::Vector<double>& x) override {
         PYBIND11_OVERLOAD(void, ROL::Vector<double>, set, x);
     }
 
     virtual double reduce(
-        const ROL::Elementwise::ReductionOp<double>& r) const {
+        const ROL::Elementwise::ReductionOp<double>& r) const override {
         double res = r.initialValue();
         for (int i = 0; i < this->dimension(); ++i) {
             r.reduce(this->getitem(i), res);
@@ -64,7 +65,7 @@ class PyVector : public ROL::Vector<double> {
         return res;
     }
 
-    void applyUnary(const ROL::Elementwise::UnaryFunction<double>& f) {
+    void applyUnary(const ROL::Elementwise::UnaryFunction<double>& f) override {
         uint dim = dimension();
         for (uint i = 0; i < dim; ++i) {
             setitem(i, f.apply(getitem(i)));
@@ -72,7 +73,7 @@ class PyVector : public ROL::Vector<double> {
     }
 
     void applyBinary(const ROL::Elementwise::BinaryFunction<double>& f,
-                     const ROL::Vector<double>& x) {
+                     const ROL::Vector<double>& x) override {
         if (dimension() != x.dimension()) {
             throw std::length_error(
                 "Error: Vectors must have the same dimension.");
@@ -93,7 +94,7 @@ class PyVector : public ROL::Vector<double> {
                                     setitem, i, val);
     }
 
-    virtual void print(std::ostream& outStream) const {
+    virtual void print(std::ostream& outStream) const override {
         PYBIND11_OVERLOAD(void, ROL::Vector<double>, print, outStream);
     }
 };
