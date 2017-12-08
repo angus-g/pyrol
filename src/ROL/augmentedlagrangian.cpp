@@ -13,5 +13,5 @@ void init_augmentedlagrangian(py::module& m) {
         .def(py::init<std::shared_ptr<ROL::Objective<double>>,
                       std::shared_ptr<ROL::Constraint<double>>,
                       ROL::Vector<double>&, double, ROL::Vector<double>&,
-                      ROL::Vector<double>&, Teuchos::ParameterList&>());
+                      ROL::Vector<double>&, ROL::ParameterList&>());
 }

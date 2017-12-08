@@ -19,6 +19,12 @@ class PyObjective : public ROL::Objective<double> {
         PYBIND11_OVERLOAD(void, ROL::Objective<double>, hessVec, hv, v, x, tol);
     }
 
+    void invHessVec(ROL::Vector<double> &hv, const ROL::Vector<double> &v,
+                    const ROL::Vector<double> &x, double &tol) override {
+        PYBIND11_OVERLOAD(void, ROL::Objective<double>, invHessVec, hv, v, x,
+                          tol);
+    }
+
     virtual void update(const ROL::Vector<double> &x, bool flag = true,
                         int iter = -1) override {
         PYBIND11_OVERLOAD(void, ROL::Objective<double>, update, x, flag, iter);

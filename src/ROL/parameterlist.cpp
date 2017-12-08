@@ -1,10 +1,9 @@
 #include <pybind11/stl.h>
 namespace py = pybind11;
 
-#include <Teuchos_XMLParameterListHelpers.hpp>
-#include "Teuchos_ParameterList.hpp"
+#include <ROL_ParameterList.hpp>
 
-void dictToParameterList(py::dict param_dict, Teuchos::ParameterList& parlist) {
+void dictToParameterList(py::dict param_dict, ROL::ParameterList& parlist) {
     for (auto item : param_dict) {
         auto key = item.first;
         auto value = item.second;
@@ -32,17 +31,17 @@ void dictToParameterList(py::dict param_dict, Teuchos::ParameterList& parlist) {
 }
 
 void init_parameterlist(py::module& m) {
-    py::class_<Teuchos::ParameterList, std::shared_ptr<Teuchos::ParameterList>>(
+    py::class_<ROL::ParameterList, std::shared_ptr<ROL::ParameterList>>(
         m, "ParameterList", "Create a ParameterList object from an XML string")
-        .def(py::init([](std::string xml_params) {
-            return new Teuchos::ParameterList(
-                *(Teuchos::getParametersFromXmlString(xml_params)));
+        .def(py::init([](std::string xml_file) {
+            return new ROL::ParameterList(
+                *(ROL::getParametersFromXmlFile(xml_file)));
         }))
         .def(py::init([](py::dict param_dict, std::string name) {
-            auto res = new Teuchos::ParameterList(name);
+            auto res = new ROL::ParameterList(name);
             dictToParameterList(param_dict, *res);
             return res;
         }))
         .def("print",
-             [](Teuchos::ParameterList& instance) { instance.print(); });
+             [](ROL::ParameterList& instance) { instance.print(); });
 }

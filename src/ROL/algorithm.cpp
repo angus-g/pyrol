@@ -9,7 +9,7 @@ void init_algorithm(py::module& m) {
     // ROL::Algorithm<double>
     //
     py::class_<ROL::Algorithm<double>>(m, "Algorithm")
-        .def(py::init<const std::string&, Teuchos::ParameterList&>())
+        .def(py::init<const std::string&, ROL::ParameterList&>())
         .def("run",
              [](ROL::Algorithm<double>& instance, ROL::Vector<double>& x,
                 ROL::Objective<double>& obj) {
