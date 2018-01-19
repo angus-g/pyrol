@@ -1,29 +1,16 @@
-# Get firedrake and install in same image as dolfin master
+# Install DOLFIN and ROL/Trilinos together
 #
 # Author:
 # Chris Richardson
-FROM quay.io/fenicsproject/dev-env-trilinos:latest
+FROM quay.io/fenicsproject/dev-env:latest
 MAINTAINER Chris Richardson <chris@bpi.cam.ac.uk>
 
-USER fenics
-WORKDIR /home/fenics
-RUN . ./fenics.env.conf && fenics-update fiat dijitso instant ufl ffc dolfin
-
 USER root
-WORKDIR /tmp
-RUN apt-get update && \
-    apt-get install -y automake git-core libopenmpi-dev libtool mercurial openmpi-bin python-pip python-tk && \
-    pip2 install virtualenv
+RUN pip3 install git+https://bitbucket.org/fenics-project/fiat.git@master && \
+    pip3 install git+https://bitbucket.org/fenics-project/ufl.git@master && \
+    pip3 install git+https://bitbucket.org/fenics-project/dijitso.git@master && \
+    pip3 install git+https://bitbucket.org/fenics-project/ffc.git@master && \
+    git clone https://bitbucket.org/fenics-project/dolfin.git && \
+    cd dolfin && mkdir -p build && cd build && cmake .. && make -j2 && make install
 
-USER fenics
-WORKDIR /home/fenics
-RUN curl -O https://raw.githubusercontent.com/firedrakeproject/firedrake/master/scripts/firedrake-install && \
-    unset PETSC_DIR && \
-    unset PYTHONPATH && \
-    python firedrake-install --disable-ssh && \
-    . firedrake/bin/activate && \
-    cd firedrake/src/h5py && \
-    python setup.py install && \
-    deactivate
-
-USER root
+RUN cd dolfin/python && pip3 install .
