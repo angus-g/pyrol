@@ -19,7 +19,13 @@ class dolfinLA(ROL.CustomLA):
         return self.vec[i][0]
 
     def __setitem__(self, i, v):
-        self.vec[i] = v
+        # self.vec[i] = v
+        a = self.vec.get_local()
+        a[i] = v
+        self.vec.set_local(a)
+        # Total hack - apply when on the last entry
+        if (i == self.vec.local_size() - 1):
+            self.vec.apply("insert")
 
     def dot(self, xx):
         if self.inner is not None:
@@ -32,7 +38,7 @@ class dolfinLA(ROL.CustomLA):
         return res
 
     def dimension(self):
-        return len(self.vec)
+        return self.vec.local_size()#len(self.vec)
 
     def basis(self, i):
         res = self.clone()
