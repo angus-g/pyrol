@@ -1,6 +1,0 @@
-build/
-pybind11/
-eigen/
-*.pyc
-*.json
-*.so

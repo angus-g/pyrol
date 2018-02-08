@@ -8,6 +8,12 @@ Florian Wechsung (@florianwechsung)
 
 Chris Richardson (@chris_richardson)
 
+INSTALLATION
+------------
+
+First install Trilinos, then 
+
+    python3 setup.py install
 
 License
 -------
