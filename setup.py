@@ -22,6 +22,20 @@ class CMakeExtension(Extension):
         Extension.__init__(self, name, sources=[])
         self.sourcedir = os.path.abspath(sourcedir)
 
+def set_rpath_linux(library, rpath):
+    subprocess.check_call(["patchelf", "--set-rpath", rpath, library])
+
+# def set_rpath_mac(library, rpath):
+#     subprocess.check_call(["install_name_tool", "-add_rpath", rpath, library])
+
+def fix_rpaths(trilinos_install_path):
+    lib_path=os.path.join(trilinos_install_path, "lib")
+    for s in os.listdir(lib_path):
+        if ".so" in s:
+            set_rpath_linux(os.path.join(lib_path, s), lib_path)
+        # if ".dylib" in s
+        #     set_rpath_mac(os.path.join(lib_path, s), lib_path)
+
 
 class CMakeBuild(build_ext):
     def run(self):
@@ -58,6 +72,10 @@ class CMakeBuild(build_ext):
             build_args += ['--', '-j2']
         trilinos_installation = TrilinosInstallation()
         trilinos_dir = trilinos_installation.get_path()
+        try:
+            fix_rpaths(trilinos_dir)
+        except:
+            pass
 
         cmake_args += ['-DTRILINOS_DIR:Path=' + trilinos_dir]
         env = os.environ.copy()
@@ -70,7 +88,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='ROL',
-    version='0.0.3',
+    version='0.0.6',
     author='Chris Richardson, Greg von Winckel, Florian Wechsung',
     author_email='wechsung@maths.ox.ac.uk',
     description='A python wrapper for the ROL package.',
