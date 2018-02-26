@@ -6,15 +6,17 @@
 
 namespace py = pybind11;
 void init_optimizationsolver(py::module& m) {
-    // ROL::OptimizationSolver<double>
-    //
+  // ROL::OptimizationSolver<double>
+  //
 
-    py::class_<ROL::OptimizationSolver<double>,
-               std::shared_ptr<ROL::OptimizationSolver<double>>>(
-        m, "OptimizationSolver")
-        .def(py::init<ROL::OptimizationProblem<double>&,
-                      ROL::ParameterList&>())
-        .def("solve", [](ROL::OptimizationSolver<double>& instance) {
-            instance.solve(std::cout);
-        });
+  py::class_<ROL::OptimizationSolver<double>,
+             std::shared_ptr<ROL::OptimizationSolver<double>>>(
+      m, "OptimizationSolver")
+      .def(py::init<ROL::OptimizationProblem<double>&, ROL::ParameterList&>())
+      .def("solve",
+           [](ROL::OptimizationSolver<double>& instance) {
+             instance.solve(std::cout);
+           })
+      .def("getAlgorithmState",
+           &ROL::OptimizationSolver<double>::getAlgorithmState);
 }
