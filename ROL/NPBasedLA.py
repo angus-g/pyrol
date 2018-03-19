@@ -1,9 +1,9 @@
 import ROL
 import numpy as np
 
-class NPBasedLA(ROL.CustomLA):
+class NPBasedLA(ROL.Vector):
     def __init__(self, size):
-        ROL.CustomLA.__init__(self)
+        ROL.Vector.__init__(self)
         self.data = np.zeros(size)
         self.size = size
 
@@ -34,3 +34,7 @@ class NPBasedLA(ROL.CustomLA):
         res = NPBasedLA(self.size)
         res.data = np.copy(self.data)
         return res
+
+    def applyBinary(self, f, x):
+        for i in range(len(self.data)):
+            self.data[i] = f(self.data[i], x.data[i])
