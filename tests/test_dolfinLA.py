@@ -2,6 +2,7 @@
 import dolfin
 import ROL
 from ROL.dolfin_LA import dolfinLA
+
 class Objective(ROL.Objective):
     def __init__(self):
         ROL.Objective.__init__(self)
@@ -21,23 +22,22 @@ class Objective(ROL.Objective):
 
 obj = Objective()
 
-parameterXML = """
-<ParameterList>
-  <ParameterList name="Step">
-    <ParameterList name="Line Search">
-      <ParameterList name="Descent Method">
-        <Parameter name="Type" type="string" value="Quasi-Newton Method"/>
-      </ParameterList>
-    </ParameterList>
-  </ParameterList>
-  <ParameterList name="Status Test">
-    <Parameter name="Gradient Tolerance" type="double" value="1e-20"/>
-    <Parameter name="Step Tolerance" type="double" value="1e-20"/>
-    <Parameter name="Iteration Limit" type="int" value="100"/>
-  </ParameterList>
-</ParameterList>
-"""
-params = ROL.ParameterList(parameterXML)
+
+paramsdict = {
+    "Step": { 
+        "Line Search": { 
+            "Descent Method": {
+                "Type": "Quasi-Newton Method"
+            }
+        }
+    },
+    "Status Test":{
+        "Gradient Tolerance" :"1e-20",
+        "Step Tolerance" : "1e-20",
+        "Iteration Limit": "100",
+    }
+}
+params = ROL.ParameterList(paramsdict, "Parameters")
 
 algo = ROL.Algorithm("Line Search", params)
 
