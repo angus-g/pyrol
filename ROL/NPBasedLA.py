@@ -38,3 +38,13 @@ class NPBasedLA(ROL.Vector):
     def applyBinary(self, f, x):
         for i in range(len(self.data)):
             self.data[i] = f(self.data[i], x.data[i])
+
+    def applyUnary(self, f):
+        for i in range(len(self.data)):
+            self.data[i] = f(self.data[i])
+
+    def reduce(self, r, r0):
+        res = r0
+        for i in range(len(self.data)):
+            res = r(self.data[i], res)
+        return res
