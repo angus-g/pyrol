@@ -1,8 +1,8 @@
 import ROL
 
-class dolfinLA(ROL.CustomLA):
+class dolfinLA(ROL.Vector):
     def __init__(self, vec, inner=None):
-        ROL.CustomLA.__init__(self)
+        ROL.Vector.__init__(self)
         self.vec = vec
         self.inner = inner
 
