@@ -15,9 +15,7 @@ void init_optimizationsolver(py::module& m) {
       .def("solve",
            [](ROL::OptimizationSolver<double>& instance) {
              instance.solve(std::cout);
-           }, 
-      py::call_guard<py::scoped_ostream_redirect,
-                     py::scoped_estream_redirect>())
+           })
       .def("getAlgorithmState",
            &ROL::OptimizationSolver<double>::getAlgorithmState);
 }

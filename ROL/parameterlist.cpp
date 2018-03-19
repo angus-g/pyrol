@@ -31,17 +31,16 @@ void dictToParameterList(py::dict param_dict, ROL::ParameterList& parlist) {
 }
 
 void init_parameterlist(py::module& m) {
-    py::class_<ROL::ParameterList, std::shared_ptr<ROL::ParameterList>>(
-        m, "ParameterList", "Create a ParameterList object from an XML string")
-        .def(py::init([](std::string xml_file) {
-            return new ROL::ParameterList(
-                *(ROL::getParametersFromXmlFile(xml_file)));
-        }))
-        .def(py::init([](py::dict param_dict, std::string name) {
-            auto res = new ROL::ParameterList(name);
-            dictToParameterList(param_dict, *res);
-            return res;
-        }))
-        .def("print",
-             [](ROL::ParameterList& instance) { instance.print(); });
+  py::class_<ROL::ParameterList, std::shared_ptr<ROL::ParameterList>>(
+      m, "ParameterList", "Create a ParameterList object from an XML string")
+      .def(py::init([](std::string xml_file) {
+        return new ROL::ParameterList(
+            *(ROL::getParametersFromXmlFile(xml_file)));
+      }))
+      .def(py::init([](py::dict param_dict, std::string name) {
+        auto res = new ROL::ParameterList(name);
+        dictToParameterList(param_dict, *res);
+        return res;
+      }))
+      .def("print", [](ROL::ParameterList& instance) { instance.print(); });
 }
