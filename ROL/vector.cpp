@@ -61,18 +61,17 @@ class PyVector : public ROL::Vector<double> {
 
     virtual double reduce(
         const ROL::Elementwise::ReductionOp<double>& r) const override {
-        double res = r.initialValue();
-        for (int i = 0; i < this->dimension(); ++i) {
-            r.reduce(this->getitem(i), res);
-        }
-        return res;
+      std::function<double(double, double)> stdr = [&r](double a, double r0) {
+        r.reduce(a, r0);
+        return r0;
+      };
+      PYBIND11_OVERLOAD_PURE(double, ROL::Vector<double>, reduce,
+                             py::cpp_function(stdr), r.initialValue());
     }
 
     void applyUnary(const ROL::Elementwise::UnaryFunction<double>& f) override {
-        uint dim = dimension();
-        for (uint i = 0; i < dim; ++i) {
-            setitem(i, f.apply(getitem(i)));
-        }
+        std::function<double(double)> stdf = [&f](double a){return f.apply(a);};
+        PYBIND11_OVERLOAD_PURE(void, ROL::Vector<double>, applyUnary, py::cpp_function(stdf));
     }
 
     void applyBinary(const ROL::Elementwise::BinaryFunction<double>& f,
