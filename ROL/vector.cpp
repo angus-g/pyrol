@@ -23,7 +23,7 @@ class PyVector : public ROL::Vector<double> {
     virtual double norm() const override { return std::sqrt(this->dot(*this)); }
 
     virtual int dimension() const override {
-        PYBIND11_OVERLOAD_PURE(int, ROL::Vector<double>, dimension, );
+        PYBIND11_OVERLOAD(int, ROL::Vector<double>, dimension, );
     }
 
     std::shared_ptr<ROL::Vector<double>> basis(const int i) const override {
