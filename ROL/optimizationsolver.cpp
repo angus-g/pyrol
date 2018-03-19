@@ -1,4 +1,3 @@
-#include <pybind11/iostream.h>
 #include <pybind11/pybind11.h>
 
 #include <ROL_OptimizationProblem.hpp>
@@ -15,12 +14,10 @@ void init_optimizationsolver(py::module& m) {
       .def(py::init<ROL::OptimizationProblem<double>&, ROL::ParameterList&>())
       .def("solve",
            [](ROL::OptimizationSolver<double>& instance) {
-             py::scoped_ostream_redirect stream(
-                 std::cout,                                // std::ostream&
-                 py::module::import("sys").attr("stdout")  // Python output
-                 );
              instance.solve(std::cout);
-           })
+           }, 
+      py::call_guard<py::scoped_ostream_redirect,
+                     py::scoped_estream_redirect>())
       .def("getAlgorithmState",
            &ROL::OptimizationSolver<double>::getAlgorithmState);
 }

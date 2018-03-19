@@ -1,6 +1,5 @@
 #include <functional>
 #include <pybind11/pybind11.h>
-#include <pybind11/iostream.h>
 #include <pybind11/stl.h>
 
 namespace py = pybind11;
@@ -107,10 +106,6 @@ void init_vector(py::module& m) {
       .def(py::init<>())
       .def("checkVector", [](ROL::Vector<double>& instance, ROL::Vector<double>& x,
               ROL::Vector<double>& y) {
-        py::scoped_ostream_redirect stream(
-            std::cout,                                // std::ostream&
-            py::module::import("sys").attr("stdout")  // Python output
-            );
         return instance.checkVector(x, y);
       });
 }
