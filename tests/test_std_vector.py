@@ -22,6 +22,8 @@ def test_std_vector_check():
 
     x[0] = 1.5
     x[1] = 0.5
+    y[0] = 1.2
+    y[1] = 0.2
 
     u = x.checkVector(y, z)
     assert sum(u) < 1e-12
@@ -29,23 +31,30 @@ def test_std_vector_check():
 
 def test_std_vector_run():
 
-    parameterXML = """
-    <ParameterList>
-      <ParameterList name="Step">
-	<ParameterList name="Line Search">
-	  <ParameterList name="Descent Method">
-	    <Parameter name="Type" type="string" value="Quasi-Newton Method"/>
-	  </ParameterList>
-	</ParameterList>
-      </ParameterList>
-      <ParameterList name="Status Test">
-	<Parameter name="Gradient Tolerance" type="double" value="1e-12"/>
-	<Parameter name="Step Tolerance" type="double" value="1e-16"/>
-	<Parameter name="Iteration Limit" type="int" value="10"/>
-      </ParameterList>
-    </ParameterList>
-    """
-    params = ROL.ParameterList(parameterXML)
+    params_dict = {
+        'General': {
+            'Secant': {
+                'Type': 'Limited-Memory BFGS',
+                'Maximum Storage': 5
+            }
+        },
+        'Step': {
+            'Type': 'Line Search',
+            'Line Search': {
+                'Descent Method': {
+                    'Type': 'Quasi-Newton Method'
+                }
+            }
+        },
+        'Status Test': {
+            'Gradient Tolerance': 1e-15,
+            'Relative Gradient Tolerance': 1e-10,
+            'Step Tolerance': 1e-16,
+            'Relative Step Tolerance': 1e-10,
+            'Iteration Limit': 10
+        }
+    }
+    params = ROL.ParameterList(params_dict, "Parameters")
     algo = ROL.Algorithm("Line Search", params)
     x = ROL.StdVector(2)
     x[0] = -1.0
