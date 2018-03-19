@@ -15,6 +15,10 @@ void init_optimizationsolver(py::module& m) {
       .def(py::init<ROL::OptimizationProblem<double>&, ROL::ParameterList&>())
       .def("solve",
            [](ROL::OptimizationSolver<double>& instance) {
+             py::scoped_ostream_redirect stream(
+                 std::cout,                                // std::ostream&
+                 py::module::import("sys").attr("stdout")  // Python output
+                 );
              instance.solve(std::cout);
            })
       .def("getAlgorithmState",

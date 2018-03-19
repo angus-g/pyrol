@@ -1,4 +1,7 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/iostream.h>
+#include <pybind11/stl.h>
+
 namespace py = pybind11;
 
 #include <ROL_Vector.hpp>
@@ -100,7 +103,15 @@ class PyVector : public ROL::Vector<double> {
 };
 
 void init_vector(py::module& m) {
-    py::class_<ROL::Vector<double>, std::shared_ptr<ROL::Vector<double>>,
-               PyVector>(m, "Vector")
-        .def(py::init<>());
+  py::class_<ROL::Vector<double>, std::shared_ptr<ROL::Vector<double>>,
+             PyVector>(m, "Vector")
+      .def(py::init<>())
+      .def("checkVector", [](ROL::Vector<double>& instance, ROL::Vector<double>& x,
+              ROL::Vector<double>& y) {
+        py::scoped_ostream_redirect stream(
+            std::cout,                                // std::ostream&
+            py::module::import("sys").attr("stdout")  // Python output
+            );
+        return instance.checkVector(x, y);
+      });
 }
