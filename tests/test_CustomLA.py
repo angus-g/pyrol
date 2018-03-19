@@ -173,3 +173,27 @@ def test_E_AL():
 
 def test_E_CS():
     run_E("Composite Step")
+
+def createBounds():
+    x_lo = NPBasedLA(2)
+    x_lo[0] = -1
+    x_lo[1] = -1
+    x_up = NPBasedLA(2)
+    x_up[0] = +0.7
+    x_up[1] = +0.7
+    bnd = ROL.Bounds(x_lo, x_up, 1.0)
+    bnd.test()
+    return bnd
+
+def test_create_bounds_seperately():
+    obj = MyObj()
+    paramsDict["Step"]["Type"] = "Trust Region"
+    params = ROL.ParameterList(paramsDict, "Parameters")
+    x = NPBasedLA(2)
+    bnd = createBounds()
+    bnd.test()
+    optimProblem = ROL.OptimizationProblem(obj, x, bnd=bnd)
+    solver = ROL.OptimizationSolver(optimProblem, params)
+    solver.solve()
+    assert round(x[0] - 0.7, 6) == 0.0
+    assert round(x[1], 6) == 0.0
