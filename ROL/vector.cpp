@@ -1,3 +1,4 @@
+#include <functional>
 #include <pybind11/pybind11.h>
 #include <pybind11/iostream.h>
 #include <pybind11/stl.h>
@@ -81,10 +82,8 @@ class PyVector : public ROL::Vector<double> {
             throw std::length_error(
                 "Error: Vectors must have the same dimension.");
         }
-        const PyVector& ex = dynamic_cast<const PyVector&>(x);
-        for (int i = 0; i < dimension(); ++i) {
-            setitem(i, f.apply(getitem(i), ex.getitem(i)));
-        }
+        std::function<double(double, double)> stdf = [&f](double a, double b){return f.apply(a, b);};
+        PYBIND11_OVERLOAD_PURE(void, ROL::Vector<double>, applyBinary, py::cpp_function(stdf), x);
     }
 
     virtual double getitem(const int& i) const {
