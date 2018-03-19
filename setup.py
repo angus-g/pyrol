@@ -30,11 +30,15 @@ def set_rpath_linux(library, rpath):
 
 def fix_rpaths(trilinos_install_path):
     lib_path=os.path.join(trilinos_install_path, "lib")
-    for s in os.listdir(lib_path):
-        if ".so" in s:
-            set_rpath_linux(os.path.join(lib_path, s), lib_path)
-        # if ".dylib" in s
-        #     set_rpath_mac(os.path.join(lib_path, s), lib_path)
+    try:
+        for s in os.listdir(lib_path):
+            if ".so" in s:
+                set_rpath_linux(os.path.join(lib_path, s), lib_path)
+            # if ".dylib" in s
+            #     set_rpath_mac(os.path.join(lib_path, s), lib_path)
+    except:
+        print("Could not set rpath; this might lead to a broken installation.")
+        pass
 
 
 class CMakeBuild(build_ext):
@@ -88,7 +92,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='ROL',
-    version='0.0.6',
+    version='0.0.9',
     author='Chris Richardson, Greg von Winckel, Florian Wechsung',
     author_email='wechsung@maths.ox.ac.uk',
     description='A python wrapper for the ROL package.',
