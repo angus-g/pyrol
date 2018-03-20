@@ -5,7 +5,6 @@ class NumpyVector(ROL.Vector):
     def __init__(self, size):
         ROL.Vector.__init__(self)
         self.data = np.zeros(size)
-        self.size = size
 
     def plus(self, xx):
         self.data += xx.data
@@ -23,15 +22,15 @@ class NumpyVector(ROL.Vector):
         return np.inner(self.data, xx.data)
 
     def dimension(self):
-        return self.size
+        return len(self.data)
 
     def basis(self, i):
-        res = NumpyVector(self.size)
+        res = NumpyVector(self.dimension())
         res[i] = 1.0
         return res
 
     def clone(self):
-        res = NumpyVector(self.size)
+        res = NumpyVector(self.dimension())
         res.data = np.copy(self.data)
         return res
 
