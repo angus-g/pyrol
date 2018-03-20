@@ -4,7 +4,7 @@ Stokes Topology Optimization
 We consider the topology optimization example from `dolfin-adjoint <http://www.dolfin-adjoint.org/en/latest/documentation/stokes-topology/stokes-topology.html/>`_ ::
 
     from dolfin import *
-    from ROL.dolfin_LA import dolfinLA as LA
+    from ROL.dolfin_vector import DolfinVector as FeVector
     import numpy
     import ROL
 
@@ -128,7 +128,6 @@ We consider the topology optimization example from `dolfin-adjoint <http://www.d
             g.vec += grad
 
         def update(self, x, flag, iteration):
-            print "iteration %s" % iteration
             rho = Function(A, x.vec)
             self.rho.assign(rho)
             state = solve_state(self.rho)
@@ -137,10 +136,10 @@ We consider the topology optimization example from `dolfin-adjoint <http://www.d
                 control_file << self.rho
                 state_file << self.state
 
-    class VolConstraint(ROL.EqualityConstraint):
+    class VolConstraint(ROL.Constraint):
 
         def __init__(self, inner_product):
-            ROL.EqualityConstraint.__init__(self)
+            ROL.Constraint.__init__(self)
             self.inner_product = inner_product
 
         def value(self, cvec, xvec, tol):
@@ -172,20 +171,20 @@ We consider the topology optimization example from `dolfin-adjoint <http://www.d
     v.checkVector(c, l)
 
     x = interpolate(Constant(V/delta), A)
-    x = LA(x.vector(), dot_product)
+    x = FeVector(x.vector(), dot_product)
     g = Function(A)
-    g = LA(g.vector(), dot_product)
+    g = FeVector(g.vector(), dot_product)
     d = interpolate(Expression("1 + x[0] * (1-x[0])*x[1] * (1-x[1])", degree=1), A)
-    d = LA(d.vector(), dot_product)
+    d = FeVector(d.vector(), dot_product)
     x.checkVector(d, g)
 
     jd = Function(A)
-    jd = LA(jd.vector(), dot_product)
+    jd = FeVector(jd.vector(), dot_product)
 
     lower = interpolate(Constant(0.0), A)
-    lower = LA(lower.vector(), dot_product)
+    lower = FeVector(lower.vector(), dot_product)
     upper = interpolate(Constant(1.0), A)
-    upper = LA(upper.vector(), dot_product)
+    upper = FeVector(upper.vector(), dot_product)
 
     # Instantiate Objective class for poisson problem
     obj = ObjR(dot_product)
@@ -194,14 +193,38 @@ We consider the topology optimization example from `dolfin-adjoint <http://www.d
     volConstr.checkApplyJacobian(x, d, jd, 3, 1)
     volConstr.checkAdjointConsistencyJacobian(v, d, x)
 
-    with open('input.xml', 'r') as myfile:
-        parametersXML=myfile.read().replace('\n', '')
     set_log_level(30)
+    
+    paramsDict = {
+            'General': {
+                'Secant': { 'Type': 'Limited-Memory BFGS', 'Maximum Storage': 25 } },
+                'Step': {
+                    'Type': 'Augmented Lagrangian',
+                    'Line Search': {
+                        'Descent Method': {
+                          'Type': 'Quasi-Newton Step'}},
+                    'Augmented Lagrangian': {
+                        'Initial Penalty Parameter'               : 1.e2,
+                        'Penalty Parameter Growth Factor'         : 2,
+                        'Minimum Penalty Parameter Reciprocal'    : 0.1,
+                        'Initial Optimality Tolerance'            : 1.0,
+                        'Optimality Tolerance Update Exponent'    : 1.0,
+                        'Optimality Tolerance Decrease Exponent'  : 1.0,
+                        'Initial Feasibility Tolerance'           : 1.0,
+                        'Feasibility Tolerance Update Exponent'   : 0.1,
+                        'Feasibility Tolerance Decrease Exponent' : 0.9,
+                        'Print Intermediate Optimization History' : True,
+                        'Subproblem Step Type'                    : 'Line Search',
+                        'Subproblem Iteration Limit'              : 10
+                      }},
+            'Status Test': {
+                'Gradient Tolerance': 1e-15, 'Relative Gradient Tolerance': 1e-10,
+                'Step Tolerance': 1e-16, 'Relative Step Tolerance': 1e-10,
+                'Iteration Limit': 7}
+            }
+    params = ROL.ParameterList(paramsDict, "Parameters")
+    bound_constraint = ROL.Bounds(lower, upper, 1.0)
 
-    params = ROL.ParameterList(parametersXML)
-    bound_constraint = ROL.BoundConstraint(lower, upper, 1.0)
-
-    alg2 = ROL.Algorithm("Augmented Lagrangian", params)
-    penaltyParam = 1
-    augLag = ROL.AugmentedLagrangian(obj, volConstr, l, penaltyParam, x, c, params)
-    alg2.run(x, l, augLag, volConstr, bound_constraint)
+    optimProblem = ROL.OptimizationProblem(obj, x, bnd=bound_constraint, econ=volConstr, emul=l)
+    solver = ROL.OptimizationSolver(optimProblem, params)
+    solver.solve()
