@@ -9,13 +9,13 @@ Begin by including either of the two finite element libraries and the correspond
     from firedrake import UnitSquareMesh, FunctionSpace, Function, \
         Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
         dx, Constant, solve, assemble, as_backend_type, File
-    from ROL.firedrake_LA import FiredrakeLA as LA
+    from ROL.firedrake_vector import FiredrakeVector as FeVector
     backend = "firedrake"
-    # from ROL.dolfin_LA import dolfinLA as LA
-    # from dolfin import UnitSquareMesh, FunctionSpace, Function, \
-    #     Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
-    #     dx, Constant, solve, assemble, as_backend_type, File, CellFunction, refine
-    # backend = "dolfin"
+    #  from ROL.dolfin_vector import DolfinVector as FeVector
+    #  from dolfin import UnitSquareMesh, FunctionSpace, Function, \
+    #      Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
+    #      dx, Constant, solve, assemble, as_backend_type, File, CellFunction, refine
+    #  backend = "dolfin"
 
 Import ROL ::
 
@@ -36,7 +36,7 @@ Define a mesh and in the case of dolfin, optionally perform some random mesh ref
                    cf[k] = True
            return refine(initial_mesh, cell_markers = cf)
 
-        k = 2
+        k = 3
         for i in range(k):
            mesh = randomly_refine(mesh)
     else:
@@ -163,33 +163,31 @@ Define the objective class, inheriting from ROL.Objective ::
             self.u.assign(u)
             y = solve_state(self.u)
             self.y.assign(y)
-            if backend == "firedrake":
-                control_file.write(self.u)
-                state_file.write(self.y)
-            else:
-                control_file << self.u
-                state_file << self.y
+            if iteration >= 0:
+              if backend == "firedrake":
+                  control_file.write(self.u)
+                  state_file.write(self.y)
+              else:
+                  control_file << self.u
+                  state_file << self.y
 
 Set some basic parameters for the optimization. We want to use L-BFGS for the optimization ::
 
-    parametersXML = """
-    <ParameterList>
-      <ParameterList name="Step">
-        <ParameterList name="Line Search">
-          <ParameterList name="Descent Method">
-            <Parameter name="Type" type="string"
-              value="Quasi-Newton Method"/>
-          </ParameterList>
-        </ParameterList>
-      </ParameterList>
-      <ParameterList name="Status Test">
-        <Parameter name="Gradient Tolerance" type="double" value="1e-8"/>
-        <Parameter name="Step Tolerance" type="double" value="1e-8"/>
-        <Parameter name="Iteration Limit" type="int" value="4"/>
-      </ParameterList>
-    </ParameterList>
-    """
-    params = ROL.ParameterList(parametersXML)
+    paramsDict = {
+        "Step": {
+            "Line Search": {
+                "Descent Method": {
+                    "Type": "Quasi-Newton Method"
+                }
+            },
+            "Type": "Line Search",
+        },
+        "Status Test": {
+            "Gradient Tolerance": 1e-12,
+            "Iteration Limit": 20
+        }
+    }
+    params = ROL.ParameterList(paramsDict, "Parameters")
 
 Create the inner product ::
 
@@ -205,10 +203,10 @@ Create the objective ::
 Create vectors for the optimization and perform a linear algebra check::
 
     u = Function(M)
-    opt = LA(u.vector(), inner_product)
+    opt = FeVector(u.vector(), inner_product)
     d = Function(M)
     d.interpolate(Expression("sin(x[0]*pi)*sin(x[1]*pi)", degree=1))
-    d = LA(d.vector(), inner_product)
+    d = FeVector(d.vector(), inner_product)
     # if backend == "firedrake":
     #     obj.checkGradient(opt, d, 3, 1)
 
@@ -216,11 +214,11 @@ Create the upper and lower bound constraints ::
 
     xlo = Function(M)
     xlo.interpolate(Constant(0.0))
-    x_lo = LA(xlo.vector(), inner_product)
+    x_lo = FeVector(xlo.vector(), inner_product)
     xup = Function(M)
     xup.interpolate(Constant(0.9))
-    x_up = LA(xup.vector(), inner_product)
-    bnd = ROL.BoundConstraint(x_lo, x_up, 1.0)
+    x_up = FeVector(xup.vector(), inner_product)
+    bnd = ROL.Bounds(x_lo, x_up, 1.0)
 
 Run the optimization ::
 

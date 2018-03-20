@@ -1,8 +1,8 @@
 import ROL
 
-class FiredrakeVector(ROL.CustomLA):
+class FiredrakeVector(ROL.Vector):
     def __init__(self, vec, inner):
-        ROL.CustomLA.__init__(self)
+        ROL.Vector.__init__(self)
         self.vec = vec
         self.inner = inner
 
@@ -17,6 +17,28 @@ class FiredrakeVector(ROL.CustomLA):
 
     def __setitem__(self, i, v):
         self.vec[i] = v
+
+    def reduce(self, r, r0):
+        res = r0
+        tempx = self.vec.get_local()
+        for i in range(len(tempx)):
+            res = r(tempx[i], res)
+        self.vec.set_local(tempx)
+        return res
+
+    def applyBinary(self, f, y):
+        tempx = self.vec.get_local()
+        tempy = y.vec.get_local()
+        for i in range(len(tempx)):
+            tempx[i] = f(tempx[i], tempy[i])
+        self.vec.set_local(tempx)
+
+    def applyUnary(self, f):
+        res = r0
+        tempx = self.vec.get_local()
+        for i in range(len(tempx)):
+            tempx[i] = f(tempx[i])
+        self.vec.set_local(tempx)
 
     def dot(self, xx):
         if self.inner is not None:

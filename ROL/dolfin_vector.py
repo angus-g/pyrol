@@ -15,6 +15,28 @@ class DolfinVector(ROL.Vector):
     def scale(self, alpha):
         self.vec *= alpha
 
+    def reduce(self, r, r0):
+        res = r0
+        tempx = self.vec.get_local()
+        for i in range(len(tempx)):
+            res = r(tempx[i], res)
+        self.vec.set_local(tempx)
+        return res
+
+    def applyBinary(self, f, y):
+        tempx = self.vec.get_local()
+        tempy = y.vec.get_local()
+        for i in range(len(tempx)):
+            tempx[i] = f(tempx[i], tempy[i])
+        self.vec.set_local(tempx)
+
+    def applyUnary(self, f):
+        res = r0
+        tempx = self.vec.get_local()
+        for i in range(len(tempx)):
+            tempx[i] = f(tempx[i])
+        self.vec.set_local(tempx)
+
     def __getitem__(self, i):
         return self.vec[i][0]
 
