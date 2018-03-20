@@ -1,6 +1,6 @@
 import ROL
 
-class dolfinLA(ROL.Vector):
+class DolfinVector(ROL.Vector):
     def __init__(self, vec, inner=None):
         ROL.Vector.__init__(self)
         self.vec = vec
@@ -34,7 +34,7 @@ class dolfinLA(ROL.Vector):
             return self.vec.inner(xx.vec)
 
     def clone(self):
-        res = dolfinLA(self.vec.copy(), self.inner)
+        res = DolfinVector(self.vec.copy(), self.inner)
         return res
 
     def dimension(self):

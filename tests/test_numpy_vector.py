@@ -1,7 +1,7 @@
 #!/usr/bin/env py.test
 import ROL
 import numpy as np
-from ROL.NPBasedLA import NPBasedLA
+from ROL.numpy_vector import NumpyVector
 import pytest
 
 class MyObj(ROL.Objective):
@@ -70,13 +70,13 @@ paramsDict = {
 
 
 def test_checkVectorPassed():
-    x = NPBasedLA(2)
+    x = NumpyVector(2)
     x.data[0] = 0.5
     x.data[1] = 0.5
-    y = NPBasedLA(2)
+    y = NumpyVector(2)
     y.data[0] = 0.2
     y.data[1] = 0.3
-    z = NPBasedLA(2)
+    z = NumpyVector(2)
     z.data[0] = 0.1
     z.data[1] = 0.7
 
@@ -87,7 +87,7 @@ def run_U(algo):
     obj = MyObj()
     paramsDict["Step"]["Type"] = algo
     params = ROL.ParameterList(paramsDict, "Parameters")
-    x = NPBasedLA(2)
+    x = NumpyVector(2)
     optimProblem = ROL.OptimizationProblem(obj, x)
     solver = ROL.OptimizationSolver(optimProblem, params)
     solver.solve()
@@ -108,11 +108,11 @@ def run_B(algo):
     obj = MyObj()
     paramsDict["Step"]["Type"] = algo
     params = ROL.ParameterList(paramsDict, "Parameters")
-    x = NPBasedLA(2)
-    x_lo = NPBasedLA(2)
+    x = NumpyVector(2)
+    x_lo = NumpyVector(2)
     x_lo[0] = -1
     x_lo[1] = -1
-    x_up = NPBasedLA(2)
+    x_up = NumpyVector(2)
     x_up[0] = +0.7
     x_up[1] = +0.7
     bnd = ROL.Bounds(x_lo, x_up, 1.0)
@@ -141,14 +141,14 @@ def test_B_IP():
 
 def test_EqualityConstraintSatisfiesChecks():
     con = EqConstraint()
-    x = NPBasedLA(2)
+    x = NumpyVector(2)
     x[0] = 0.5 * 0.5**2
     x[1] = 0.5 * 0.5**2
-    v = NPBasedLA(2)
+    v = NumpyVector(2)
     v[0] = 1.0
     v[1] = -0.5
-    jv = NPBasedLA(1)
-    w = NPBasedLA(1)
+    jv = NumpyVector(1)
+    w = NumpyVector(1)
     w[0] = 1.0
     con.checkApplyJacobian(x, v, jv, 4, 1);
     con.checkAdjointConsistencyJacobian(w, v, x)
@@ -157,10 +157,10 @@ def run_E(algo):
     obj = MyObj2()
     paramsDict["Step"]["Type"] = algo
     params = ROL.ParameterList(paramsDict, "Parameters")
-    x = NPBasedLA(2)
+    x = NumpyVector(2)
     x[0] = 0.5 * 0.5**2
     x[1] = 0.5 * 0.5**2
-    l = NPBasedLA(1)
+    l = NumpyVector(1)
     con = EqConstraint()
     optimProblem = ROL.OptimizationProblem(obj, x, econ=con, emul=l)
     solver = ROL.OptimizationSolver(optimProblem, params)
@@ -175,10 +175,10 @@ def test_E_CS():
     run_E("Composite Step")
 
 def createBounds():
-    x_lo = NPBasedLA(2)
+    x_lo = NumpyVector(2)
     x_lo[0] = -1
     x_lo[1] = -1
-    x_up = NPBasedLA(2)
+    x_up = NumpyVector(2)
     x_up[0] = +0.7
     x_up[1] = +0.7
     bnd = ROL.Bounds(x_lo, x_up, 1.0)
@@ -189,7 +189,7 @@ def test_create_bounds_seperately():
     obj = MyObj()
     paramsDict["Step"]["Type"] = "Trust Region"
     params = ROL.ParameterList(paramsDict, "Parameters")
-    x = NPBasedLA(2)
+    x = NumpyVector(2)
     bnd = createBounds()
     bnd.test()
     optimProblem = ROL.OptimizationProblem(obj, x, bnd=bnd)

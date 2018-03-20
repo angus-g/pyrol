@@ -1,7 +1,7 @@
 import ROL
 import numpy as np
 
-class NPBasedLA(ROL.Vector):
+class NumpyVector(ROL.Vector):
     def __init__(self, size):
         ROL.Vector.__init__(self)
         self.data = np.zeros(size)
@@ -26,12 +26,12 @@ class NPBasedLA(ROL.Vector):
         return self.size
 
     def basis(self, i):
-        res = NPBasedLA(self.size)
+        res = NumpyVector(self.size)
         res[i] = 1.0
         return res
 
     def clone(self):
-        res = NPBasedLA(self.size)
+        res = NumpyVector(self.size)
         res.data = np.copy(self.data)
         return res
 

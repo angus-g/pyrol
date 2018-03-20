@@ -1,6 +1,6 @@
 import ROL
 
-class FiredrakeLA(ROL.CustomLA):
+class FiredrakeVector(ROL.CustomLA):
     def __init__(self, vec, inner):
         ROL.CustomLA.__init__(self)
         self.vec = vec
@@ -25,14 +25,14 @@ class FiredrakeLA(ROL.CustomLA):
             return self.vec.inner(xx.vec)
 
     def clone(self):
-        res = FiredrakeLA(self.vec.copy(), self.inner)
+        res = FiredrakeVector(self.vec.copy(), self.inner)
         return res
 
     def dimension(self):
         return len(self.vec)
 
     def basis(self, i):
-        res = FiredrakeLA(self.vec.copy(), self.inner)
+        res = FiredrakeVector(self.vec.copy(), self.inner)
         res.scale(0.0)
         res[i] = 1.0
         return res
