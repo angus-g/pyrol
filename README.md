@@ -1,7 +1,7 @@
 README
 ------
 
-We are wrapping ROL with pybind11. Please see [Issues](../../issues) to contribute proposals, tasks, bugs etc.
+We are wrapping [ROL](trilinos.org/packages/rol/) with pybind11. Please see [Issues](../../issues) to contribute proposals, tasks, bugs etc.
 
 
 Florian Wechsung (@florianwechsung)
@@ -11,9 +11,22 @@ Chris Richardson (@chris_richardson)
 INSTALLATION
 ------------
 
-First install Trilinos, then 
+PyROL needs to link to an installation of ROL which is part of the [Trilinos](https://github.com/trilinos/Trilinos) package.
+Running 
+    
+    pip3 install roltrilinos
 
-    python3 setup.py install
+will install Trilinos with the proper options set.
+You can then either
+
+    pip3 install ROL
+
+or if you want to contribute to ROL, you simply run
+
+    git clone git@bitbucket.org:pyrol/pyrol.git
+    cd pyrol
+    pip3 install -e .
+
 
 License
 -------
