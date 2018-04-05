@@ -49,31 +49,38 @@ We consider the topology optimization example from `dolfin-adjoint <http://www.d
         def value_shape(self):
             return (2,)
 
-    def solve_state(rho):
-        """Solve the forward problem for a given fluid distribution rho(x)."""
-        (u, p) = TrialFunctions(W)
+    def residual(rho, w):
+        W = w.function_space()
+        (u, p) = split(w)
         (v, q) = TestFunctions(W)
 
         F = (alpha(rho) * inner(u, v) * dx + mu * inner(grad(u), grad(v)) * dx +
              inner(grad(p), v) * dx  + inner(div(u), q) * dx + Constant(0) * q * dx)
         bc = DirichletBC(W.sub(0), InflowOutflow(degree=1), "on_boundary")
-        w = Function(W)
-        solve(lhs(F) == rhs(F), w, bcs=bc)
+        return (F, bc)
+
+    def functional(rho, w):
+        (u, p) = split(w)
+        return 0.5 * inner(alpha(rho) * u, u) * dx + mu * inner(grad(u), grad(u)) * dx
+
+    def solve_state(rho):
+        """Solve the forward problem for a given fluid distribution rho(x)."""
+        w_ = TrialFunction(W)
+        (F, bc) = residual(rho, w_)
+        w  = Function(W)
+        solve(lhs(F) == rhs(F), w, bc)
         return w
 
-    def solve_adjoint(rho, w):
-        (u, p) = split(w)
-        (v, q) = TrialFunctions(W)
-        (du, dp) = TestFunctions(W)
-        F = inner(alpha(rho) * u, du) * dx
-        F += inner(2 * mu * grad(u), grad(du)) * dx
-        F += inner(alpha(rho) * du, v) * dx
-        F += inner(mu * grad(du), grad(v)) * dx
-        F += inner(grad(dp), v) * dx
-        F += inner(div(du), q) * dx
-        bc = DirichletBC(W.sub(0), Constant((0,0)), "on_boundary")
+    def solve_adjoint(rho, w, J):
+        (F, bc) = residual(rho, w)
+        bc.homogenize() # adjoint has homogeneous BCs
+
         adj = Function(W)
-        solve(lhs(F) == rhs(F), adj, bcs=bc)
+
+        adF = adjoint(derivative(F, w))
+        dJ = derivative(J, w, TestFunction(w.function_space()))
+
+        solve(action(adF, adj) - dJ == 0, adj, bc)
         return adj
 
     class L2Inner(object):
@@ -106,16 +113,14 @@ We consider the topology optimization example from `dolfin-adjoint <http://www.d
             self.state = Function(W)
 
         def value(self, x, tol):
-            rho = self.rho
-            state = self.state
-            (u, p) = split(state)
-            return assemble(0.5 * inner(alpha(rho) * u, u) * dx + mu * inner(grad(u), grad(u)) * dx)
+            J = functional(self.rho, self.state)
+            return assemble(J)
 
         def gradient(self, g, x, tol):
             rho = self.rho
             state = self.state
             (u, p) = split(state)
-            lam = solve_adjoint(rho, state)
+            lam = solve_adjoint(rho, state, functional(rho, state))
             (v, q)= split(lam)
             drho = TestFunction(A)
             L = 0.5 * alphadash(rho) * drho * inner(u, u) * dx + alphadash(rho) * drho * inner(u, v) * dx
@@ -194,7 +199,7 @@ We consider the topology optimization example from `dolfin-adjoint <http://www.d
     volConstr.checkAdjointConsistencyJacobian(v, d, x)
 
     set_log_level(30)
-    
+
     paramsDict = {
             'General': {
                 'Secant': { 'Type': 'Limited-Memory BFGS', 'Maximum Storage': 25 } },
