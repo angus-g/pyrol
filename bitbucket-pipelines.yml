@@ -12,8 +12,9 @@ pipelines:
         script:
           - python3 setup.py build --debug
           - export PYTHONPATH=$(pwd)/build/lib.linux-x86_64-3.5:$PYTHONPATH
-          - python3 -m pytest tests/test_std_vector.py
-          - python3 -m pytest tests/test_dolfin_vector.py
+          - cd tests
+          - python3 -m pytest test_std_vector.py
+          - python3 -m pytest test_dolfin_vector.py
           - . /home/fenics/firedrake/bin/activate
           - unset PETSC_DIR
           - cd ../examples/motherproblem/

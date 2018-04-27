@@ -24,8 +24,8 @@ obj = Objective()
 
 
 paramsdict = {
-    "Step": { 
-        "Line Search": { 
+    "Step": {
+        "Line Search": {
             "Descent Method": {
                 "Type": "Quasi-Newton Method"
             }
@@ -42,9 +42,9 @@ params = ROL.ParameterList(paramsdict, "Parameters")
 algo = ROL.Algorithm("Line Search", params)
 
 def test_dolfin_la_checkvector():
-    x = DolfinVector(dolfin.Vector(dolfin.mpi_comm_world(), 2))
-    y = DolfinVector(dolfin.Vector(dolfin.mpi_comm_world(), 2))
-    z = DolfinVector(dolfin.Vector(dolfin.mpi_comm_world(), 2))
+    x = DolfinVector(dolfin.Vector(dolfin.MPI.comm_world, 2))
+    y = DolfinVector(dolfin.Vector(dolfin.MPI.comm_world, 2))
+    z = DolfinVector(dolfin.Vector(dolfin.MPI.comm_world, 2))
     x.vec[0] = 1.0
     x.vec[1] = 1.5
 
@@ -53,6 +53,6 @@ def test_dolfin_la_checkvector():
 def test_dolfin_la_objective():
     n = 10
     m = n*(n-1)/2
-    x = DolfinVector(dolfin.Vector(dolfin.mpi_comm_world(), n))
+    x = DolfinVector(dolfin.Vector(dolfin.MPI.comm_world, n))
     algo.run(x, obj)
     assert abs((sum(x.vec.array()) - m)/m) < 1e-6
