@@ -10,20 +10,13 @@ pipelines:
   default:
     - step:
         script:
-          - pip2 install pybind11           # FIXME - python2/3 issue
-          - export TRILINOS_DIR=/usr/local
-          - cd src
-          - python setup.py build
-          - export PYTHONPATH=$(pwd)/build/lib.linux-x86_64-2.7:$PYTHONPATH
+          - python3 setup.py build --debug
+          - export PYTHONPATH=$(pwd)/build/lib.linux-x86_64-3.5:$PYTHONPATH
+          - python3 -m pytest tests/test_std_vector.py
+          - python3 -m pytest tests/test_dolfin_vector.py
           - . /home/fenics/firedrake/bin/activate
           - unset PETSC_DIR
           - cd ../examples/motherproblem/
           - python ../../utils/pylit/pylit.py motherproblem.py.rst
           - python motherproblem.py
           - deactivate
-          - cd ../..
-          - source /home/fenics/fenics.env.conf
-          - py.test -s tests
-          #- deactivate
-          #- cd ../stokes_topology_optimization
-          #- python stokes_topology_optimization.py
