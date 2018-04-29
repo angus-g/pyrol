@@ -10,6 +10,7 @@ pipelines:
   default:
     - step:
         script:
+          - git submodule update --init
           - python3 setup.py build --debug
           - export PYTHONPATH=$(pwd)/build/lib.linux-x86_64-3.5:$PYTHONPATH
           - cd tests
