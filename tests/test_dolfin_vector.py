@@ -55,4 +55,4 @@ def test_dolfin_la_objective():
     m = n*(n-1)/2
     x = DolfinVector(dolfin.Vector(dolfin.MPI.comm_world, n))
     algo.run(x, obj)
-    assert abs((sum(x.vec.array()) - m)/m) < 1e-6
+    assert abs((sum(x.vec.get_local()) - m)/m) < 1e-6

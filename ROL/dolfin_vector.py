@@ -38,7 +38,7 @@ class DolfinVector(ROL.Vector):
         self.vec.set_local(tempx)
 
     def __getitem__(self, i):
-        return self.vec[i][0]
+        return self.vec[i]
 
     def __setitem__(self, i, v):
         # self.vec[i] = v
