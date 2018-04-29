@@ -18,5 +18,7 @@ RUN apt-get -qq update && \
         -o Dpkg::Options::="--force-confold" upgrade && \
     apt-get -y install patchelf
 RUN cd dolfin/python && pip3 install . && pip3 install roltrilinos
-RUN unset PETSC_DIR; curl -O https://raw.githubusercontent.com/firedrakeproject/firedrake/master/scripts/firedrake-install; python3 firedrake-install
+RUN apt-get -y install automake git-core libmpich-dev libtool mercurial python3-pip python3-tk python3-venv
+RUN unset PETSC_DIR; curl -O https://raw.githubusercontent.com/firedrakeproject/firedrake/master/scripts/firedrake-install; python3 firedrake-install --no-package-manager --minimal-petsc
+RUN unset PETSC_DIR; . /home/fenics/firedrake/bin/activate; pip3 install roltrilinos
 
