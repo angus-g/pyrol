@@ -18,3 +18,5 @@ RUN apt-get -qq update && \
         -o Dpkg::Options::="--force-confold" upgrade && \
     apt-get -y install patchelf
 RUN cd dolfin/python && pip3 install . && pip3 install roltrilinos
+RUN unset PETSC_DIR; curl -O https://raw.githubusercontent.com/firedrakeproject/firedrake/master/scripts/firedrake-install; python3 firedrake-install
+
