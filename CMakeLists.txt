@@ -31,8 +31,8 @@ endif()
 ##message(STATUS "Python version found:" ${PYTHON_VERSION_STRING})
 find_package(MPI)
 
-# add_subdirectory(pybind11)
-find_package(pybind11 REQUIRED) # if not including pybind11 in subdirectory
+add_subdirectory(pybind11)
+# find_package(pybind11 REQUIRED) # if not including pybind11 in subdirectory
 
 pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/algorithm.cpp

@@ -13,4 +13,8 @@ RUN pip3 install git+https://bitbucket.org/fenics-project/fiat.git@master && \
     git clone https://bitbucket.org/fenics-project/dolfin.git && \
     cd dolfin && mkdir -p build && cd build && cmake .. && make -j2 && make install
 
+RUN apt-get -qq update && \
+    apt-get -y --with-new-pkgs \
+        -o Dpkg::Options::="--force-confold" upgrade && \
+    apt-get -y install patchelf
 RUN cd dolfin/python && pip3 install . && pip3 install roltrilinos

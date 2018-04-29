@@ -12,11 +12,15 @@ INSTALLATION
 ------------
 
 PyROL needs to link to an installation of ROL which is part of the [Trilinos](https://github.com/trilinos/Trilinos) package.
+Since this is a C++ package, we need to do some rpath magic to make things work. If you're on linux you should install `patchelf` first, e.g. by 
+
+    sudo apt install patchelf
+
 Running 
     
     pip3 install roltrilinos
 
-will install Trilinos with the proper options set.
+will then install Trilinos with the proper options set.
 You can then either
 
     pip3 install ROL
