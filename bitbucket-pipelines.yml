@@ -16,6 +16,7 @@ pipelines:
           - python3 -m pytest test_std_vector.py
           - python3 -m pytest test_dolfin_vector.py
           - python3 -m pytest test_numpy_vector.py
+          - cd ..
           - . /home/fenics/firedrake/bin/activate
           - unset PETSC_DIR
           - sudo pip3 install .
