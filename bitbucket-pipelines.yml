@@ -19,7 +19,7 @@ pipelines:
           - cd ..
           - . /home/fenics/firedrake/bin/activate
           - unset PETSC_DIR
-          - sudo pip3 install .
+          - pip3 install .
           - cd examples/motherproblem/
           - python ../../utils/pylit/pylit.py motherproblem.py.rst
           - python motherproblem.py
