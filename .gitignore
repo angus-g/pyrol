@@ -9,3 +9,7 @@ docs/_build/
 *.pvtu
 docs/examples
 src/PyROL.egg-info
+ROL.egg-info/
+.pytest_cache/
+dist/
+*.so
