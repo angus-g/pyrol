@@ -2,6 +2,8 @@
 namespace py = pybind11;
 
 #include <ROL_Constraint.hpp>
+#include "py_shared_ptr.hpp"
+PYBIND11_DECLARE_HOLDER_TYPE(T, py_shared_ptr<T>);
 
 class PyConstraint : public ROL::Constraint<double> {
    public:
@@ -37,7 +39,7 @@ void init_constraint(py::module &m) {
     // ROL::Constraint<double>
     //
     py::class_<ROL::Constraint<double>, PyConstraint,
-               std::shared_ptr<ROL::Constraint<double>>>(m, "Constraint")
+               py_shared_ptr<ROL::Constraint<double>>>(m, "Constraint")
         .def(py::init<>())
         //.def("value", &ROL::Constraint<double>::value)
         //.def("applyJacobian", &ROL::Constraint<double>::applyJacobian)

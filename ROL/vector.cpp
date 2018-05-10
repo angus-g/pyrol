@@ -5,6 +5,8 @@
 namespace py = pybind11;
 
 #include <ROL_Vector.hpp>
+#include "py_shared_ptr.hpp"
+PYBIND11_DECLARE_HOLDER_TYPE(T, py_shared_ptr<T>);
 
 class PyVector : public ROL::Vector<double> {
    public:
@@ -100,7 +102,7 @@ class PyVector : public ROL::Vector<double> {
 };
 
 void init_vector(py::module& m) {
-  py::class_<ROL::Vector<double>, std::shared_ptr<ROL::Vector<double>>,
+  py::class_<ROL::Vector<double>, py_shared_ptr<ROL::Vector<double>>,
              PyVector>(m, "Vector")
       .def(py::init<>())
       .def("checkVector", [](ROL::Vector<double>& instance, ROL::Vector<double>& x,

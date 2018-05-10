@@ -4,6 +4,9 @@ namespace py = pybind11;
 #include <ROL_Bounds.hpp>
 #include <iostream>
 
+#include "py_shared_ptr.hpp"
+PYBIND11_DECLARE_HOLDER_TYPE(T, py_shared_ptr<T>);
+
 class PyBounds : public ROL::Bounds<double> {
    public:
     // PyBounds()
@@ -22,7 +25,7 @@ class PyBounds : public ROL::Bounds<double> {
 
 void init_bounds(py::module& m) {
     py::class_<ROL::BoundConstraint<double>,
-               std::shared_ptr<ROL::BoundConstraint<double>>>(
+               py_shared_ptr<ROL::BoundConstraint<double>>>(
         m, "BoundConstraint");
 
     //
@@ -30,8 +33,8 @@ void init_bounds(py::module& m) {
     //
     py::class_<ROL::Bounds<double>, ROL::BoundConstraint<double>, PyBounds,
                std::shared_ptr<ROL::Bounds<double>>>(m, "Bounds")
-        .def(py::init<std::shared_ptr<ROL::Vector<double>>,
-                      std::shared_ptr<ROL::Vector<double>>, double>())
+        .def(py::init<const std::shared_ptr<ROL::Vector<double>>&,
+                      const std::shared_ptr<ROL::Vector<double>>&, double>())
         .def("test", [](const ROL::Bounds<double> &inst){
             std::cout << "lower dim:" << inst.getLowerBound()->dimension() << std::endl;
             std::cout << "upper dim:" << inst.getUpperBound()->dimension() << std::endl;

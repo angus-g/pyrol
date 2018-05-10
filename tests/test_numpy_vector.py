@@ -136,7 +136,7 @@ def test_B_MY():
 
 @pytest.mark.xfail(reason="There is some issue with the interior point solver we need to figure out")
 def test_B_IP():
-    run_BoundConstrainedNew("Interior Point")
+    run_B("Interior Point")
 
 
 def test_EqualityConstraintSatisfiesChecks():
@@ -185,7 +185,6 @@ def createBounds():
     bnd.test()
     return bnd
 
-@pytest.mark.xfail(reason="Bounds are passed by reference in ROL. We should fix that.")
 def test_create_bounds_seperately():
     obj = MyObj()
     paramsDict["Step"]["Type"] = "Trust Region"
@@ -198,3 +197,23 @@ def test_create_bounds_seperately():
     solver.solve()
     assert round(x[0] - 0.7, 6) == 0.0
     assert round(x[1], 6) == 0.0
+
+def get_problem():
+    obj = MyObj()
+    x = NumpyVector(2)
+    x_lo = NumpyVector(2)
+    x_lo[0] = -1
+    x_lo[1] = -1
+    x_up = NumpyVector(2)
+    x_up[0] = +0.7
+    x_up[1] = +0.7
+    bnd = ROL.Bounds(x_lo, x_up, 1.0)
+    optimProblem = ROL.OptimizationProblem(obj, x, bnd=bnd)
+    return optimProblem
+
+def test_create_problem_seperately():
+    paramsDict["Step"]["Type"] = "Trust Region"
+    params = ROL.ParameterList(paramsDict, "Parameters")
+    problem = get_problem()
+    solver = ROL.OptimizationSolver(problem, params)
+    solver.solve()

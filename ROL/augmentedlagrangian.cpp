@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 namespace py = pybind11;
 
+#include <ROL_ParameterList.hpp>
 #include <ROL_AugmentedLagrangian.hpp>
 
 void init_augmentedlagrangian(py::module& m) {
