@@ -34,28 +34,49 @@ class PyObjective : public ROL::Objective<double> {
 };
 
 void init_objective(py::module &m) {
-    //
-    // ROL::Objective<double>
-    //
-    py::class_<ROL::Objective<double>, PyObjective,
-               py_shared_ptr<ROL::Objective<double>>>
-        objective(
-            m, "Objective",
-            "Base class for the objective class. Python objectives need to"
-            "inherit from this class.");
-    objective.def(py::init<>())
-        .def("checkGradient",
-             [](ROL::Objective<double> &instance, ROL::Vector<double> &x,
-                ROL::Vector<double> &d, int steps, int order) {
-                 auto res = instance.checkGradient(x, d, true, std::cout, steps,
-                                                   order);
-                 return res;
-             })
-        .def("checkHessVec",
-             [](ROL::Objective<double> &instance, ROL::Vector<double> &x,
-                ROL::Vector<double> &v, int steps, int order) {
-                 auto res =
-                     instance.checkHessVec(x, v, true, std::cout, steps, order);
-                 return res;
-             });
+  //
+  // ROL::Objective<double>
+  //
+  py::class_<ROL::Objective<double>, PyObjective,
+    py_shared_ptr<ROL::Objective<double>>>
+      objective(
+          m, "Objective",
+          "Base class for the objective class. Python objectives need to"
+          "inherit from this class.");
+  objective.def(py::init<>())
+  .def("checkGradient", [](ROL::Objective<double> &instance, ROL::Vector<double>& x,
+       std::shared_ptr<ROL::Vector<double>> d, int steps, int order, double scale)
+      {
+        if(d == nullptr)
+        {
+          d = x.dual().clone();
+          double tol = 0.0;
+          instance.gradient(*d, x, tol);
+          d->scale(scale);
+          return instance.checkGradient(x, d->dual(), true, std::cout, steps, order);
+        }
+        else {
+          d->scale(scale);
+          return instance.checkGradient(x, *d, true, std::cout, steps, order);
+        }
+      }, py::arg("x"), py::arg("d")=(ROL::Vector<double>*)nullptr, py::arg("steps")=4,
+      py::arg("order")=1, py::arg("scale")=1.0
+      )
+    .def("checkHessVec",
+        [](ROL::Objective<double> &instance, ROL::Vector<double> &x,
+          std::shared_ptr<ROL::Vector<double>> v, int steps, int order, double scale) {
+        if(v == nullptr)
+        {
+          v = x.dual().clone();
+          double tol = 0.0;
+          instance.gradient(*v, x, tol);
+          v->scale(scale);
+          return instance.checkHessVec(x, v->dual(), true, std::cout, steps, order);
+        }
+        else {
+          v->scale(scale);
+          return instance.checkHessVec(x, *v, true, std::cout, steps, order);
+        }
+        }, py::arg("x"), py::arg("v")=(ROL::Vector<double>*)nullptr, py::arg("steps")=4,
+        py::arg("order")=1, py::arg("scale")=1.0);
 }

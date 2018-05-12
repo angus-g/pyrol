@@ -4,7 +4,7 @@ import numpy as np
 class NumpyVector(ROL.Vector):
     def __init__(self, size):
         ROL.Vector.__init__(self)
-        self.data = np.zeros(size)
+        self.data = np.zeros(size, dtype=np.float64)
 
     def plus(self, xx):
         self.data += xx.data
@@ -31,7 +31,7 @@ class NumpyVector(ROL.Vector):
 
     def clone(self):
         res = NumpyVector(self.dimension())
-        res.data = np.copy(self.data)
+        # res.data = np.copy(self.data)
         return res
 
     def applyBinary(self, f, x):

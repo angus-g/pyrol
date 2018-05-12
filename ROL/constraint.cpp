@@ -27,6 +27,14 @@ class PyConstraint : public ROL::Constraint<double> {
         PYBIND11_OVERLOAD(void, ROL::Constraint<double>, applyAdjointJacobian,
                           ajv, v, x, tol);
     }
+    virtual void applyAdjointHessian(ROL::Vector<double> &ahuv,
+                                     const ROL::Vector<double> &u,
+                                     const ROL::Vector<double> &v,
+                                     const ROL::Vector<double> &x, double &tol) override {
+        PYBIND11_OVERLOAD(void, ROL::Constraint<double>, applyAdjointHessian,
+            ahuv, u, v, x, tol);
+      }
+
 
     virtual void update(const ROL::Vector<double> &x, bool flag = true,
                         int iter = -1) override {
@@ -61,5 +69,11 @@ void init_constraint(py::module &m) {
                 ROL::Vector<double> &v, ROL::Vector<double> &x) {
                  instance.checkAdjointConsistencyJacobian(w, v, x, true,
                                                           std::cout);
+             })
+        .def("checkApplyAdjointHessian",
+             [](ROL::Constraint<double> &instance, ROL::Vector<double> &x,
+                ROL::Vector<double> &u, ROL::Vector<double> &v, 
+                 ROL::Vector<double> &hv, int numSteps, int order){
+                 instance.checkApplyAdjointHessian(x, u, v, hv, true, std::cout, numSteps, order);
              });
 }

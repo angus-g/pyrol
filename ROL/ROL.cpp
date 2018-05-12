@@ -21,13 +21,13 @@ PYBIND11_MODULE(_ROL, m) {
       "Trilinos ROL library.";
   m.attr("__version__") = "0.1.1";
 
+  init_vector(m);
   init_algorithm(m);
   init_algorithmstate(m);
   init_bounds(m);
   init_constraint(m);
   init_objective(m);
   init_moreauyosidapenalty(m);
-  init_vector(m);
   init_stdvector(m);
   init_optimizationproblem(m);
   init_optimizationsolver(m);
