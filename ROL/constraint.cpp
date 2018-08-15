@@ -61,19 +61,19 @@ void init_constraint(py::module &m) {
              [](ROL::Constraint<double> &instance, ROL::Vector<double> &x,
                 ROL::Vector<double> &v, ROL::Vector<double> &jv, int steps,
                 int order) {
-                 instance.checkApplyJacobian(x, v, jv, true, std::cout, steps,
+                 return instance.checkApplyJacobian(x, v, jv, true, std::cout, steps,
                                              order);
              })
         .def("checkAdjointConsistencyJacobian",
              [](ROL::Constraint<double> &instance, ROL::Vector<double> &w,
                 ROL::Vector<double> &v, ROL::Vector<double> &x) {
-                 instance.checkAdjointConsistencyJacobian(w, v, x, true,
+                 return instance.checkAdjointConsistencyJacobian(w, v, x, true,
                                                           std::cout);
              })
         .def("checkApplyAdjointHessian",
              [](ROL::Constraint<double> &instance, ROL::Vector<double> &x,
                 ROL::Vector<double> &u, ROL::Vector<double> &v, 
                  ROL::Vector<double> &hv, int numSteps, int order){
-                 instance.checkApplyAdjointHessian(x, u, v, hv, true, std::cout, numSteps, order);
+                 return instance.checkApplyAdjointHessian(x, u, v, hv, true, std::cout, numSteps, order);
              });
 }
