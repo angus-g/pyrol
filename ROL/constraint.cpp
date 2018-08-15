@@ -3,6 +3,8 @@ namespace py = pybind11;
 
 #include <ROL_Constraint.hpp>
 #include "py_shared_ptr.hpp"
+#include <pybind11/stl.h>
+
 PYBIND11_DECLARE_HOLDER_TYPE(T, py_shared_ptr<T>);
 
 class PyConstraint : public ROL::Constraint<double> {
