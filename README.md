@@ -29,6 +29,7 @@ or if you want to contribute to ROL, you simply run
 
     git clone git@bitbucket.org:pyrol/pyrol.git
     cd pyrol
+    git submodule update --init
     pip3 install -e .
 
 
