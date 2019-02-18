@@ -30,6 +30,7 @@ endif()
 ##find_package(PythonInterp)
 ##message(STATUS "Python version found:" ${PYTHON_VERSION_STRING})
 find_package(MPI)
+find_package(Boost)
 
 add_subdirectory(pybind11)
 # find_package(pybind11 REQUIRED) # if not including pybind11 in subdirectory
@@ -48,7 +49,7 @@ pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/stdvector.cpp
   ROL/vector.cpp)
 
-target_include_directories(_ROL PRIVATE ${ROL_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH})
+target_include_directories(_ROL PRIVATE ${ROL_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH} ${Boost_INCLUDE_DIRS})
 target_link_libraries(_ROL PRIVATE ${MPI_LIBRARY} ${ROL_LIBRARIES})
 set_target_properties(_ROL PROPERTIES COMPILE_DEFINITIONS "ENABLE_PYROL")
 install(TARGETS _ROL DESTINATION ${CMAKE_INSTALL_PREFIX})
