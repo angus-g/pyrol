@@ -92,7 +92,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='ROL',
-    version='0.0.15',
+    version='0.0.16',
     author='Chris Richardson, Greg von Winckel, Florian Wechsung',
     author_email='wechsung@maths.ox.ac.uk',
     description='A python wrapper for the ROL package.',
