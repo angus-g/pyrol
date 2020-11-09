@@ -6,9 +6,10 @@ We can use either dolfin or firedrake to do this.
 
 Begin by including either of the two finite element libraries and the corresponding vector class from ROL ::
 
-    from firedrake import UnitSquareMesh, FunctionSpace, Function, \
-        Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
-        dx, Constant, solve, assemble, as_backend_type, File
+    #from firedrake import UnitSquareMesh, FunctionSpace, Function, \
+    #    Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
+    #    dx, Constant, solve, assemble, as_backend_type, File
+    from firedrake import *
     from ROL.firedrake_vector import FiredrakeVector as FeVector
     backend = "firedrake"
     #  from ROL.dolfin_vector import DolfinVector as FeVector
@@ -57,10 +58,11 @@ Define the function space, regularity parameter and target function ::
     M = FunctionSpace(mesh, "DG", 0)  # space for control variable
     beta = 1e-4
     yd = Function(V)
-    yd.interpolate(Expression("(1.0/(2*pi*pi)) * sin(pi*x[0]) * sin(pi*x[1])",
-                   degree=3))
+    x, y = SpatialCoordinate(mesh)
+    pi = 3.141592653589793
+    yd.interpolate((1.0/(2*pi*pi)) * sin(pi*x) * sin(pi*y))
     # uncomment this for a 'more difficult' target distribution
-    # yd.interpolate(Expression("(x[0] <= 0.5)*(x[1] <= 0.5)", degree=1))
+    # yd.interpolate((x <= 0.5)*(y <= 0.5))
 
 
 Define function that solves for the state given a control ::
@@ -205,7 +207,7 @@ Create vectors for the optimization and perform a linear algebra check::
     u = Function(M)
     opt = FeVector(u.vector(), inner_product)
     d = Function(M)
-    d.interpolate(Expression("sin(x[0]*pi)*sin(x[1]*pi)", degree=1))
+    d.interpolate(sin(x*pi)*sin(y*pi))
     d = FeVector(d.vector(), inner_product)
     # if backend == "firedrake":
     #     obj.checkGradient(opt, d, 3, 1)
