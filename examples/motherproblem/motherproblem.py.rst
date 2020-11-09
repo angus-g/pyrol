@@ -6,10 +6,10 @@ We can use either dolfin or firedrake to do this.
 
 Begin by including either of the two finite element libraries and the corresponding vector class from ROL ::
 
-    #from firedrake import UnitSquareMesh, FunctionSpace, Function, \
-    #    Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
-    #    dx, Constant, solve, assemble, as_backend_type, File
-    from firedrake import *
+    from firedrake import UnitSquareMesh, FunctionSpace, Function, \
+        Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
+        dx, Constant, solve, assemble, as_backend_type, File, sin, \
+        SpatialCoordinate
     from ROL.firedrake_vector import FiredrakeVector as FeVector
     backend = "firedrake"
     #  from ROL.dolfin_vector import DolfinVector as FeVector
@@ -96,7 +96,8 @@ Define the proper inner product based on the L^2 inner product on the function s
         def __init__(self):
             self.A = assemble(TrialFunction(M)*TestFunction(M)*dx)
             self.Ap = as_backend_type(self.A).mat()
-            self.bcs = [DirichletBC(M, Constant(0.0), "on_boundary")]
+            bcs = [DirichletBC(M, Constant(0.0), "on_boundary")]
+            self.Ap_b = assemble(TrialFunction(M)*TestFunction(M)*dx, bcs=bcs)
 
         def eval(self, _u, _v):
             upet = as_backend_type(_u).vec()
@@ -109,7 +110,7 @@ Define the proper inner product based on the L^2 inner product on the function s
             if backend == "firedrake":
                 rhs = Function(M, val=derivative.dat)
                 res = Function(M)
-                solve(self.A, res, rhs, bcs=self.bcs)
+                solve(self.Ap_b, res, rhs)
                 # solve(self.A, res, rhs, bcs=self.bcs,
                 #       solver_parameters={
                 #           'ksp_monitor': False,
@@ -185,7 +186,7 @@ Set some basic parameters for the optimization. We want to use L-BFGS for the op
             "Type": "Line Search",
         },
         "Status Test": {
-            "Gradient Tolerance": 1e-12,
+            "Gradient Tolerance": 1e-10,
             "Iteration Limit": 20
         }
     }
