@@ -7,7 +7,7 @@ We can use either dolfin or firedrake to do this.
 Begin by including either of the two finite element libraries and the corresponding vector class from ROL ::
 
     from firedrake import UnitSquareMesh, FunctionSpace, Function, \
-        Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
+        TrialFunction, TestFunction, inner, grad, DirichletBC, \
         dx, Constant, solve, assemble, as_backend_type, File, sin, \
         SpatialCoordinate
     from ROL.firedrake_vector import FiredrakeVector as FeVector
