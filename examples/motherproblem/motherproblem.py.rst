@@ -7,8 +7,9 @@ We can use either dolfin or firedrake to do this.
 Begin by including either of the two finite element libraries and the corresponding vector class from ROL ::
 
     from firedrake import UnitSquareMesh, FunctionSpace, Function, \
-        Expression, TrialFunction, TestFunction, inner, grad, DirichletBC, \
-        dx, Constant, solve, assemble, as_backend_type, File
+        TrialFunction, TestFunction, inner, grad, DirichletBC, \
+        dx, Constant, solve, assemble, as_backend_type, File, sin, \
+        SpatialCoordinate
     from ROL.firedrake_vector import FiredrakeVector as FeVector
     backend = "firedrake"
     #  from ROL.dolfin_vector import DolfinVector as FeVector
@@ -57,10 +58,11 @@ Define the function space, regularity parameter and target function ::
     M = FunctionSpace(mesh, "DG", 0)  # space for control variable
     beta = 1e-4
     yd = Function(V)
-    yd.interpolate(Expression("(1.0/(2*pi*pi)) * sin(pi*x[0]) * sin(pi*x[1])",
-                   degree=3))
+    x, y = SpatialCoordinate(mesh)
+    pi = 3.141592653589793
+    yd.interpolate((1.0/(2*pi*pi)) * sin(pi*x) * sin(pi*y))
     # uncomment this for a 'more difficult' target distribution
-    # yd.interpolate(Expression("(x[0] <= 0.5)*(x[1] <= 0.5)", degree=1))
+    # yd.interpolate((x <= 0.5)*(y <= 0.5))
 
 
 Define function that solves for the state given a control ::
@@ -94,7 +96,8 @@ Define the proper inner product based on the L^2 inner product on the function s
         def __init__(self):
             self.A = assemble(TrialFunction(M)*TestFunction(M)*dx)
             self.Ap = as_backend_type(self.A).mat()
-            self.bcs = [DirichletBC(M, Constant(0.0), "on_boundary")]
+            bcs = [DirichletBC(M, Constant(0.0), "on_boundary")]
+            self.Ap_b = assemble(TrialFunction(M)*TestFunction(M)*dx, bcs=bcs)
 
         def eval(self, _u, _v):
             upet = as_backend_type(_u).vec()
@@ -107,7 +110,7 @@ Define the proper inner product based on the L^2 inner product on the function s
             if backend == "firedrake":
                 rhs = Function(M, val=derivative.dat)
                 res = Function(M)
-                solve(self.A, res, rhs, bcs=self.bcs)
+                solve(self.Ap_b, res, rhs)
                 # solve(self.A, res, rhs, bcs=self.bcs,
                 #       solver_parameters={
                 #           'ksp_monitor': False,
@@ -183,7 +186,7 @@ Set some basic parameters for the optimization. We want to use L-BFGS for the op
             "Type": "Line Search",
         },
         "Status Test": {
-            "Gradient Tolerance": 1e-12,
+            "Gradient Tolerance": 1e-10,
             "Iteration Limit": 20
         }
     }
@@ -205,7 +208,7 @@ Create vectors for the optimization and perform a linear algebra check::
     u = Function(M)
     opt = FeVector(u.vector(), inner_product)
     d = Function(M)
-    d.interpolate(Expression("sin(x[0]*pi)*sin(x[1]*pi)", degree=1))
+    d.interpolate(sin(x*pi)*sin(y*pi))
     d = FeVector(d.vector(), inner_product)
     # if backend == "firedrake":
     #     obj.checkGradient(opt, d, 3, 1)
