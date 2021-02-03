@@ -41,6 +41,7 @@ pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/augmentedlagrangian.cpp
   ROL/bounds.cpp
   ROL/constraint.cpp
+  ROL/linesearchstep.cpp
   ROL/moreauyosidapenalty.cpp
   ROL/objective.cpp
   ROL/optimizationproblem.cpp

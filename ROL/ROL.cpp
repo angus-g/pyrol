@@ -2,7 +2,7 @@
 #include <pybind11/pybind11.h>
 namespace py = pybind11;
 
-
+void init_linesearchstep(py::module&);
 void init_algorithm(py::module&);
 void init_algorithmstate(py::module&);
 void init_bounds(py::module&);
@@ -20,6 +20,8 @@ PYBIND11_MODULE(_ROL, m) {
       "PyROL provides Python wrappers for a subset of the"
       "Trilinos ROL library.";
   m.attr("__version__") = "0.1.1";
+
+  init_linesearchstep(m);
 
   init_vector(m);
   init_algorithm(m);
