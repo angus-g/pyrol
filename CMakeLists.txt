@@ -41,14 +41,15 @@ pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/augmentedlagrangian.cpp
   ROL/bounds.cpp
   ROL/constraint.cpp
-  ROL/linesearchstep.cpp
   ROL/moreauyosidapenalty.cpp
   ROL/objective.cpp
   ROL/optimizationproblem.cpp
   ROL/optimizationsolver.cpp
   ROL/parameterlist.cpp
+  ROL/secant.cpp
   ROL/statustest.cpp
   ROL/stdvector.cpp
+  ROL/step.cpp
   ROL/vector.cpp)
 
 target_include_directories(_ROL PRIVATE ${ROL_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH} ${Boost_INCLUDE_DIRS})

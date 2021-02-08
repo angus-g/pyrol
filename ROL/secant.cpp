@@ -3,7 +3,6 @@ namespace py = pybind11;
 #include "py_shared_ptr.hpp"
 PYBIND11_DECLARE_HOLDER_TYPE(T, py_shared_ptr<T>);
 
-#include <ROL_LineSearchStep.hpp>
 #include <ROL_Secant.hpp>
 
 class InitBFGS : public ROL::Secant<double> {
@@ -50,18 +49,11 @@ public:
   }
 };
 
-void init_linesearchstep(py::module& m) {
+void init_secant(py::module& m) {
   py::class_<ROL::Secant<double>, std::shared_ptr<ROL::Secant<double>>>(m, "Secant");
 
   // class, trampoline, reference type and parent class
   py::class_<InitBFGS, PyInitBFGS, py_shared_ptr<InitBFGS>, ROL::Secant<double>>(m, "InitBFGS")
     .def(py::init<>())
     .def("applyH0", &ROL::Secant<double>::applyH0);
-
-  py::class_<ROL::Step<double>, std::shared_ptr<ROL::Step<double>>>(m, "Step");
-
-  py::class_<ROL::LineSearchStep<double>, std::shared_ptr<ROL::LineSearchStep<double>>, ROL::Step<double>>(m, "LineSearchStep")
-    .def(py::init([](ROL::ParameterList &params, std::shared_ptr<ROL::Secant<double>> &secant) {
-      return new ROL::LineSearchStep<double>(params, nullptr, secant);
-    }));
 }
