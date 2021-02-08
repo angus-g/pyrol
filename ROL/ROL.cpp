@@ -9,6 +9,7 @@ void init_bounds(py::module&);
 void init_constraint(py::module&);
 void init_moreauyosidapenalty(py::module&);
 void init_objective(py::module&);
+void init_statustest(py::module&);
 void init_stdvector(py::module&);
 void init_vector(py::module&);
 void init_optimizationproblem(py::module&);
@@ -30,6 +31,7 @@ PYBIND11_MODULE(_ROL, m) {
   init_constraint(m);
   init_objective(m);
   init_moreauyosidapenalty(m);
+  init_statustest(m);
   init_stdvector(m);
   init_optimizationproblem(m);
   init_optimizationsolver(m);
