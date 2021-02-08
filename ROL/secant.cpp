@@ -45,7 +45,7 @@ public:
   using InitBFGS::InitBFGS;
 
   void applyH0(ROL::Vector<double> &Hv, const ROL::Vector<double> &v) const override {
-    PYBIND11_OVERRIDE(void, ROL::Secant<double>, applyH0, Hv, v);
+    PYBIND11_OVERRIDE(void, InitBFGS, applyH0, Hv, v);
   }
 };
 
