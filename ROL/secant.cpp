@@ -36,7 +36,37 @@ public:
   }
 
   void applyB(ROL::Vector<double> &Bv, const ROL::Vector<double> &v) const override {
+    const auto& state = ROL::Secant<double>::get_state();
+    double one(1);
 
+    applyB0(Bv, v);
+
+    std::vector<std::shared_ptr<ROL::Vector<double>>> a(state->current + 1), b(state->current + 1);
+    double bv(0), av(0), bs(0), as(0);
+    for (int i = 0; i <= state->current; i++) {
+      b[i] = Bv.clone();
+      b[i]->set(*(state->gradDiff[i]));
+      b[i]->scale(one / sqrt(state->product[i]));
+      bv = v.dot(b[i]->dual());
+      Bv.axpy(bv, *b[i]);
+
+      a[i] = Bv.clone();
+      applyB0(*a[i], *(state->iterDiff[i]));
+
+      for (int j = 0; j < i; j++) {
+	bs = (state->iterDiff[i])->dot(b[j]->dual());
+	a[i]->axpy(bs, *b[j]);
+
+	as = (state->iterDiff[i])->dot(a[j]->dual());
+	a[i]->axpy(as, *a[j]);
+      }
+
+      as = (state->iterDiff[i])->dot(a[i]->dual());
+      a[i]->scale(one / sqrt(as));
+
+      av = v.dot(a[i]->dual());
+      Bv.axpy(-av, *a[i]);
+    }
   }
 };
 
@@ -47,6 +77,10 @@ public:
   void applyH0(ROL::Vector<double> &Hv, const ROL::Vector<double> &v) const override {
     PYBIND11_OVERRIDE(void, InitBFGS, applyH0, Hv, v);
   }
+
+  void applyB0(ROL::Vector<double> &Bv, const ROL::Vector<double> &v) const override {
+    PYBIND11_OVERRIDE(void, InitBFGS, applyB0, Bv, v);
+  }
 };
 
 void init_secant(py::module& m) {
@@ -55,5 +89,6 @@ void init_secant(py::module& m) {
   // class, trampoline, reference type and parent class
   py::class_<InitBFGS, PyInitBFGS, py_shared_ptr<InitBFGS>, ROL::Secant<double>>(m, "InitBFGS")
     .def(py::init<>())
-    .def("applyH0", &ROL::Secant<double>::applyH0);
+    .def("applyH0", &InitBFGS::applyH0)
+    .def("applyB0", &InitBFGS::applyB0);
 }
