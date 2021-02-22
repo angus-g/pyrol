@@ -88,7 +88,7 @@ void init_secant(py::module& m) {
 
   // class, trampoline, reference type and parent class
   py::class_<InitBFGS, PyInitBFGS, py_shared_ptr<InitBFGS>, ROL::Secant<double>>(m, "InitBFGS")
-    .def(py::init<>())
+    .def(py::init<int>())
     .def("applyH0", &InitBFGS::applyH0)
     .def("applyB0", &InitBFGS::applyB0);
 }
