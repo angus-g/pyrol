@@ -9,6 +9,24 @@ class InitBFGS : public ROL::Secant<double> {
 public:
   using ROL::Secant<double>::Secant;
 
+  virtual void scaleH0(ROL::Vector<double> &Hv) const {
+    const auto& state = ROL::Secant<double>::get_state();
+
+    if (state->iter != 0 && state->current != -1) {
+      double yy = state->gradDiff[state->current]->dot(*(state->gradDiff[state->current]));
+      Hv.scale(state->product[state->current] / yy);
+    }
+  }
+
+  virtual void scaleB0(ROL::Vector<double> &Bv) const {
+    const auto& state = ROL::Secant<double>::get_state();
+
+    if (state->iter != 0 && state->current != -1) {
+      double yy = state->gradDiff[state->current]->dot(*(state->gradDiff[state->current]));
+      Bv.scale(yy / state->product[state->current]);
+    }
+  }
+
   void applyH(ROL::Vector<double> &Hv, const ROL::Vector<double> &v) const override {
     const auto& state = ROL::Secant<double>::get_state();
     double zero(0);
@@ -74,6 +92,14 @@ class PyInitBFGS : public InitBFGS {
 public:
   using InitBFGS::InitBFGS;
 
+  void scaleH0(ROL::Vector<double> &Hv) const override {
+    PYBIND11_OVERRIDE(void, InitBFGS, scaleH0, Hv);
+  }
+
+  void scaleB0(ROL::Vector<double> &Bv) const override {
+    PYBIND11_OVERRIDE(void, InitBFGS, scaleB0, Bv);
+  }
+
   void applyH0(ROL::Vector<double> &Hv, const ROL::Vector<double> &v) const override {
     PYBIND11_OVERRIDE(void, InitBFGS, applyH0, Hv, v);
   }
@@ -90,5 +116,7 @@ void init_secant(py::module& m) {
   py::class_<InitBFGS, PyInitBFGS, py_shared_ptr<InitBFGS>, ROL::Secant<double>>(m, "InitBFGS")
     .def(py::init<int>())
     .def("applyH0", &InitBFGS::applyH0)
-    .def("applyB0", &InitBFGS::applyB0);
+    .def("applyB0", &InitBFGS::applyB0)
+    .def("scaleH0", &InitBFGS::scaleH0)
+    .def("scaleB0", &InitBFGS::scaleB0);
 }
