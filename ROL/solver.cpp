@@ -1,6 +1,8 @@
 #include <pybind11/pybind11.h>
 namespace py = pybind11;
 
+#include <cereal/archives/binary.hpp>
+
 #include <map>
 
 #include <ROL_StatusTest.hpp>

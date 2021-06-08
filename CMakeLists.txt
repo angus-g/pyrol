@@ -24,7 +24,7 @@ include(FetchContent)
 FetchContent_Declare(Trilinos
   GIT_REPOSITORY https://github.com/angus-g/Trilinos
   GIT_SHALLOW TRUE
-  GIT_TAG "pyrol-2.0")
+  GIT_TAG "pyrol-2.0-checkpointing")
 FetchContent_MakeAvailable(Trilinos)
 
 find_package(Boost)
@@ -40,7 +40,7 @@ pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/optimizationproblem.cpp
   ROL/optimizationsolver.cpp
   ROL/secant.cpp
-  ROL/step.cpp
+  # ROL/step.cpp
   ROL/algorithm.cpp
   ROL/problem.cpp
   ROL/solver.cpp
@@ -48,6 +48,6 @@ pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/stdvector.cpp
   ROL/vector.cpp)
 
-target_include_directories(_ROL PRIVATE ${ROL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+target_include_directories(_ROL PRIVATE ${ROL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} include)
 target_link_libraries(_ROL PRIVATE rol)
 set_target_properties(_ROL PROPERTIES COMPILE_DEFINITIONS "ENABLE_PYROL")
