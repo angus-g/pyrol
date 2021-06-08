@@ -3,7 +3,13 @@ namespace py = pybind11;
 #include "py_shared_ptr.hpp"
 PYBIND11_DECLARE_HOLDER_TYPE(T, py_shared_ptr<T>);
 
+#include "vector.hpp"
+
 #include <ROL_Secant.hpp>
+
+#include <fstream>
+#include <cereal/types/vector.hpp>
+#include <cereal/archives/binary.hpp>
 
 class InitBFGS : public ROL::Secant<double> {
 public:
@@ -109,7 +115,24 @@ public:
   }
 };
 
+void serialise_secant(const ROL::Secant<double> &v) {
+  std::ofstream os("rol_secant.cereal", std::ios::binary);
+  cereal::BinaryOutputArchive oarchive(os);
+
+  oarchive(v);
+}
+
+void load_secant(ROL::Secant<double> &v) {
+  std::ifstream is("rol_secant.cereal", std::ios::binary);
+  cereal::BinaryInputArchive iarchive(is);
+
+  iarchive(v);
+}
+
 void init_secant(py::module& m) {
+  m.def("serialise_secant", &serialise_secant, "Serialise a ROL Secant using Cereal");
+  m.def("load_secant", &load_secant, "Load a ROL Secant from Cereal archive");
+
   py::class_<ROL::Secant<double>, std::shared_ptr<ROL::Secant<double>>>(m, "Secant");
 
   // class, trampoline, reference type and parent class

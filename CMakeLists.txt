@@ -52,7 +52,7 @@ pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/step.cpp
   ROL/vector.cpp)
 
-target_include_directories(_ROL PRIVATE ${ROL_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH} ${Boost_INCLUDE_DIRS})
+target_include_directories(_ROL PRIVATE ${ROL_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH} ${Boost_INCLUDE_DIRS} include)
 target_link_libraries(_ROL PRIVATE ${MPI_LIBRARY} ${ROL_LIBRARIES})
 set_target_properties(_ROL PROPERTIES COMPILE_DEFINITIONS "ENABLE_PYROL")
 install(TARGETS _ROL DESTINATION ${CMAKE_INSTALL_PREFIX})
