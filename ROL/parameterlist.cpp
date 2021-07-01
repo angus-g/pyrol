@@ -1,6 +1,7 @@
 #include <pybind11/stl.h>
 namespace py = pybind11;
 
+#include <ROL_Types.hpp>
 #include <ROL_ParameterList.hpp>
 
 void dictToParameterList(py::dict param_dict, ROL::ParameterList& parlist) {
