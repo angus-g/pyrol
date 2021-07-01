@@ -36,15 +36,15 @@ add_subdirectory(pybind11)
 # find_package(pybind11 REQUIRED) # if not including pybind11 in subdirectory
 
 pybind11_add_module(_ROL MODULE ROL/ROL.cpp
-  ROL/algorithm.cpp
   ROL/algorithmstate.cpp
   ROL/augmentedlagrangian.cpp
   ROL/bounds.cpp
   ROL/constraint.cpp
-  ROL/moreauyosidapenalty.cpp
   ROL/objective.cpp
   ROL/optimizationproblem.cpp
   ROL/optimizationsolver.cpp
+  ROL/problem.cpp
+  ROL/solver.cpp
   ROL/parameterlist.cpp
   ROL/stdvector.cpp
   ROL/vector.cpp)

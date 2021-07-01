@@ -1,9 +1,11 @@
 #include <pybind11/pybind11.h>
+namespace py = pybind11;
+
+#include <map>
 
 #include <ROL_OptimizationProblem.hpp>
 #include <ROL_OptimizationSolver.hpp>
 
-namespace py = pybind11;
 void init_optimizationsolver(py::module& m) {
   // ROL::OptimizationSolver<double>
   //
