@@ -31,6 +31,10 @@ class PyObjective : public ROL::Objective<double> {
                         int iter = -1) override {
         PYBIND11_OVERLOAD(void, ROL::Objective<double>, update, x, flag, iter);
     }
+
+  virtual void update(const ROL::Vector<double> &x, ROL::UpdateType type, int iter = -1) override {
+    PYBIND11_OVERRIDE(void, ROL::Objective<double>, update, x, type, iter);
+  }
 };
 
 void init_objective(py::module &m) {
@@ -79,4 +83,11 @@ void init_objective(py::module &m) {
         }
         }, py::arg("x"), py::arg("v")=(ROL::Vector<double>*)nullptr, py::arg("steps")=4,
         py::arg("order")=1, py::arg("scale")=1.0);
+
+  py::enum_<ROL::UpdateType>(m, "UpdateType")
+    .value("Initial", ROL::UpdateType::Initial)
+    .value("Accept", ROL::UpdateType::Accept)
+    .value("Revert", ROL::UpdateType::Revert)
+    .value("Trial", ROL::UpdateType::Trial)
+    .value("Temp", ROL::UpdateType::Temp);
 }
