@@ -41,8 +41,10 @@ pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/bounds.cpp
   ROL/constraint.cpp
   ROL/objective.cpp
+  ROL/statustest.cpp
   ROL/optimizationproblem.cpp
   ROL/optimizationsolver.cpp
+  ROL/algorithm.cpp
   ROL/problem.cpp
   ROL/solver.cpp
   ROL/parameterlist.cpp

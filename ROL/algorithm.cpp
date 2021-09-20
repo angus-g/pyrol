@@ -1,0 +1,16 @@
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+
+#include <ROL_TypeB_LinMoreAlgorithm.hpp>
+#include <ROL_Bounds.hpp>
+
+void init_algorithm(py::module &m) {
+  py::class_<ROL::TypeB::LinMoreAlgorithm<double>>(m, "LinMoreAlgorithm")
+    .def(py::init<ROL::ParameterList&>())
+    .def("setStatusTest", &ROL::TypeB::LinMoreAlgorithm<double>::setStatusTest)
+    .def("run",
+	 [](ROL::TypeB::LinMoreAlgorithm<double> &instance, ROL::Vector<double> &x,
+	    ROL::Objective<double> &obj, ROL::Bounds<double> &bnd) {
+	   instance.run(x, obj, bnd, std::cout);
+	 });
+}
