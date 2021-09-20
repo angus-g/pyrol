@@ -7,10 +7,6 @@ namespace py = pybind11;
 #include <ROL_Solver.hpp>
 
 void init_solver(py::module &m) {
-  py::class_<ROL::StatusTest<double>,
-	     std::shared_ptr<ROL::StatusTest<double>>>(m, "StatusTest")
-    .def(py::init<ROL::ParameterList&>());
-
   py::class_<ROL::Solver<double>,
 	     std::shared_ptr<ROL::Solver<double>>>(m, "Solver")
     .def(py::init<std::shared_ptr<ROL::Problem<double>>&, ROL::ParameterList&>())
