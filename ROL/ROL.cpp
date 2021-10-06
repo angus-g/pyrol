@@ -20,7 +20,7 @@ PYBIND11_MODULE(_ROL, m) {
   m.doc() =
       "PyROL provides Python wrappers for a subset of the"
       "Trilinos ROL library.";
-  m.attr("__version__") = "0.1.1";
+  m.attr("__version__") = "0.2.dev0";
 
   init_vector(m);
   init_algorithmstate(m);
