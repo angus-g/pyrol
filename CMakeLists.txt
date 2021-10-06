@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 2.8.9)
-project(_ROL)
+cmake_minimum_required(VERSION 3.0)
+project(_ROL VERSION 0.2.0)
 set(CMAKE_BUILD_TYPE Debug)
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
