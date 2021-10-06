@@ -11,6 +11,7 @@ void init_vector(py::module&);
 void init_statustest(py::module&);
 void init_optimizationproblem(py::module&);
 void init_optimizationsolver(py::module&);
+void init_secant(py::module&);
 void init_algorithm(py::module&);
 void init_problem(py::module&);
 void init_solver(py::module&);
@@ -31,6 +32,7 @@ PYBIND11_MODULE(_ROL, m) {
   init_statustest(m);
   init_optimizationproblem(m);
   init_optimizationsolver(m);
+  init_secant(m);
   init_algorithm(m);
   init_problem(m);
   init_solver(m);

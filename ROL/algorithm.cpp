@@ -7,6 +7,7 @@ namespace py = pybind11;
 void init_algorithm(py::module &m) {
   py::class_<ROL::TypeB::LinMoreAlgorithm<double>>(m, "LinMoreAlgorithm")
     .def(py::init<ROL::ParameterList&>())
+    .def(py::init<ROL::ParameterList&, const std::shared_ptr<ROL::Secant<double>>&>())
     .def("setStatusTest", &ROL::TypeB::LinMoreAlgorithm<double>::setStatusTest)
     .def("run",
 	 [](ROL::TypeB::LinMoreAlgorithm<double> &instance, ROL::Vector<double> &x,
