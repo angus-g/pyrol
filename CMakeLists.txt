@@ -1,40 +1,35 @@
-cmake_minimum_required(VERSION 3.0)
-project(_ROL VERSION 0.2.0)
-set(CMAKE_BUILD_TYPE Debug)
-SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+cmake_minimum_required(VERSION 3.14)
+project(_ROL VERSION 0.3.0)
 
-SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-message(STATUS "Checking for Trilinos")
-find_package(Trilinos PATHS ${TRILINOS_DIR} ${Trilinos_DIR}
-  $ENV{TRILINOS_DIR})
+# options for Trilinos
+set(BUILD_SHARED_LIBS ON CACHE BOOL "")
+set(TPL_ENABLE_MPI OFF CACHE BOOL "")
+set(Trilinos_INSTALL_LIBRARIES_AND_HEADERS OFF CACHE BOOL "")
+set(Trilinos_ENABLE_ALL_OPTIONAL_PACKAGES OFF CACHE BOOL "")
+set(Trilinos_ENABLE_TESTS OFF CACHE BOOL "")
+set(Trilinos_ENABLE_ROL ON CACHE BOOL "")
+set(Trilinos_ENABLE_EXPLICIT_INSTANTIATION ON CACHE BOOL "")
+set(ROL_ParameterList boost::property_tree CACHE STRING "")
+set(ROL_Ptr std::shared_ptr CACHE STRING "")
+set(ROL_stacktrace noop CACHE STRING "")
+set(ROL_ENABLE_EXAMPLES OFF CACHE BOOL "")
+set(ROL_ENABLE_TESTS OFF CACHE BOOL "")
+set(ROL_ENABLE_Sacado OFF CACHE BOOL "")
 
-if ("${Trilinos_VERSION}" VERSION_LESS "12.10.0")
-  set(Trilinos_FOUND FALSE)
-  message(FATAL_ERROR "Unable to find Trilinos (>= 12.10.0)")
-endif()
-message(STATUS "Found Trilinos")
+include(FetchContent)
+FetchContent_Declare(Trilinos
+  GIT_REPOSITORY https://github.com/angus-g/Trilinos
+  GIT_SHALLOW TRUE
+  GIT_TAG "pyrol-2.0")
+FetchContent_MakeAvailable(Trilinos)
 
-find_library(ROL PATHS ${Trilinos_DIR})
-if (DEFINED ROL_LIBRARIES)
-  set(ROL_FOUND TRUE)
-  message(STATUS "Found ROL: " ${ROL_INCLUDE_DIRS})
-  message(STATUS "Found ROL: " ${ROL_LIBRARIES})
-else()
-  message(FATAL_ERROR "ROL library not found - make sure Trilinos is compiled with ROL support")
-endif()
-
-##find_package(PythonLibs)
-##find_package(PythonInterp)
-##message(STATUS "Python version found:" ${PYTHON_VERSION_STRING})
-find_package(MPI)
 find_package(Boost)
 
 add_subdirectory(pybind11)
-# find_package(pybind11 REQUIRED) # if not including pybind11 in subdirectory
-
 pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/algorithmstate.cpp
   ROL/augmentedlagrangian.cpp
@@ -52,7 +47,6 @@ pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/stdvector.cpp
   ROL/vector.cpp)
 
-target_include_directories(_ROL PRIVATE ${ROL_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH} ${Boost_INCLUDE_DIRS})
-target_link_libraries(_ROL PRIVATE ${MPI_CXX_LIBRARIES} ${ROL_LIBRARIES})
+target_include_directories(_ROL PRIVATE ${ROL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+target_link_libraries(_ROL PRIVATE rol)
 set_target_properties(_ROL PROPERTIES COMPILE_DEFINITIONS "ENABLE_PYROL")
-install(TARGETS _ROL DESTINATION ${CMAKE_INSTALL_PREFIX})
