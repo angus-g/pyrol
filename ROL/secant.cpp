@@ -77,7 +77,7 @@ public:
 	a[i]->axpy(bs, *b[j]);
 
 	as = (state->iterDiff[i])->dot(a[j]->dual());
-	a[i]->axpy(as, *a[j]);
+	a[i]->axpy(-as, *a[j]);
       }
 
       as = (state->iterDiff[i])->dot(a[i]->dual());
