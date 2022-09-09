@@ -62,7 +62,7 @@ setup(
     author_email='angus@agibson.me',
     description='A python wrapper for the ROL package.',
     long_description='',
-    ext_modules=[CMakeExtension('ROL')],
+    ext_modules=[CMakeExtension('_ROL')],
     packages=['ROL'],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
