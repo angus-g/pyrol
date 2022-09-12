@@ -24,6 +24,12 @@ set(ROL_ENABLE_EXAMPLES OFF CACHE BOOL "")
 set(ROL_ENABLE_TESTS OFF CACHE BOOL "")
 set(ROL_ENABLE_Sacado OFF CACHE BOOL "")
 
+# This is just making sure if MKLROOT is installed we use it
+IF(DEFINED ENV{MKLROOT})
+   SET(TPL_BLAS_LIBRARIES "$ENV{MKLROOT}/lib/intel64/libmkl_rt.so")
+   SET(TPL_LAPACK_LIBRARIES "$ENV{MKLROOT}/lib/intel64/libmkl_rt.so")
+ENDIF ()
+
 include(FetchContent)
 FetchContent_Declare(Trilinos
   GIT_REPOSITORY https://github.com/angus-g/Trilinos
