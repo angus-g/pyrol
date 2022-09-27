@@ -31,9 +31,9 @@ void load_algorithm(ROL::TypeB::Algorithm<double> &v, int rank, std::string chdi
 
 void init_algorithm(py::module& m) {
   m.def("serialise_algorithm", &serialise_algorithm, "Serialise a ROL Algorithm using Cereal",
-	py::arg("algorithm"), py::arg("rank") = 0);
+	py::arg("algorithm"), py::arg("rank") = 0, py::arg("chdir") = "./");
   m.def("load_algorithm", &load_algorithm, "Load a ROL Algorithm from Cereal archive",
-	py::arg("algorithm"), py::arg("rank") = 0);
+	py::arg("algorithm"), py::arg("rank") = 0, py::arg("chdir") = "./");
 
   //
   // ROL::Algorithm<double>

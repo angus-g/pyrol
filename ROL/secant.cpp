@@ -135,9 +135,9 @@ void load_secant(ROL::Secant<double> &v, int rank, std::string chdir="./") {
 
 void init_secant(py::module& m) {
   m.def("serialise_secant", &serialise_secant, "Serialise a ROL Secant using Cereal",
-	py::arg("secant"), py::arg("rank") = 0);
+	py::arg("secant"), py::arg("rank") = 0, py::arg("chdir") = "./");
   m.def("load_secant", &load_secant, "Load a ROL Secant from Cereal archive",
-	py::arg("secant"), py::arg("rank") = 0);
+	py::arg("secant"), py::arg("rank") = 0, py::arg("chdir") = "./");
 
   py::class_<ROL::Secant<double>, std::shared_ptr<ROL::Secant<double>>>(m, "Secant");
 
