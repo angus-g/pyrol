@@ -10,7 +10,6 @@ PYBIND11_DECLARE_HOLDER_TYPE(T, py_shared_ptr<T>);
 #include <ROL_Types.hpp>
 
 #include <ROL_Secant.hpp>
-#include <string>
 
 #include <fstream>
 #define FMT_HEADER_ONLY
@@ -120,14 +119,14 @@ public:
   }
 };
 
-void serialise_secant(const ROL::Secant<double> &v, int rank, string chdir="./") {
+void serialise_secant(const ROL::Secant<double> &v, int rank, std::string chdir="./") {
   std::ofstream os(fmt::format("{0}/rol_secant_{1}.cereal", chdir, rank), std::ios::binary);
   cereal::BinaryOutputArchive oarchive(os);
 
   oarchive(v);
 }
 
-void load_secant(ROL::Secant<double> &v, int rank, string chdir="./") {
+void load_secant(ROL::Secant<double> &v, int rank, std::string chdir="./") {
   std::ifstream is(fmt::format("{0}/rol_secant_{1}.cereal", chdir, rank), std::ios::binary);
   cereal::BinaryInputArchive iarchive(is);
 
