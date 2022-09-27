@@ -14,15 +14,15 @@ namespace py = pybind11;
 #define FMT_HEADER_ONLY
 #include <fmt/core.h>
 
-void serialise_algorithm(const ROL::TypeB::Algorithm<double> &v, int rank) {
-  std::ofstream os(fmt::format("rol_typeb_algorithm_{}.cereal", rank), std::ios::binary);
+void serialise_algorithm(const ROL::TypeB::Algorithm<double> &v, int rank, string chdir='.') {
+  std::ofstream os(fmt::format("{0}/rol_typeb_algorithm_{1}.cereal", chdir, rank), std::ios::binary);
   cereal::BinaryOutputArchive oarchive(os);
 
   oarchive(v);
 }
 
-void load_algorithm(ROL::TypeB::Algorithm<double> &v, int rank) {
-  std::ifstream is(fmt::format("rol_typeb_algorithm_{}.cereal", rank), std::ios::binary);
+void load_algorithm(ROL::TypeB::Algorithm<double> &v, int rank, string chdir='.') {
+  std::ifstream is(fmt::format("{0}/rol_typeb_algorithm_{1}.cereal", chdir, rank), std::ios::binary);
   cereal::BinaryInputArchive iarchive(is);
 
   iarchive(v);

@@ -119,15 +119,15 @@ public:
   }
 };
 
-void serialise_secant(const ROL::Secant<double> &v, int rank) {
-  std::ofstream os(fmt::format("rol_secant_{}.cereal", rank), std::ios::binary);
+void serialise_secant(const ROL::Secant<double> &v, int rank, string chdir='.') {
+  std::ofstream os(fmt::format("{0}/rol_secant_{1}.cereal", chdir, rank), std::ios::binary);
   cereal::BinaryOutputArchive oarchive(os);
 
   oarchive(v);
 }
 
-void load_secant(ROL::Secant<double> &v, int rank) {
-  std::ifstream is(fmt::format("rol_secant_{}.cereal", rank), std::ios::binary);
+void load_secant(ROL::Secant<double> &v, int rank, string chdir='.') {
+  std::ifstream is(fmt::format("{0}/rol_secant_{1}.cereal", chdir, rank), std::ios::binary);
   cereal::BinaryInputArchive iarchive(is);
 
   iarchive(v);
