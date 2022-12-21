@@ -1,13 +1,20 @@
 cmake_minimum_required(VERSION 3.14)
 project(_ROL VERSION 0.3.0)
 
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-   set(MACOSX_RPATH TRUE)
-endif()
+# minimum cpp for using filesystem 
+set(CMAKE_CXX_STANDARD 17)
+
 
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+# making sure rpath is set correctly
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+   set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+   set(MACOSX_RPATH TRUE)
+else()
+   set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+endif()
 
 # options for Trilinos
 set(BUILD_SHARED_LIBS ON CACHE BOOL "")
@@ -23,12 +30,6 @@ set(ROL_stacktrace noop CACHE STRING "")
 set(ROL_ENABLE_EXAMPLES OFF CACHE BOOL "")
 set(ROL_ENABLE_TESTS OFF CACHE BOOL "")
 set(ROL_ENABLE_Sacado OFF CACHE BOOL "")
-
-# This is just making sure if MKLROOT is installed we use it
-IF(DEFINED ENV{MKLROOT})
-   SET(TPL_BLAS_LIBRARIES "$ENV{MKLROOT}/lib/intel64/libmkl_rt.so")
-   SET(TPL_LAPACK_LIBRARIES "$ENV{MKLROOT}/lib/intel64/libmkl_rt.so")
-ENDIF ()
 
 include(FetchContent)
 FetchContent_Declare(Trilinos
