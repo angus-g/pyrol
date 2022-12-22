@@ -19,6 +19,7 @@ set(ROL_stacktrace noop CACHE STRING "")
 set(ROL_ENABLE_EXAMPLES OFF CACHE BOOL "")
 set(ROL_ENABLE_TESTS OFF CACHE BOOL "")
 set(ROL_ENABLE_Sacado OFF CACHE BOOL "")
+set(Trilinos_WARNINGS_AS_ERRORS_FLAGS "" CACHE STRING "")
 
 include(FetchContent)
 FetchContent_Declare(Trilinos
