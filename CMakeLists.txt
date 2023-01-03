@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(_ROL VERSION 0.3.0)
+project(_ROL VERSION 0.4.0)
 
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
