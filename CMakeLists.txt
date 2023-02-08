@@ -38,36 +38,35 @@ if (DEFINED $ENV{MKLROOT})
    set(TPL_LAPACK_LIBRARIES "$ENV{MKLROOT}/lib/intel64/libmkl_rt.so" CACHE STRING "")
 endif()
 
-#
-#
-#include(FetchContent)
-#FetchContent_Declare(Trilinos
-#  GIT_REPOSITORY https://github.com/angus-g/Trilinos
-#  GIT_SHALLOW TRUE
-#  GIT_TAG "pyrol-2.0-checkpointing")
-#FetchContent_MakeAvailable(Trilinos)
-#
-#find_package(Boost)
-#
-#add_subdirectory(pybind11)
-#pybind11_add_module(_ROL MODULE ROL/ROL.cpp
-#  ROL/algorithmstate.cpp
-#  ROL/augmentedlagrangian.cpp
-#  ROL/bounds.cpp
-#  ROL/constraint.cpp
-#  ROL/objective.cpp
-#  ROL/statustest.cpp
-#  ROL/optimizationproblem.cpp
-#  ROL/optimizationsolver.cpp
-#  ROL/secant.cpp
-#  # ROL/step.cpp
-#  ROL/algorithm.cpp
-#  ROL/problem.cpp
-#  ROL/solver.cpp
-#  ROL/parameterlist.cpp
-#  ROL/stdvector.cpp
-#  ROL/vector.cpp)
-#
-#target_include_directories(_ROL PRIVATE ${ROL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} include)
-#target_link_libraries(_ROL PRIVATE rol)
-#set_target_properties(_ROL PROPERTIES COMPILE_DEFINITIONS "ENABLE_PYROL")
+
+include(FetchContent)
+FetchContent_Declare(Trilinos
+  GIT_REPOSITORY https://github.com/angus-g/Trilinos
+  GIT_SHALLOW TRUE
+  GIT_TAG "pyrol-2.0-checkpointing")
+FetchContent_MakeAvailable(Trilinos)
+
+find_package(Boost)
+
+add_subdirectory(pybind11)
+pybind11_add_module(_ROL MODULE ROL/ROL.cpp
+  ROL/algorithmstate.cpp
+  ROL/augmentedlagrangian.cpp
+  ROL/bounds.cpp
+  ROL/constraint.cpp
+  ROL/objective.cpp
+  ROL/statustest.cpp
+  ROL/optimizationproblem.cpp
+  ROL/optimizationsolver.cpp
+  ROL/secant.cpp
+  # ROL/step.cpp
+  ROL/algorithm.cpp
+  ROL/problem.cpp
+  ROL/solver.cpp
+  ROL/parameterlist.cpp
+  ROL/stdvector.cpp
+  ROL/vector.cpp)
+
+target_include_directories(_ROL PRIVATE ${ROL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} include)
+target_link_libraries(_ROL PRIVATE rol)
+set_target_properties(_ROL PROPERTIES COMPILE_DEFINITIONS "ENABLE_PYROL")
