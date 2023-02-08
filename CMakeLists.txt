@@ -63,5 +63,5 @@ pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/vector.cpp)
 
 target_include_directories(_ROL PRIVATE ${ROL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} include)
-target_link_libraries(_ROL PRIVATE rol)
+target_link_libraries(_ROL PRIVATE rol -lstdc++fs)
 set_target_properties(_ROL PROPERTIES COMPILE_DEFINITIONS "ENABLE_PYROL")
