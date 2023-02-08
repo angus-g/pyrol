@@ -30,13 +30,8 @@ set(ROL_stacktrace noop CACHE STRING "")
 set(ROL_ENABLE_EXAMPLES OFF CACHE BOOL "")
 set(ROL_ENABLE_TESTS OFF CACHE BOOL "")
 set(ROL_ENABLE_Sacado OFF CACHE BOOL "")
-
-
-# Only if MKL is being used 
-if (DEFINED $ENV{MKLROOT})
-   set(TPL_BLAS_LIBRARIES "$ENV{MKLROOT}/lib/intel64/libmkl_rt.so" CACHE STRING "")
-   set(TPL_LAPACK_LIBRARIES "$ENV{MKLROOT}/lib/intel64/libmkl_rt.so" CACHE STRING "")
-endif()
+set(TPL_BLAS_LIBRARIES "" CACHE STRING "")
+set(TPL_LAPACK_LIBRARIES "" CACHE STRING "")
 
 
 include(FetchContent)
