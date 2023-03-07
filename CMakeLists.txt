@@ -62,6 +62,18 @@ pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/stdvector.cpp
   ROL/vector.cpp)
 
+# Testing if we have filesystem
+try_compile(HAS_FS "${CMAKE_BINARY_DIR}/temp" 
+"${CMAKE_SOURCE_DIR}/tests/has_filesystem.cc" 
+            CMAKE_FLAGS -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON
+            LINK_LIBRARIES stdc++fs)
+
 target_include_directories(_ROL PRIVATE ${ROL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} include)
-target_link_libraries(_ROL PRIVATE rol -lstdc++fs)
+target_link_libraries(_ROL PRIVATE rol)
+if (HAS_FS)
+   target_link_libraries(_ROL PRIVATE -lstdc++fs)
+endif(HAS_FS)
 set_target_properties(_ROL PROPERTIES COMPILE_DEFINITIONS "ENABLE_PYROL")
+
+
+
