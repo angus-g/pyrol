@@ -1,3 +1,5 @@
+#ifndef _PYROL_VECTOR_HPP_
+#define _PYROL_VECTOR_HPP_
 // register polymorphic serialisation to binary archive
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/polymorphic.hpp>
@@ -142,3 +144,4 @@ void load(Archive &archive, cereal::memory_detail::PtrWrapper<std::shared_ptr<Py
 
 CEREAL_REGISTER_TYPE(PyVector);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ROL::Vector<double>, PyVector);
+#endif
