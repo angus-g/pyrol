@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.14)
 project(_ROL VERSION 0.4.0)
 
+# Required for std::filesystem
+set(CMAKE_CXX_STANDARD 17)
+
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)

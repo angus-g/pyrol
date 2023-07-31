@@ -12,6 +12,7 @@ PYBIND11_DECLARE_HOLDER_TYPE(T, py_shared_ptr<T>);
 #include <ROL_Secant.hpp>
 
 #include <fstream>
+#include <filesystem>
 #define FMT_HEADER_ONLY
 #include <fmt/core.h>
 
@@ -119,15 +120,17 @@ public:
   }
 };
 
-void serialise_secant(const ROL::Secant<double> &v, int rank) {
-  std::ofstream os(fmt::format("rol_secant_{}.cereal", rank), std::ios::binary);
+void serialise_secant(const ROL::Secant<double> &v, int rank, std::string checkpoint_dir) {
+  std::filesystem::path checkpoint_path(checkpoint_dir);
+  std::ofstream os(checkpoint_path.append(fmt::format("rol_secant_{}.cereal", rank)), std::ios::binary);
   cereal::BinaryOutputArchive oarchive(os);
 
   oarchive(v);
 }
 
-void load_secant(ROL::Secant<double> &v, int rank) {
-  std::ifstream is(fmt::format("rol_secant_{}.cereal", rank), std::ios::binary);
+void load_secant(ROL::Secant<double> &v, int rank, std::string checkpoint_dir) {
+  std::filesystem::path checkpoint_path(checkpoint_dir);
+  std::ifstream is(checkpoint_path.append(fmt::format("rol_secant_{}.cereal", rank)), std::ios::binary);
   cereal::BinaryInputArchive iarchive(is);
 
   iarchive(v);
@@ -135,9 +138,9 @@ void load_secant(ROL::Secant<double> &v, int rank) {
 
 void init_secant(py::module& m) {
   m.def("serialise_secant", &serialise_secant, "Serialise a ROL Secant using Cereal",
-	py::arg("secant"), py::arg("rank") = 0);
+	py::arg("secant"), py::arg("rank") = 0, py::arg("checkpoint_dir") = "");
   m.def("load_secant", &load_secant, "Load a ROL Secant from Cereal archive",
-	py::arg("secant"), py::arg("rank") = 0);
+	py::arg("secant"), py::arg("rank") = 0, py::arg("checkpoint_dir") = "");
 
   py::class_<ROL::Secant<double>, std::shared_ptr<ROL::Secant<double>>>(m, "Secant");
 

@@ -11,18 +11,21 @@ namespace py = pybind11;
 #include <ROL_Bounds.hpp>
 
 #include <fstream>
+#include <filesystem>
 #define FMT_HEADER_ONLY
 #include <fmt/core.h>
 
-void serialise_algorithm(const ROL::TypeB::Algorithm<double> &v, int rank) {
-  std::ofstream os(fmt::format("rol_typeb_algorithm_{}.cereal", rank), std::ios::binary);
+void serialise_algorithm(const ROL::TypeB::Algorithm<double> &v, int rank, std::string checkpoint_dir) {
+  std::filesystem::path checkpoint_path(checkpoint_dir);
+  std::ofstream os(checkpoint_path.append(fmt::format("rol_typeb_algorithm_{}.cereal", rank)), std::ios::binary);
   cereal::BinaryOutputArchive oarchive(os);
 
   oarchive(v);
 }
 
-void load_algorithm(ROL::TypeB::Algorithm<double> &v, int rank) {
-  std::ifstream is(fmt::format("rol_typeb_algorithm_{}.cereal", rank), std::ios::binary);
+void load_algorithm(ROL::TypeB::Algorithm<double> &v, int rank, std::string checkpoint_dir) {
+  std::filesystem::path checkpoint_path(checkpoint_dir);
+  std::ifstream is(checkpoint_path.append(fmt::format("rol_typeb_algorithm_{}.cereal", rank)), std::ios::binary);
   cereal::BinaryInputArchive iarchive(is);
 
   iarchive(v);
@@ -30,9 +33,9 @@ void load_algorithm(ROL::TypeB::Algorithm<double> &v, int rank) {
 
 void init_algorithm(py::module& m) {
   m.def("serialise_algorithm", &serialise_algorithm, "Serialise a ROL Algorithm using Cereal",
-	py::arg("algorithm"), py::arg("rank") = 0);
+	py::arg("algorithm"), py::arg("rank") = 0, py::arg("checkpoint_dir") = "");
   m.def("load_algorithm", &load_algorithm, "Load a ROL Algorithm from Cereal archive",
-	py::arg("algorithm"), py::arg("rank") = 0);
+	py::arg("algorithm"), py::arg("rank") = 0, py::arg("checkpoint_dir") = "");
 
   //
   // ROL::Algorithm<double>
