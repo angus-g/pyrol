@@ -1,6 +1,7 @@
 // register polymorphic serialisation to binary archive
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/polymorphic.hpp>
+#include <cereal/types/memory.hpp>
 
 #include <ROL_Vector.hpp>
 
@@ -126,7 +127,7 @@ void load(Archive &archive, cereal::memory_detail::PtrWrapper<std::shared_ptr<Py
 
     auto pickle = py::module_::import("pickle");
     std::string pickled;
-    archive(pickled);
+    archive(CEREAL_NVP_("data", pickled));
     auto loaded = pickle.attr("loads")(py::bytes(pickled));
 
     auto keep_alive = std::make_shared<py::object>(loaded);
