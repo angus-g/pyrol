@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
-project(_ROL VERSION 0.3.0)
+project(_ROL VERSION 0.4.0)
+
+# Required for std::filesystem
+set(CMAKE_CXX_STANDARD 17)
 
 # minimum cpp for using filesystem 
 set(CMAKE_CXX_STANDARD 17)
@@ -30,9 +33,9 @@ set(ROL_stacktrace noop CACHE STRING "")
 set(ROL_ENABLE_EXAMPLES OFF CACHE BOOL "")
 set(ROL_ENABLE_TESTS OFF CACHE BOOL "")
 set(ROL_ENABLE_Sacado OFF CACHE BOOL "")
+set(Trilinos_WARNINGS_AS_ERRORS_FLAGS "" CACHE STRING "")
 set(TPL_BLAS_LIBRARIES "" CACHE STRING "")
 set(TPL_LAPACK_LIBRARIES "" CACHE STRING "")
-
 
 include(FetchContent)
 FetchContent_Declare(Trilinos
@@ -54,10 +57,8 @@ pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/optimizationproblem.cpp
   ROL/optimizationsolver.cpp
   ROL/secant.cpp
-  # ROL/step.cpp
   ROL/algorithm.cpp
   ROL/problem.cpp
-  ROL/solver.cpp
   ROL/parameterlist.cpp
   ROL/stdvector.cpp
   ROL/vector.cpp)

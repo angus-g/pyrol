@@ -2,9 +2,10 @@
 #include <pybind11/stl.h>
 namespace py = pybind11;
 
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/polymorphic.hpp>
+
 #include <ROL_Objective.hpp>
-#include "py_shared_ptr.hpp"
-PYBIND11_DECLARE_HOLDER_TYPE(T, py_shared_ptr<T>);
 
 class PyObjective : public ROL::Objective<double> {
    public:
@@ -41,8 +42,7 @@ void init_objective(py::module &m) {
   //
   // ROL::Objective<double>
   //
-  py::class_<ROL::Objective<double>, PyObjective,
-    py_shared_ptr<ROL::Objective<double>>>
+  py::class_<ROL::Objective<double>, PyObjective, std::shared_ptr<ROL::Objective<double>>>
       objective(
           m, "Objective",
           "Base class for the objective class. Python objectives need to"
@@ -91,3 +91,6 @@ void init_objective(py::module &m) {
     .value("Trial", ROL::UpdateType::Trial)
     .value("Temp", ROL::UpdateType::Temp);
 }
+
+CEREAL_REGISTER_TYPE(PyObjective);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ROL::Objective<double>, PyObjective);

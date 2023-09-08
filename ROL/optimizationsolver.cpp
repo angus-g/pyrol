@@ -3,6 +3,8 @@ namespace py = pybind11;
 
 #include <map>
 
+#include <cereal/types/base_class.hpp>
+
 #include <ROL_OptimizationProblem.hpp>
 #include <ROL_OptimizationSolver.hpp>
 

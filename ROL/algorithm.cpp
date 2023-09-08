@@ -2,6 +2,8 @@
 namespace py = pybind11;
 
 #include <cereal/archives/binary.hpp>
+#include <cereal/types/polymorphic.hpp>
+#include <cereal/types/memory.hpp>
 
 #include "vector.hpp"
 
@@ -16,27 +18,37 @@ namespace py = pybind11;
 #define FMT_HEADER_ONLY
 #include <fmt/core.h>
 
-void serialise_algorithm(const ROL::TypeB::Algorithm<double> &v, int rank, std::string chdir="") {
-  std::filesystem::path checkpoint_path(chdir);
-  std::ofstream os(checkpoint_path.append(fmt::format("rol_typeb_algorithm_{0}.cereal", rank)), std::ios::binary);
+CEREAL_REGISTER_TYPE(ROL::TypeB::LinMoreAlgorithm<double>);
+
+void serialise_algorithm(const std::shared_ptr<ROL::TypeB::Algorithm<double>> &v, int rank, std::string checkpoint_dir) {
+  std::filesystem::path checkpoint_path(checkpoint_dir);
+  std::ofstream os(checkpoint_path.append(fmt::format("rol_typeb_algorithm_{}.cereal", rank)), std::ios::binary);
   cereal::BinaryOutputArchive oarchive(os);
 
   oarchive(v);
 }
 
-void load_algorithm(ROL::TypeB::Algorithm<double> &v, int rank, std::string chdir="") {
-  std::filesystem::path checkpoint_path(chdir);
-  std::ifstream is(checkpoint_path.append(fmt::format("rol_typeb_algorithm_{0}.cereal", rank)), std::ios::binary);
+std::shared_ptr<ROL::TypeB::Algorithm<double>> load_algorithm(int rank, std::string checkpoint_dir) {
+  std::filesystem::path checkpoint_path(checkpoint_dir);
+  std::ifstream is(checkpoint_path.append(fmt::format("rol_typeb_algorithm_{}.cereal", rank)), std::ios::binary);
   cereal::BinaryInputArchive iarchive(is);
 
+  std::shared_ptr<ROL::TypeB::Algorithm<double>> v;
   iarchive(v);
+  return v;
 }
 
 void init_algorithm(py::module& m) {
   m.def("serialise_algorithm", &serialise_algorithm, "Serialise a ROL Algorithm using Cereal",
+<<<<<<< HEAD
 	py::arg("algorithm"), py::arg("rank") = 0, py::arg("chdir") = "");
   m.def("load_algorithm", &load_algorithm, "Load a ROL Algorithm from Cereal archive",
 	py::arg("algorithm"), py::arg("rank") = 0, py::arg("chdir") = "");
+=======
+	py::arg("algorithm"), py::arg("rank") = 0, py::arg("checkpoint_dir") = "");
+  m.def("load_algorithm", &load_algorithm, "Load a ROL Algorithm from Cereal archive",
+	py::arg("rank") = 0, py::arg("checkpoint_dir") = "");
+>>>>>>> upstream/rol-2.0-checkpointing
 
   //
   // ROL::Algorithm<double>
@@ -70,10 +82,10 @@ void init_algorithm(py::module& m) {
 	 instance.run(x, l, obj, con, bnd, true, std::cout);
 	 });
 
-  py::class_<ROL::TypeB::Algorithm<double>>(m, "TypeBAlgorithm");
+  py::class_<ROL::TypeB::Algorithm<double>, std::shared_ptr<ROL::TypeB::Algorithm<double>>>(m, "TypeBAlgorithm");
 
   // ROL 2.0 TypeB algorithms
-  py::class_<ROL::TypeB::LinMoreAlgorithm<double>, ROL::TypeB::Algorithm<double>>(m, "LinMoreAlgorithm")
+  py::class_<ROL::TypeB::LinMoreAlgorithm<double>, ROL::TypeB::Algorithm<double>, std::shared_ptr<ROL::TypeB::LinMoreAlgorithm<double>>>(m, "LinMoreAlgorithm")
     .def(py::init<ROL::ParameterList&>())
     .def(py::init<ROL::ParameterList&, const std::shared_ptr<ROL::Secant<double>>&>())
     .def("setStatusTest", &ROL::TypeB::LinMoreAlgorithm<double>::setStatusTest)
@@ -81,15 +93,5 @@ void init_algorithm(py::module& m) {
 	 [](ROL::TypeB::LinMoreAlgorithm<double> &instance, ROL::Vector<double> &x,
 	    ROL::Objective<double> &obj, ROL::Bounds<double> &bnd) {
 	   instance.run(x, obj, bnd, std::cout);
-	 });
-
-  py::class_<ROL::TypeB::QuasiNewtonAlgorithm<double>, ROL::TypeB::Algorithm<double>>(m, "QuasiNewtonAlgorithm")
-    .def(py::init<ROL::ParameterList&>())
-    .def(py::init<ROL::ParameterList&, const std::shared_ptr<ROL::Secant<double>>&>())
-    .def("setStatusTest", &ROL::TypeB::QuasiNewtonAlgorithm<double>::setStatusTest)
-    .def("run",
-	 [](ROL::TypeB::QuasiNewtonAlgorithm<double> &instance, ROL::Vector<double> &x,
-	    ROL::Objective<double> &obj, ROL::Bounds<double> &bnd) {
-	   instance.run(x, obj, bnd,std::cout);
 	 });
 }
