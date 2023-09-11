@@ -12,6 +12,7 @@ namespace py = pybind11;
 #include <ROL_TypeB_QuasiNewtonAlgorithm.hpp>
 #include <ROL_Bounds.hpp>
 
+
 #include <fstream>
 #include <filesystem>
 #define FMT_HEADER_ONLY
@@ -39,9 +40,15 @@ std::shared_ptr<ROL::TypeB::Algorithm<double>> load_algorithm(int rank, std::str
 
 void init_algorithm(py::module& m) {
   m.def("serialise_algorithm", &serialise_algorithm, "Serialise a ROL Algorithm using Cereal",
+<<<<<<< HEAD
+	py::arg("algorithm"), py::arg("rank") = 0, py::arg("chdir") = "");
+  m.def("load_algorithm", &load_algorithm, "Load a ROL Algorithm from Cereal archive",
+	py::arg("algorithm"), py::arg("rank") = 0, py::arg("chdir") = "");
+=======
 	py::arg("algorithm"), py::arg("rank") = 0, py::arg("checkpoint_dir") = "");
   m.def("load_algorithm", &load_algorithm, "Load a ROL Algorithm from Cereal archive",
 	py::arg("rank") = 0, py::arg("checkpoint_dir") = "");
+>>>>>>> upstream/rol-2.0-checkpointing
 
   //
   // ROL::Algorithm<double>
