@@ -4,19 +4,21 @@ project(_ROL VERSION 0.4.0)
 # Required for std::filesystem
 set(CMAKE_CXX_STANDARD 17)
 
-# minimum cpp for using filesystem 
-set(CMAKE_CXX_STANDARD 17)
-
-
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-# making sure rpath is set correctly
+# Making sure we know where dynamic libraries are being isntalled
+execute_process(COMMAND python -m site --user-site
+                OUTPUT_VARIABLE PIP_INSTALL_DIR
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
    set(MACOSX_RPATH TRUE)
+   set_target_properties(_ROL PROPERTIES INSTALL_RPATH "@loader_path/;${PIP_INSTALL_DIR}")
 else()
    set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+   set_target_properties(_ROL PROPERTIES INSTALL_RPATH "${PIP_INSTALL_DIR}")
 endif()
 
 # options for Trilinos
