@@ -77,6 +77,8 @@ void init_algorithm(py::module& m) {
 
   py::class_<ROL::TypeB::Algorithm<double>, std::shared_ptr<ROL::TypeB::Algorithm<double>>>(m, "TypeBAlgorithm");
 
+  py::class_<ROL::TypeU::Algorithm<double>, std::shared_ptr<ROL::TypeU::Algorithm<double>>>(m, "TypeUAlgorithm");
+
   // ROL 2.0 TypeB algorithms
   py::class_<ROL::TypeB::LinMoreAlgorithm<double>, ROL::TypeB::Algorithm<double>, std::shared_ptr<ROL::TypeB::LinMoreAlgorithm<double>>>(m, "LinMoreAlgorithm")
     .def(py::init<ROL::ParameterList&>())
@@ -86,5 +88,17 @@ void init_algorithm(py::module& m) {
 	 [](ROL::TypeB::LinMoreAlgorithm<double> &instance, ROL::Vector<double> &x,
 	    ROL::Objective<double> &obj, ROL::Bounds<double> &bnd) {
 	   instance.run(x, obj, bnd, std::cout);
+	 });
+
+  py::class_<ROL::TypeU::LineSearchAlgorithm<double>, ROL::TypeU::Algorithm<double>, std::shared_ptr<ROL::TypeU::LineSearchAlgorithm<double>>>(m, "LineSearchAlgorithm")
+    .def(py::init<ROL::ParameterList&>())
+    .def(py::init<ROL::ParameterList&,
+	 const std::shared_ptr<ROL::Secant<double>>&,
+	 const std::shared_ptr<ROL::DescentDirection_U<double>>&>())
+    .def("setStatusTest", &ROL::TypeU::LineSearchAlgorithm<double>::setStatusTest)
+    .def("run",
+	 [](ROL::TypeU::LineSearchAlgorithm<double> &instance, ROL::Vector<double> &x,
+	    ROL::Objective<double> &obj) {
+	   instance.run(x, obj, std::cout);
 	 });
 }

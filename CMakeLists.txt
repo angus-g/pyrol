@@ -30,7 +30,7 @@ include(FetchContent)
 FetchContent_Declare(Trilinos
   GIT_REPOSITORY https://github.com/angus-g/Trilinos
   GIT_SHALLOW TRUE
-  GIT_TAG "pyrol-2.0-checkpointing")
+  GIT_TAG "pyrol-2.0-rebase")
 FetchContent_MakeAvailable(Trilinos)
 
 find_package(Boost)
@@ -46,6 +46,7 @@ pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/optimizationproblem.cpp
   ROL/optimizationsolver.cpp
   ROL/secant.cpp
+  ROL/descent.cpp
   ROL/algorithm.cpp
   ROL/problem.cpp
   ROL/parameterlist.cpp
