@@ -1,41 +1,30 @@
-README
-------
+pyrol
+=====
 
-We are wrapping [ROL](trilinos.org/packages/rol/) with pybind11. Please see [Issues](../../issues) to contribute proposals, tasks, bugs etc.
+pyrol is a wrapper for the Trilinos
+[ROL](https://trilinos.github.io/rol) library using
+[pybind11](https://github.com/pybind/pybind11). It also supports
+serialisation of in-progress optimisation using [cereal](https://github.com/USCiLab/cereal).
 
-
-Florian Wechsung (@florianwechsung)
-
-Chris Richardson (@chris_richardson)
-
-INSTALLATION
+Installation
 ------------
 
-PyROL needs to link to an installation of ROL which is part of the [Trilinos](https://github.com/trilinos/Trilinos) package.
-Since this is a C++ package, we need to do some rpath magic to make things work. If you're on linux you should install `patchelf` first, e.g. by 
-
-    sudo apt install patchelf
-
-Running 
-    
-    pip3 install roltrilinos
-
-will then install Trilinos with the proper options set.
-You can then either
-
-    pip3 install ROL
-
-or if you want to contribute to ROL, you simply run
-
-    git clone git@bitbucket.org:pyrol/pyrol.git
-    cd pyrol
-    git submodule update --init
-    pip3 install -e .
-
+pyrol will build a compatible version of the Trilinos shared library
+as part of its build process. For this, a C++ compiler, CMake, BLAS
+and LAPACK implementations are all required. With these components in
+place, installation should be as simple as `pip install`. For more
+complicated environments, CMake arguments can be provided through the
+`CMAKE_ARGS` environment variable.
 
 License
 -------
 
-PyROL is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-PyROL is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
-You should have received a copy of the GNU Lesser General Public License along with PyROL. If not, see <http://www.gnu.org/licenses/>.
+PyROL is free software: you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the
+Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.  PyROL is distributed in the hope that it
+will be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+the GNU Lesser General Public License for more details.  You should
+have received a copy of the GNU Lesser General Public License along
+with PyROL. If not, see <http://www.gnu.org/licenses/>.
