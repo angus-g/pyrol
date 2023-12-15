@@ -8,11 +8,13 @@ manylinux-x86_64-image = "manylinux_2_28"
 musllinux-x86_64-image = "musllinux_1_2"
 
 [tool.cibuildwheel.linux]
-before-all = "yum install -y openblas-devel"
+before-all = "yum install -y openblas-devel boost-devel"
+environment = {"CMAKE_ARGS" = "-DTPL_BLAS_LIBRARIES=/usr/lib64/libopenblas.so -DTPL_LAPACK_LIBRARIES=/usr/lib64/libopenblas.so"}
 
 [tool.cibuildwheel.macos]
 before-all = "sh tools/build_openblas.sh"
 
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
-before-all = "apk add openblas-dev"
+before-all = "apk add openblas-dev boost-dev"
+environment = {"CMAKE_ARGS" = "-DTPL_BLAS_LIBRARIES=/usr/lib/libopenblas.so -DTPL_LAPACK_LIBRARIES=/usr/lib/libopenblas.so"}
