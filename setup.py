@@ -57,7 +57,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='pyroltrilinos',
-    version='0.4.0',
+    version='0.5.0',
     author='Chris Richardson, Greg von Winckel, Florian Wechsung, Angus Gibson',
     author_email='angus@agibson.me',
     description='A python wrapper for the ROL package.',
