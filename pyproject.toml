@@ -1,3 +1,18 @@
 [build-system]
 requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
+
+[tool.cibuildwheel]
+archs = ["x86_64"]
+manylinux-x86_64-image = "manylinux_2_28"
+musllinux-x86_64-image = "musllinux_1_2"
+
+[tool.cibuildwheel.linux]
+before-all = "yum install -y openblas-devel"
+
+[tool.cibuildwheel.macos]
+before-all = "sh tools/build_openblas.sh"
+
+[[tool.cibuildwheel.overrides]]
+select = "*-musllinux*"
+before-all = "apk add openblas-dev"
