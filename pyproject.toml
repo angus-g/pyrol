@@ -13,6 +13,7 @@ environment = {"CMAKE_ARGS" = "-DTPL_BLAS_LIBRARIES=/usr/lib64/libopenblas.so -D
 
 [tool.cibuildwheel.macos]
 before-all = "sh tools/build_openblas.sh"
+environment = {"FC" = "gfortran-13", "CC" = "gcc-13", "CXX" = "g++-13"}
 
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
