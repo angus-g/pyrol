@@ -4,6 +4,7 @@ namespace py = pybind11;
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/types/memory.hpp>
+#include <cereal/types/vector.hpp>
 
 #include "vector.hpp"
 
