@@ -1,3 +1,21 @@
+[project]
+name = "pyroltrilinos"
+version = "0.5.0"
+description = "A Python wrapper for the ROL package"
+authors = [
+  {name = "Chris Richardson"},
+  {name = "Greg von Winckel"},
+  {name = "Florian Wechsung"},
+  {name = "Angus Gibson"},
+]
+maintainers = [
+  {name = "Angus Gibson"}
+]
+classifiers = [
+  "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+  "Programming Language :: Python :: 3",
+]
+
 [build-system]
 requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
