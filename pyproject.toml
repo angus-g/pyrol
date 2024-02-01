@@ -22,6 +22,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
 archs = ["x86_64"]
+skip = "cp36-*"
 build-frontend = "build"
 manylinux-x86_64-image = "manylinux_2_28"
 musllinux-x86_64-image = "musllinux_1_2"
