@@ -1,3 +1,4 @@
 recursive-include pybind11/ *
+recursive-include include/ *
 include ROL/*
 include CMakeLists.txt
