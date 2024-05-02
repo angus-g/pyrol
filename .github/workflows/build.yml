@@ -8,6 +8,9 @@ jobs:
     name: Build wheels
     runs-on: macos-14
     steps:
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
       - uses: actions/checkout@v4
         with:
           submodules: true
