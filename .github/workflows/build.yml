@@ -1,0 +1,14 @@
+name: Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_wheels:
+    name: Build wheels
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: pypa/cibuildwheel@v2.17.0
