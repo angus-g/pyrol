@@ -1,6 +1,6 @@
 [project]
 name = "pyroltrilinos"
-version = "0.5.1"
+version = "0.5.2"
 description = "A Python wrapper for the ROL package"
 authors = [
   {name = "Chris Richardson"},
@@ -22,13 +22,13 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
-archs = ["x86_64"]
 skip = "cp36-*"
 build-frontend = "build"
 manylinux-x86_64-image = "manylinux_2_28"
 musllinux-x86_64-image = "musllinux_1_2"
 
 [tool.cibuildwheel.linux]
+archs = ["native"]
 before-all = "yum install -y openblas-devel boost-devel"
 environment = {"CMAKE_ARGS" = "-DTPL_BLAS_LIBRARIES=/usr/lib64/libopenblas.so -DTPL_LAPACK_LIBRARIES=/usr/lib64/libopenblas.so"}
 
