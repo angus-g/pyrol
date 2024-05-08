@@ -76,7 +76,13 @@ void init_algorithm(py::module& m) {
 	 instance.run(x, l, obj, con, bnd, true, std::cout);
 	 });
 
-  py::class_<ROL::TypeB::Algorithm<double>, std::shared_ptr<ROL::TypeB::Algorithm<double>>>(m, "TypeBAlgorithm");
+  py::class_<ROL::TypeB::AlgorithmState<double>, ROL::AlgorithmState<double>, std::shared_ptr<ROL::TypeB::AlgorithmState<double>>>(m, "TypeBAlgorithmState")
+    .def_readonly("searchSize", &ROL::TypeB::AlgorithmState<double>::searchSize);
+
+  py::class_<ROL::TypeB::Algorithm<double>, std::shared_ptr<ROL::TypeB::Algorithm<double>>>(m, "TypeBAlgorithm")
+    .def("getState", [](ROL::TypeB::Algorithm<double> &instance) {
+      return std::const_pointer_cast<ROL::TypeB::AlgorithmState<double>>(instance.getState());
+    });
 
   // ROL 2.0 TypeB algorithms
   py::class_<ROL::TypeB::LinMoreAlgorithm<double>, ROL::TypeB::Algorithm<double>, std::shared_ptr<ROL::TypeB::LinMoreAlgorithm<double>>>(m, "LinMoreAlgorithm")
