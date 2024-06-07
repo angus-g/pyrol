@@ -7,7 +7,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-set(CMAKE_MACOSX_RPATH TRUE)
+if (APPLE)
+  # on OSX, @loader_path is relative to the
+  # directory for dylibs, which is essentially $ORIGIN
+  # on Linux
+  set(CMAKE_INSTALL_RPATH "@loader_path")
+endif()
+
 
 # options for Trilinos
 set(BUILD_SHARED_LIBS ON CACHE BOOL "")
