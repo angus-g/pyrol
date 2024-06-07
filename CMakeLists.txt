@@ -41,6 +41,7 @@ FetchContent_Declare(Trilinos
 FetchContent_MakeAvailable(Trilinos)
 
 find_package(Boost)
+find_package(Python COMPONENTS Interpreter Development)
 
 add_subdirectory(pybind11)
 pybind11_add_module(_ROL MODULE ROL/ROL.cpp
