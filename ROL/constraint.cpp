@@ -11,36 +11,54 @@ class PyConstraint : public ROL::Constraint<double> {
    public:
     void value(ROL::Vector<double> &c, const ROL::Vector<double> &x,
                double &tol) override {
-        PYBIND11_OVERLOAD_PURE(void, ROL::Constraint<double>, value, c, x, tol);
+      py::object dummy_c = py::cast(c, py::return_value_policy::reference);
+      py::object dummy_x = py::cast(x, py::return_value_policy::reference);
+
+      PYBIND11_OVERLOAD_PURE(void, ROL::Constraint<double>, value, c, x, tol);
     }
 
     virtual void applyJacobian(ROL::Vector<double> &jv,
                                const ROL::Vector<double> &v,
                                const ROL::Vector<double> &x,
                                double &tol) override {
-        PYBIND11_OVERLOAD(void, ROL::Constraint<double>, applyJacobian, jv, v,
-                          x, tol);
+      py::object dummy_jv = py::cast(jv, py::return_value_policy::reference);
+      py::object dummy_v = py::cast(v, py::return_value_policy::reference);
+      py::object dummy_x = py::cast(x, py::return_value_policy::reference);
+
+      PYBIND11_OVERLOAD(void, ROL::Constraint<double>, applyJacobian, jv, v,
+			x, tol);
     }
 
     virtual void applyAdjointJacobian(ROL::Vector<double> &ajv,
                                       const ROL::Vector<double> &v,
                                       const ROL::Vector<double> &x,
                                       double &tol) override {
-        PYBIND11_OVERLOAD(void, ROL::Constraint<double>, applyAdjointJacobian,
-                          ajv, v, x, tol);
+      py::object dummy_ajv = py::cast(ajv, py::return_value_policy::reference);
+      py::object dummy_v = py::cast(v, py::return_value_policy::reference);
+      py::object dummy_x = py::cast(x, py::return_value_policy::reference);
+
+      PYBIND11_OVERLOAD(void, ROL::Constraint<double>, applyAdjointJacobian,
+			ajv, v, x, tol);
     }
     virtual void applyAdjointHessian(ROL::Vector<double> &ahuv,
                                      const ROL::Vector<double> &u,
                                      const ROL::Vector<double> &v,
                                      const ROL::Vector<double> &x, double &tol) override {
-        PYBIND11_OVERLOAD(void, ROL::Constraint<double>, applyAdjointHessian,
-            ahuv, u, v, x, tol);
+      py::object dummy_ahuv = py::cast(ahuv, py::return_value_policy::reference);
+      py::object dummy_u = py::cast(u, py::return_value_policy::reference);
+      py::object dummy_v = py::cast(v, py::return_value_policy::reference);
+      py::object dummy_x = py::cast(x, py::return_value_policy::reference);
+
+      PYBIND11_OVERLOAD(void, ROL::Constraint<double>, applyAdjointHessian,
+			ahuv, u, v, x, tol);
       }
 
 
     virtual void update(const ROL::Vector<double> &x, bool flag = true,
                         int iter = -1) override {
-        PYBIND11_OVERLOAD(void, ROL::Constraint<double>, update, x, flag, iter);
+      py::object dummy_x = py::cast(x, py::return_value_policy::reference);
+
+      PYBIND11_OVERLOAD(void, ROL::Constraint<double>, update, x, flag, iter);
     }
 };
 
