@@ -4,46 +4,9 @@ project(_ROL VERSION 0.4.0)
 # Required for std::filesystem
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_SKIP_BUILD_RPATH FALSE)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-if (APPLE)
-  # on OSX, @loader_path is relative to the
-  # directory for dylibs, which is essentially $ORIGIN
-  # on Linux
-  set(CMAKE_INSTALL_RPATH "@loader_path")
-endif()
+find_package(Python COMPONENTS Interpreter Development REQUIRED)
+find_package(pybind11 CONFIG)
 
-
-# options for Trilinos
-set(BUILD_SHARED_LIBS ON CACHE BOOL "")
-set(TPL_ENABLE_MPI OFF CACHE BOOL "")
-set(Trilinos_INSTALL_LIBRARIES_AND_HEADERS OFF CACHE BOOL "")
-set(Trilinos_ENABLE_ALL_OPTIONAL_PACKAGES OFF CACHE BOOL "")
-set(Trilinos_ENABLE_TESTS OFF CACHE BOOL "")
-set(Trilinos_ENABLE_ROL ON CACHE BOOL "")
-set(Trilinos_ENABLE_EXPLICIT_INSTANTIATION ON CACHE BOOL "")
-set(ROL_ParameterList boost::property_tree CACHE STRING "")
-set(ROL_Ptr std::shared_ptr CACHE STRING "")
-set(ROL_stacktrace noop CACHE STRING "")
-set(ROL_ENABLE_EXAMPLES OFF CACHE BOOL "")
-set(ROL_ENABLE_TESTS OFF CACHE BOOL "")
-set(ROL_ENABLE_Sacado OFF CACHE BOOL "")
-set(Trilinos_WARNINGS_AS_ERRORS_FLAGS "" CACHE STRING "")
-set(TPL_BLAS_LIBRARIES "" CACHE STRING "")
-set(TPL_LAPACK_LIBRARIES "" CACHE STRING "")
-
-include(FetchContent)
-FetchContent_Declare(Trilinos
-  GIT_REPOSITORY https://github.com/angus-g/Trilinos
-  GIT_SHALLOW TRUE
-  GIT_TAG "pyrol-2.0-checkpointing")
-FetchContent_MakeAvailable(Trilinos)
-
-find_package(Boost)
-find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
-
-add_subdirectory(pybind11)
 pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/algorithmstate.cpp
   ROL/augmentedlagrangian.cpp
@@ -60,6 +23,6 @@ pybind11_add_module(_ROL MODULE ROL/ROL.cpp
   ROL/stdvector.cpp
   ROL/vector.cpp)
 
-target_include_directories(_ROL PRIVATE ${ROL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+#target_include_directories(_ROL PRIVATE ${ROL_INCLUDE_DIRS})
 target_link_libraries(_ROL PRIVATE rol)
-set_target_properties(_ROL PROPERTIES COMPILE_DEFINITIONS "ENABLE_PYROL")
+# set_target_properties(_ROL PROPERTIES COMPILE_DEFINITIONS "ENABLE_PYROL")
