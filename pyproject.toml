@@ -22,7 +22,7 @@ requires = ["setuptools>=61", "setuptools_scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
-skip = "pp* cp36-* cp37-*"
+skip = "pp*"
 build-frontend = "build"
 manylinux-x86_64-image = "manylinux_2_28"
 musllinux-x86_64-image = "musllinux_1_2"
@@ -35,7 +35,7 @@ environment = {"CMAKE_ARGS" = "-DTPL_BLAS_LIBRARIES=/usr/lib64/libopenblas.so -D
 [tool.cibuildwheel.macos]
 before-all = "sh tools/build_openblas.sh"
 before-build = "sh tools/build_boost.sh"
-environment = {"FC" = "gfortran-12", "CC" = "gcc-12", "CXX" = "g++-12"}
+environment = {"FC" = "gfortran-14", "CC" = "gcc-14", "CXX" = "g++-14"}
 
 [[tool.cibuildwheel.overrides]]
 select = "*-musllinux*"
