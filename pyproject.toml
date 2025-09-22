@@ -17,6 +17,9 @@ classifiers = [
 readme = "README.md"
 dynamic = ["version"]
 
+[project.urls]
+homepage = "https://github.com/angus-g/pyrol"
+
 [build-system]
 requires = ["setuptools>=61", "setuptools_scm>=8"]
 build-backend = "setuptools.build_meta"
